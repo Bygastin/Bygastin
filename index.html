@@ -317,6 +317,7 @@
 <div class="toast" id="toast" role="status"></div>
 
 <script>
+(() => {
   // ====== Editá tus proyectos acá ======
   // demo y code: poné la URL entre comillas cuando la tengas ('' = "próximamente")
   const projects = [
@@ -522,9 +523,9 @@
   }
 
   /* ---------- Botón volver arriba ---------- */
-  const top = $('to-top');
-  addEventListener('scroll', () => top.classList.toggle('show', scrollY > 600), { passive:true });
-  top.addEventListener('click', () => scrollTo({ top:0, behavior: reduced ? 'auto' : 'smooth' }));
+  const toTopBtn = $('to-top');
+  addEventListener('scroll', () => toTopBtn.classList.toggle('show', scrollY > 600), { passive:true });
+  toTopBtn.addEventListener('click', () => scrollTo({ top:0, behavior: reduced ? 'auto' : 'smooth' }));
 
   /* ---------- Código secreto (Konami) ---------- */
   const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
@@ -544,6 +545,7 @@
 
   $('year').textContent = new Date().getFullYear();
   renderFilters(); renderProjects(); renderGame();
+})();
 </script>
 </body>
 </html>
