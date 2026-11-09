@@ -5,70 +5,119 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gastón Román — Portafolio</title>
 <meta name="description" content="Portafolio de Gastón Román: juegos para navegador, Android y multijugador LAN, e historias para YouTube.">
+<script>
+  // Marca que hay JS y aplica el tema guardado antes de pintar (evita parpadeo)
+  document.documentElement.classList.add('js');
+  try { var t = localStorage.getItem('gr-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@500;700&display=swap">
 <style>
   :root{
-    --accent:#C6F432;
+    --accent:#C6F432; --accent-ink:#C6F432; --on-accent:#0E0F13;
     --bg:#0E0F13; --panel:#15171D; --panel2:#121419;
     --line:#22252F; --line2:#3A3E4C;
-    --text:#C9CCD6; --soft:#A9AEBD; --muted:#8B90A0; --white:#FFFFFF;
+    --text:#C9CCD6; --soft:#A9AEBD; --muted:#8B90A0; --strong:#FFFFFF;
+    --overlay:rgba(5,6,8,.72);
+  }
+  [data-theme="light"]{
+    --accent-ink:#3F6212;
+    --bg:#F6F6F1; --panel:#FFFFFF; --panel2:#FBFBF8;
+    --line:#E2E2DA; --line2:#C9C9BF;
+    --text:#2E3038; --soft:#4A4D57; --muted:#5F626C; --strong:#0E0F13;
+    --overlay:rgba(20,20,20,.45);
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:17px;line-height:1.6}
-  a{color:#E8EAF0}a:hover{color:var(--white)}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:17px;line-height:1.6;transition:background .25s ease,color .25s ease}
+  a{color:var(--strong)}
   .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
   .navlink{text-decoration:none;color:var(--text)}
-  .navlink:hover{color:var(--white)}
+  .navlink:hover,.navlink[aria-current="true"]{color:var(--strong)}
+  nav .navlink[aria-current="true"]{box-shadow:0 2px 0 var(--accent)}
   .mono{font-family:'JetBrains Mono',monospace}
-  .display{font-family:'Space Grotesk',sans-serif;color:var(--white);letter-spacing:-0.02em;margin:0}
+  .display{font-family:'Space Grotesk',sans-serif;color:var(--strong);letter-spacing:-0.02em;margin:0}
   section{border-top:1px solid var(--line)}
-  .kicker{margin:0;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent)}
+  .kicker{margin:0;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent-ink)}
   h2.display{font-size:48px;line-height:1.05}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
 
-  header{border-bottom:1px solid var(--line)}
-  header .wrap{padding-top:20px;padding-bottom:20px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
-  .brand{display:flex;gap:12px;align-items:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;color:var(--white);text-decoration:none}
-  .logo{display:inline-flex;width:36px;height:36px;border-radius:8px;align-items:center;justify-content:center;background:var(--accent);color:var(--bg);font-size:16px}
-  nav{display:flex;flex-wrap:wrap;gap:28px;font-size:15px;font-weight:500}
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px)}
+  header .wrap{padding-top:16px;padding-bottom:16px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+  .brand{display:flex;gap:12px;align-items:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;color:var(--strong);text-decoration:none}
+  .logo{display:inline-flex;width:36px;height:36px;border-radius:8px;align-items:center;justify-content:center;background:var(--accent);color:var(--on-accent);font-size:16px}
+  .nav-right{display:flex;flex-wrap:wrap;gap:24px;align-items:center}
+  nav{display:flex;flex-wrap:wrap;gap:24px;font-size:15px;font-weight:500}
+  .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;border:1px solid var(--line2);background:transparent;color:var(--strong);cursor:pointer}
 
   #inicio{border-top:0}
   .hero{padding-top:96px;padding-bottom:88px;display:flex;flex-wrap:wrap;gap:56px;align-items:flex-end}
   .hero-main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:28px}
   .hero h1{font-size:clamp(44px,7vw,92px);line-height:1;letter-spacing:-0.03em}
+  .rotator{color:var(--accent-ink);white-space:nowrap}
+  .caret{display:inline-block;width:.08em;height:.9em;background:var(--accent);vertical-align:-0.08em;margin-left:.06em;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
   .lead{margin:0;max-width:620px;font-size:19px;color:var(--soft)}
   .btns{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
   .btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:10px;font-weight:600;text-decoration:none;font-size:16px;font-family:inherit;cursor:pointer}
-  .btn-primary{background:var(--accent);color:var(--bg);border:1px solid var(--accent)}
-  .btn-primary:hover{color:var(--bg);filter:brightness(1.08)}
-  .btn-ghost{background:transparent;color:var(--white);border:1px solid var(--line2)}
+  .btn-primary{background:var(--accent);color:var(--on-accent);border:1px solid var(--accent)}
+  .btn-primary:hover{color:var(--on-accent);filter:brightness(1.08)}
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed;filter:none}
+  .btn-ghost{background:transparent;color:var(--strong);border:1px solid var(--line2)}
+  .btn-sm{min-height:44px;padding:0 16px;font-size:15px}
   .facts{flex:1 1 300px;min-width:0;border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:28px;display:flex;flex-direction:column;gap:18px}
   .fact{display:flex;flex-direction:column;gap:4px}
   .fact small{font-size:13px;color:var(--muted)}
-  .fact span{color:var(--white);font-weight:500}
+  .fact span{color:var(--strong);font-weight:500}
   .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:10px}
 
   .block{padding-top:88px;padding-bottom:88px;display:flex;flex-direction:column;gap:40px}
   .head-row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between}
   .head{display:flex;flex-direction:column;gap:10px}
+  .tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .search{min-height:44px;width:220px;max-width:100%;padding:0 14px;border-radius:999px;border:1px solid var(--line2);background:var(--panel);color:var(--strong);font:500 15px Inter,system-ui,sans-serif}
+  .search::placeholder{color:var(--muted)}
   .filters{display:flex;flex-wrap:wrap;gap:8px}
   .pill{min-height:44px;padding:0 18px;border-radius:999px;font:500 15px Inter,system-ui,sans-serif;cursor:pointer;background:transparent;color:var(--text);border:1px solid var(--line2)}
-  .pill[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+  .pill[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  .empty{padding:40px;border:1px dashed var(--line2);border-radius:16px;color:var(--muted);text-align:center}
 
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px}
-  .card{border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s ease,border-color .2s ease}
+  .card{border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s ease,border-color .2s ease;text-align:left;padding:0;font:inherit;color:inherit;cursor:pointer;width:100%}
   .card:hover{transform:translateY(-4px);border-color:var(--line2)}
-  .thumb{position:relative;overflow:hidden;height:180px;display:flex;align-items:flex-end;justify-content:space-between;padding:20px}
+  .thumb{position:relative;overflow:hidden;height:180px;display:flex;align-items:flex-end;justify-content:space-between;padding:20px;width:100%}
   .thumb::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:24px 24px;pointer-events:none}
   .num{position:relative;z-index:1;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:64px;line-height:.9;color:rgba(255,255,255,.92)}
-  .status{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(14,15,19,.72);color:var(--white)}
+  .status{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(14,15,19,.72);color:#FFFFFF}
   .card-body{padding:24px;display:flex;flex-direction:column;gap:12px;flex-grow:1}
-  .card-body h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:24px;color:var(--white)}
-  .card-body p{margin:0;font-size:15px;color:var(--soft);flex-grow:1}
+  .c-title{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;line-height:1.2;color:var(--strong)}
+  .c-desc{display:block;font-size:15px;color:var(--soft);flex-grow:1}
+  .more{font-size:14px;font-weight:600;color:var(--accent-ink)}
   .tags{display:flex;flex-wrap:wrap;gap:8px;padding-top:4px}
-  .tag{font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid #2C303B;color:var(--text)}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid var(--line2);color:var(--text)}
+
+  dialog{border:1px solid var(--line2);border-radius:18px;background:var(--panel);color:var(--text);padding:0;width:min(640px,calc(100vw - 32px));max-height:calc(100vh - 48px)}
+  dialog::backdrop{background:var(--overlay)}
+  .modal-thumb{height:160px}
+  .modal-body{padding:28px;display:flex;flex-direction:column;gap:16px}
+  .modal-body h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:32px;color:var(--strong);line-height:1.1}
+  .modal-body p{margin:0;color:var(--soft)}
+  .modal-body ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+  .modal-close{position:absolute;top:14px;right:14px;z-index:2;background:rgba(14,15,19,.72);color:#FFF;border-color:transparent}
+
+  .game{display:flex;flex-wrap:wrap;gap:24px;align-items:stretch}
+  .game-main{flex:1 1 300px;min-width:0;border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:28px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+  .shroom{width:160px;height:160px;border-radius:50%;border:1px solid var(--line2);background:var(--panel2);color:var(--accent-ink);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .08s ease}
+  .shroom:active{transform:scale(.94)}
+  .count{font-family:'Space Grotesk',sans-serif;font-size:44px;font-weight:700;color:var(--strong);line-height:1}
+  .rate{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)}
+  .upgrades{flex:999 1 420px;min-width:0;display:flex;flex-direction:column;gap:14px}
+  .upgrade{border:1px solid var(--line);border-radius:14px;background:var(--panel2);padding:18px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+  .upgrade h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:18px;color:var(--strong)}
+  .upgrade p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+  .pop{position:fixed;pointer-events:none;font:700 18px 'Space Grotesk',sans-serif;color:var(--accent-ink);animation:pop .7s ease-out forwards;z-index:50}
+  @keyframes pop{to{transform:translateY(-48px);opacity:0}}
 
   .about{padding-top:88px;padding-bottom:88px;display:flex;flex-wrap:wrap;gap:56px}
   .about-head{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:10px}
@@ -77,7 +126,7 @@
 
   .skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
   .skill{border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:14px;background:var(--panel2)}
-  .skill h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:20px;color:var(--white)}
+  .skill h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:20px;color:var(--strong)}
   .skill ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:15px}
   .skill li{display:flex;gap:10px;align-items:center}
   .skill li::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--accent);flex:none}
@@ -89,11 +138,25 @@
   footer{border-top:1px solid var(--line)}
   footer .wrap{padding-top:28px;padding-bottom:28px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:14px;color:var(--muted)}
 
+  .to-top{position:fixed;right:20px;bottom:20px;z-index:30;width:48px;height:48px;border-radius:12px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .2s ease,transform .2s ease}
+  .to-top.show{opacity:1;pointer-events:auto;transform:none}
+  .toast{position:fixed;left:50%;bottom:24px;z-index:60;transform:translate(-50%,20px);opacity:0;background:var(--strong);color:var(--bg);padding:12px 20px;border-radius:999px;font-weight:600;font-size:15px;transition:opacity .25s ease,transform .25s ease;pointer-events:none}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  .js .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+  .js .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .js .reveal{opacity:1;transform:none;transition:none}
+    .caret{animation:none}
+    .card,.card:hover{transform:none}
+  }
   @media (max-width:600px){
     .wrap{padding:0 20px}
     .hero{padding-top:64px;padding-bottom:64px}
     h2.display{font-size:36px}
     .grid{grid-template-columns:1fr}
+    .search{width:100%}
   }
 </style>
 </head>
@@ -102,12 +165,18 @@
 <header>
   <div class="wrap">
     <a href="#inicio" class="brand"><span class="logo">GR</span><span>Gastón Román</span></a>
-    <nav aria-label="Secciones">
-      <a href="#proyectos" class="navlink">Proyectos</a>
-      <a href="#sobre-mi" class="navlink">Sobre mí</a>
-      <a href="#habilidades" class="navlink">Habilidades</a>
-      <a href="#contacto" class="navlink">Contacto</a>
-    </nav>
+    <div class="nav-right">
+      <nav aria-label="Secciones">
+        <a href="#proyectos" class="navlink" data-sec="proyectos">Proyectos</a>
+        <a href="#probar" class="navlink" data-sec="probar">Probá</a>
+        <a href="#sobre-mi" class="navlink" data-sec="sobre-mi">Sobre mí</a>
+        <a href="#habilidades" class="navlink" data-sec="habilidades">Habilidades</a>
+        <a href="#contacto" class="navlink" data-sec="contacto">Contacto</a>
+      </nav>
+      <button type="button" class="icon-btn" id="theme" aria-label="Cambiar a tema claro">
+        <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+      </button>
+    </div>
   </div>
 </header>
 
@@ -116,20 +185,21 @@
   <div class="wrap hero">
     <div class="hero-main">
       <p class="kicker" style="letter-spacing:.08em;text-transform:uppercase">Desarrollo de juegos · Historias en video</p>
-      <h1 class="display">Hago juegos que se juegan en el navegador, en el celu y en la red de tu casa.</h1>
+      <h1 class="display">Hago juegos que se juegan <span class="rotator" id="rotator">en el navegador</span><span class="caret" aria-hidden="true"></span></h1>
       <p class="lead">Diseño y programo juegos incrementales, de carreras y de acción, y escribo historias para YouTube con personajes propios. Acá está lo que vengo construyendo.</p>
       <div class="btns" style="padding-top:8px">
         <a href="#proyectos" class="btn btn-primary">Ver proyectos
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
         </a>
-        <a href="#contacto" class="btn btn-ghost">Contactarme</a>
+        <a href="#probar" class="btn btn-ghost">Jugar el mini idle</a>
       </div>
     </div>
-    <aside class="facts" aria-label="Ficha rápida">
+    <aside class="facts reveal" aria-label="Ficha rápida">
       <p class="mono" style="margin:0;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Ficha rápida</p>
       <div class="fact"><small>Base</small><span>[TU CIUDAD, PAÍS]</span></div>
       <div class="fact"><small>Foco</small><span>Juegos HTML, Android y multijugador LAN</span></div>
       <div class="fact"><small>Disponible para</small><span><i class="dot" aria-hidden="true"></i>[COLABORACIONES / TRABAJOS]</span></div>
+      <div class="fact"><small>Proyectos</small><span id="proj-count">6 en marcha</span></div>
     </aside>
   </div>
 </section>
@@ -141,16 +211,41 @@
         <p class="kicker">01 — Proyectos</p>
         <h2 class="display">Lo que estoy construyendo</h2>
       </div>
-      <div class="filters" role="group" aria-label="Filtrar proyectos" id="filters"></div>
+      <div class="tools">
+        <label for="q" class="mono" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Buscar proyectos</label>
+        <input id="q" class="search" type="search" placeholder="Buscar proyecto…" autocomplete="off">
+        <div class="filters" role="group" aria-label="Filtrar proyectos" id="filters"></div>
+      </div>
     </div>
-    <div class="grid" id="projects"></div>
+    <div class="grid" id="projects" aria-live="polite"></div>
+  </div>
+</section>
+
+<section id="probar">
+  <div class="wrap block">
+    <div class="head">
+      <p class="kicker">02 — Probá algo</p>
+      <h2 class="display">Mini Micelio</h2>
+      <p class="lead">Un idle de bolsillo, inspirado en Micelio. Tocá el hongo para juntar esporas y comprá mejoras para que crezca solo. Tu progreso queda guardado en este navegador.</p>
+    </div>
+    <div class="game reveal">
+      <div class="game-main">
+        <button type="button" class="shroom" id="shroom" aria-label="Tocar el hongo para sumar esporas">
+          <svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 7 0 0 1 18 0z"/><path d="M9 11v6a3 3 0 0 0 6 0v-6"/><circle cx="8" cy="7.5" r="1"/><circle cx="14" cy="6" r="1"/><circle cx="16.5" cy="9" r="0.6"/></svg>
+        </button>
+        <div class="count" id="spores">0</div>
+        <div class="rate" id="rate">esporas · 1 por toque · 0 por segundo</div>
+        <button type="button" class="btn btn-ghost btn-sm" id="reset">Empezar de cero</button>
+      </div>
+      <div class="upgrades" id="upgrades"></div>
+    </div>
   </div>
 </section>
 
 <section id="sobre-mi">
-  <div class="wrap about">
+  <div class="wrap about reveal">
     <div class="about-head">
-      <p class="kicker">02 — Sobre mí</p>
+      <p class="kicker">03 — Sobre mí</p>
       <h2 class="display">Ideas que se pueden jugar</h2>
     </div>
     <div class="about-text">
@@ -164,16 +259,16 @@
 <section id="habilidades">
   <div class="wrap block">
     <div class="head">
-      <p class="kicker">03 — Habilidades</p>
+      <p class="kicker">04 — Habilidades</p>
       <h2 class="display">Con qué trabajo</h2>
     </div>
-    <div class="skills" id="skills"></div>
+    <div class="skills reveal" id="skills"></div>
   </div>
 </section>
 
 <section id="contacto">
-  <div class="wrap contact">
-    <p class="kicker">04 — Contacto</p>
+  <div class="wrap contact reveal">
+    <p class="kicker">05 — Contacto</p>
     <h2 class="display">¿Armamos algo juntos?</h2>
     <p class="lead" style="max-width:560px">Si tenés una idea de juego, una colaboración o querés probar algo que hice, escribime.</p>
     <div class="btns">
@@ -186,7 +281,7 @@
     <div class="socials">
       <!-- Reemplazá el # por tus links reales -->
       <a href="#" class="navlink">YouTube: [TU CANAL]</a>
-      <a href="#" class="navlink">GitHub: [TU USUARIO]</a>
+      <a href="https://github.com/Bygastin" class="navlink">GitHub: Bygastin</a>
       <a href="#" class="navlink">itch.io: [TU PERFIL]</a>
     </div>
   </div>
@@ -196,31 +291,59 @@
 <footer>
   <div class="wrap">
     <span>© <span id="year">2026</span> Gastón Román</span>
-    <a href="#inicio" class="navlink">Volver arriba ↑</a>
+    <span class="mono" style="font-size:12px">Pista: ↑ ↑ ↓ ↓ ← → ← → B A</span>
   </div>
 </footer>
 
+<dialog id="modal" aria-labelledby="m-title">
+  <div style="position:relative">
+    <button type="button" class="icon-btn modal-close" id="m-close" aria-label="Cerrar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="thumb modal-thumb" id="m-thumb"><span class="num" id="m-num"></span><span class="status" id="m-status"></span></div>
+    <div class="modal-body">
+      <h3 id="m-title"></h3>
+      <p id="m-desc"></p>
+      <ul id="m-feats"></ul>
+      <div class="tags" id="m-tags"></div>
+      <div class="btns" id="m-links" style="padding-top:6px"></div>
+    </div>
+  </div>
+</dialog>
+
+<button type="button" class="to-top" id="to-top" aria-label="Volver arriba">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg>
+</button>
+<div class="toast" id="toast" role="status"></div>
+
 <script>
   // ====== Editá tus proyectos acá ======
+  // demo y code: poné la URL entre comillas cuando la tengas ('' = "próximamente")
   const projects = [
     { num:'01', title:'Micelio', bg:'#1E4D3A', status:'En desarrollo', cats:['web'],
       desc:'Juego incremental en HTML: un hongo que crece, suelta esporas y se expande. Mejoras, prestigio y niveles para seguir avanzando.',
-      tags:['HTML','JavaScript','Idle'] },
+      feats:['Mejoras para crecer más rápido','Sistema de prestigio','Niveles de progreso'],
+      tags:['HTML','JavaScript','Idle'], demo:'', code:'' },
     { num:'02', title:'Carreras LAN', bg:'#6B2A1F', status:'En desarrollo', cats:['web'],
       desc:'Juego de carreras con gráficos en HD y multijugador por red local. Cada auto tiene su propio sonido y varias skins para elegir.',
-      tags:['Multijugador','LAN','Carreras'] },
+      feats:['Multijugador en red local','Sonido distinto para cada auto','Skins para personalizar'],
+      tags:['Multijugador','LAN','Carreras'], demo:'', code:'' },
     { num:'03', title:'Shooter 3D', bg:'#2A3550', status:'En desarrollo', cats:['web'],
       desc:'Shooter en primera persona hecho en HTML, de estilo táctico: modelos 3D y armas con disparo y daño.',
-      tags:['3D','FPS','HTML'] },
+      feats:['Modelos 3D','Armas con disparo y daño','Se juega en el navegador'],
+      tags:['3D','FPS','HTML'], demo:'', code:'' },
     { num:'04', title:'Idle para Android', bg:'#4A2F63', status:'En desarrollo', cats:['movil'],
       desc:'Juego incremental inactivo para Android, con mecánicas propias que no vas a encontrar en otros idle.',
-      tags:['Android','Idle','Móvil'] },
+      feats:['Progreso mientras no jugás','Funciones únicas'],
+      tags:['Android','Idle','Móvil'], demo:'', code:'' },
     { num:'05', title:'Aprender a programar jugando', bg:'#5A4A16', status:'En diseño', cats:[],
       desc:'Un juego que enseña conceptos de programación a través de una historia, para aprender sin sentir que es una clase.',
-      tags:['Narrativa','Educativo'] },
+      feats:['Conceptos de programación contados como historia','Visual e interactivo'],
+      tags:['Narrativa','Educativo'], demo:'', code:'' },
     { num:'06', title:'La Banda del Barrio', bg:'#1F4E5C', status:'Serie en curso', cats:['video'],
       desc:'Serie de videos para YouTube creada con prompts, con Toño, Camperita, Pika y Javier como protagonistas.',
-      tags:['YouTube','Prompts','Historias'] }
+      feats:['Personajes: Toño, Camperita, Pika y Javier','Historias armadas con prompts'],
+      tags:['YouTube','Prompts','Historias'], demo:'', code:'' }
   ];
   const filters = [
     { id:'todos', label:'Todos' },
@@ -234,45 +357,193 @@
     { area:'Móvil', items:['Juegos para Android','Progreso inactivo','Diseño de mejoras y prestigio'] },
     { area:'Historias', items:['Guiones con prompts','Personajes propios','Narrativa educativa'] }
   ];
+  const rotatorWords = ['en el navegador','en el celu','en la red de tu casa'];
   // =====================================
 
+  const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  let current = 'todos';
+  const store = {
+    get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+  };
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  function toast(msg){
+    const t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  /* ---------- Tema claro / oscuro ---------- */
+  const SUN = '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+  const MOON = '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+  function paintTheme(){
+    const light = document.documentElement.dataset.theme === 'light';
+    $('theme-icon').innerHTML = light ? MOON : SUN;
+    $('theme').setAttribute('aria-label', light ? 'Cambiar a tema oscuro' : 'Cambiar a tema claro');
+  }
+  $('theme').addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = next; store.set('gr-theme', next);
+    document.documentElement.style.setProperty('--accent-ink', next === 'light' ? '' : getComputedStyle(document.documentElement).getPropertyValue('--accent'));
+    if (next === 'light') document.documentElement.style.removeProperty('--accent-ink');
+    paintTheme();
+  });
+  paintTheme();
+
+  /* ---------- Texto que escribe solo ---------- */
+  (function(){
+    const el = $('rotator'); if (reduced) return;
+    let w = 0, i = rotatorWords[0].length, deleting = true;
+    setTimeout(function tick(){
+      const word = rotatorWords[w];
+      if (deleting){ i--; if (i <= 0){ deleting = false; w = (w + 1) % rotatorWords.length; } }
+      else { i++; if (i >= rotatorWords[w].length){ deleting = true; el.textContent = rotatorWords[w]; return setTimeout(tick, 2200); } }
+      el.textContent = rotatorWords[w].slice(0, Math.max(i,0)) || ' ';
+      setTimeout(tick, deleting ? 45 : 80);
+    }, 2200);
+  })();
+
+  /* ---------- Proyectos: filtro, búsqueda y detalle ---------- */
+  let current = 'todos', query = '';
+  $('proj-count').textContent = projects.length + ' en marcha';
   function renderFilters(){
-    document.getElementById('filters').innerHTML = filters.map(f =>
-      `<button type="button" class="pill" data-id="${f.id}" aria-pressed="${f.id===current}">${esc(f.label)}</button>`
-    ).join('');
+    $('filters').innerHTML = filters.map(f =>
+      `<button type="button" class="pill" data-id="${f.id}" aria-pressed="${f.id===current}">${esc(f.label)}</button>`).join('');
   }
   function renderProjects(){
-    const list = current==='todos' ? projects : projects.filter(p => p.cats.includes(current));
-    document.getElementById('projects').innerHTML = list.map(p => `
-      <article class="card">
-        <div class="thumb" style="background:${p.bg}">
-          <span class="num">${esc(p.num)}</span>
-          <span class="status">${esc(p.status)}</span>
-        </div>
-        <div class="card-body">
-          <h3>${esc(p.title)}</h3>
-          <p>${esc(p.desc)}</p>
-          <div class="tags">${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
-        </div>
-      </article>`).join('');
+    const q = query.trim().toLowerCase();
+    const list = projects
+      .map((p, idx) => ({ p, idx }))
+      .filter(({p}) => current === 'todos' || p.cats.includes(current))
+      .filter(({p}) => !q || (p.title + ' ' + p.desc + ' ' + p.tags.join(' ')).toLowerCase().includes(q));
+    $('projects').innerHTML = list.length ? list.map(({p, idx}) => `
+      <button type="button" class="card" data-idx="${idx}" aria-label="Ver detalles de ${esc(p.title)}">
+        <span class="thumb" style="background:${p.bg}"><span class="num">${esc(p.num)}</span><span class="status">${esc(p.status)}</span></span>
+        <span class="card-body">
+          <span class="c-title">${esc(p.title)}</span>
+          <span class="c-desc">${esc(p.desc)}</span>
+          <span class="tags">${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</span>
+          <span class="more">Ver detalles →</span>
+        </span>
+      </button>`).join('') : `<div class="empty">No hay proyectos que coincidan con “${esc(query)}”.</div>`;
   }
-  document.getElementById('filters').addEventListener('click', e => {
-    const b = e.target.closest('.pill'); if(!b) return;
+  $('filters').addEventListener('click', e => {
+    const b = e.target.closest('.pill'); if (!b) return;
     current = b.dataset.id; renderFilters(); renderProjects();
   });
-  document.getElementById('skills').innerHTML = skills.map(s => `
+  $('q').addEventListener('input', e => { query = e.target.value; renderProjects(); });
+  $('projects').addEventListener('click', e => {
+    const c = e.target.closest('.card'); if (c) openProject(+c.dataset.idx);
+  });
+
+  const modal = $('modal');
+  function openProject(i){
+    const p = projects[i];
+    $('m-thumb').style.background = p.bg;
+    $('m-num').textContent = p.num; $('m-status').textContent = p.status;
+    $('m-title').textContent = p.title; $('m-desc').textContent = p.desc;
+    $('m-feats').innerHTML = p.feats.map(f => `<li>${esc(f)}</li>`).join('');
+    $('m-tags').innerHTML = p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('');
+    const link = (url, label, primary) => url
+      ? `<a class="btn ${primary ? 'btn-primary' : 'btn-ghost'} btn-sm" href="${esc(url)}" target="_blank" rel="noopener">${label}</a>`
+      : `<span class="btn btn-ghost btn-sm" style="cursor:default;color:var(--muted)">${label}: próximamente</span>`;
+    $('m-links').innerHTML = link(p.demo, 'Jugar demo', true) + link(p.code, 'Ver código', false);
+    if (modal.showModal) modal.showModal(); else modal.setAttribute('open', '');
+  }
+  $('m-close').addEventListener('click', () => modal.close ? modal.close() : modal.removeAttribute('open'));
+  modal.addEventListener('click', e => { if (e.target === modal) modal.close(); });
+
+  /* ---------- Mini Micelio (idle) ---------- */
+  const fresh = () => ({ spores:0, hifas:0, dobles:0, total:0 });
+  let g = fresh();
+  try { g = Object.assign(fresh(), JSON.parse(store.get('gr-micelio') || '{}')); } catch(e){}
+  const upgrades = [
+    { id:'hifas', name:'Hifas', info:'+1 espora por segundo', base:10, mult:1.5 },
+    { id:'dobles', name:'Esporas dobles', info:'+1 espora por toque', base:40, mult:2.2 }
+  ];
+  const cost = u => Math.floor(u.base * Math.pow(u.mult, g[u.id]));
+  const perClick = () => 1 + g.dobles;
+  const perSec = () => g.hifas;
+  const fmt = n => Math.floor(n).toLocaleString('es-AR');
+  function renderGame(){
+    $('spores').textContent = fmt(g.spores);
+    $('rate').textContent = `esporas · ${perClick()} por toque · ${perSec()} por segundo`;
+    $('upgrades').innerHTML = upgrades.map(u => `
+      <div class="upgrade">
+        <div><h3>${u.name} <span class="mono" style="font-size:13px;color:var(--muted)">× ${g[u.id]}</span></h3><p>${u.info}</p></div>
+        <button type="button" class="btn btn-primary btn-sm" data-up="${u.id}" ${g.spores < cost(u) ? 'disabled' : ''}>Comprar · ${fmt(cost(u))}</button>
+      </div>`).join('') + `<p class="rate" style="margin:4px 0 0">Esporas juntadas en total: ${fmt(g.total)}</p>`;
+  }
+  const save = () => store.set('gr-micelio', JSON.stringify(g));
+  function gain(n){
+    const before = Math.floor(g.total / 100);
+    g.spores += n; g.total += n;
+    if (Math.floor(g.total / 100) > before) toast('¡' + fmt(Math.floor(g.total / 100) * 100) + ' esporas juntadas!');
+  }
+  $('shroom').addEventListener('click', e => {
+    gain(perClick()); renderGame(); save();
+    if (!reduced){
+      const s = document.createElement('span'); s.className = 'pop'; s.textContent = '+' + perClick();
+      const r = e.currentTarget.getBoundingClientRect();
+      s.style.left = (e.clientX || r.left + r.width/2) - 10 + 'px';
+      s.style.top = (e.clientY || r.top + r.height/2) - 20 + 'px';
+      document.body.appendChild(s); setTimeout(() => s.remove(), 700);
+    }
+  });
+  $('upgrades').addEventListener('click', e => {
+    const b = e.target.closest('[data-up]'); if (!b) return;
+    const u = upgrades.find(x => x.id === b.dataset.up);
+    if (g.spores >= cost(u)){ g.spores -= cost(u); g[u.id]++; renderGame(); save(); }
+  });
+  $('reset').addEventListener('click', () => { g = fresh(); renderGame(); save(); toast('Micelio reiniciado'); });
+  setInterval(() => { if (perSec()){ gain(perSec()); renderGame(); save(); } }, 1000);
+
+  /* ---------- Habilidades ---------- */
+  $('skills').innerHTML = skills.map(s => `
     <div class="skill"><h3>${esc(s.area)}</h3><ul>${s.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></div>`).join('');
 
-  document.getElementById('copy').addEventListener('click', async e => {
+  /* ---------- Copiar email ---------- */
+  $('copy').addEventListener('click', async e => {
     try { await navigator.clipboard.writeText('gastonroman41@gmail.com'); e.target.textContent = 'Copiado ✓'; }
     catch { e.target.textContent = 'Copialo a mano'; }
   });
-  document.getElementById('year').textContent = new Date().getFullYear();
 
-  renderFilters(); renderProjects();
+  /* ---------- Animación al hacer scroll + menú activo ---------- */
+  if ('IntersectionObserver' in window){
+    const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } }), { threshold:.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    const links = document.querySelectorAll('nav .navlink');
+    const spy = new IntersectionObserver(es => es.forEach(en => {
+      if (en.isIntersecting) links.forEach(l => l.setAttribute('aria-current', l.dataset.sec === en.target.id ? 'true' : 'false'));
+    }), { rootMargin:'-45% 0px -50% 0px' });
+    document.querySelectorAll('main section[id]').forEach(s => spy.observe(s));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
+  }
+
+  /* ---------- Botón volver arriba ---------- */
+  const top = $('to-top');
+  addEventListener('scroll', () => top.classList.toggle('show', scrollY > 600), { passive:true });
+  top.addEventListener('click', () => scrollTo({ top:0, behavior: reduced ? 'auto' : 'smooth' }));
+
+  /* ---------- Código secreto (Konami) ---------- */
+  const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  const palette = ['#C6F432','#5EEAD4','#FDBA74','#A5B4FC','#F9A8D4'];
+  let kpos = 0, pidx = 0;
+  addEventListener('keydown', e => {
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    kpos = (k === konami[kpos]) ? kpos + 1 : (k === konami[0] ? 1 : 0);
+    if (kpos === konami.length){
+      kpos = 0; pidx = (pidx + 1) % palette.length;
+      document.documentElement.style.setProperty('--accent', palette[pidx]);
+      if (document.documentElement.dataset.theme !== 'light') document.documentElement.style.setProperty('--accent-ink', palette[pidx]);
+      gain(500); renderGame(); save();
+      toast('¡Código secreto! Nuevo color y +500 esporas');
+    }
+  });
+
+  $('year').textContent = new Date().getFullYear();
+  renderFilters(); renderProjects(); renderGame();
 </script>
 </body>
 </html>
