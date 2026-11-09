@@ -320,27 +320,28 @@
 (() => {
   // ====== Editá tus proyectos acá ======
   // demo y code: poné la URL entre comillas cuando la tengas ('' = "próximamente")
+  const REPO = 'https://github.com/Bygastin/Bygastin/tree/main/demos/';
   const projects = [
-    { num:'01', title:'Micelio', bg:'#1E4D3A', status:'En desarrollo', cats:['web'],
+    { num:'01', title:'Micelio', bg:'#1E4D3A', status:'Demo jugable', cats:['web'],
       desc:'Juego incremental en HTML: un hongo que crece, suelta esporas y se expande. Mejoras, prestigio y niveles para seguir avanzando.',
       feats:['Mejoras para crecer más rápido','Sistema de prestigio','Niveles de progreso'],
-      tags:['HTML','JavaScript','Idle'], demo:'', code:'' },
-    { num:'02', title:'Carreras LAN', bg:'#6B2A1F', status:'En desarrollo', cats:['web'],
-      desc:'Juego de carreras con gráficos en HD y multijugador por red local. Cada auto tiene su propio sonido y varias skins para elegir.',
-      feats:['Multijugador en red local','Sonido distinto para cada auto','Skins para personalizar'],
-      tags:['Multijugador','LAN','Carreras'], demo:'', code:'' },
-    { num:'03', title:'Shooter 3D', bg:'#2A3550', status:'En desarrollo', cats:['web'],
+      tags:['HTML','JavaScript','Idle'], demo:'demos/micelio/', code:REPO+'micelio' },
+    { num:'02', title:'APEX RUSH', bg:'#6B2A1F', status:'Demo jugable', cats:['web'],
+      desc:'Juego de carreras en 3D con gráficos en HD y multijugador por red local. Cada auto tiene su propio sonido y varias skins para elegir.',
+      feats:['Carreras en 3D','Sonido distinto para cada auto','Skins para personalizar','Multijugador en red local'],
+      tags:['3D','Multijugador','Carreras'], demo:'demos/apex-rush/', code:REPO+'apex-rush' },
+    { num:'03', title:'Strike 3D', bg:'#2A3550', status:'Demo jugable', cats:['web'],
       desc:'Shooter en primera persona hecho en HTML, de estilo táctico: modelos 3D y armas con disparo y daño.',
-      feats:['Modelos 3D','Armas con disparo y daño','Se juega en el navegador'],
-      tags:['3D','FPS','HTML'], demo:'', code:'' },
-    { num:'04', title:'Idle para Android', bg:'#4A2F63', status:'En desarrollo', cats:['movil'],
-      desc:'Juego incremental inactivo para Android, con mecánicas propias que no vas a encontrar en otros idle.',
-      feats:['Progreso mientras no jugás','Funciones únicas'],
-      tags:['Android','Idle','Móvil'], demo:'', code:'' },
-    { num:'05', title:'Aprender a programar jugando', bg:'#5A4A16', status:'En diseño', cats:[],
+      feats:['Modelos 3D','Armas con disparo y daño','Se juega en el navegador','Las salas online solo funcionan dentro de Claude'],
+      tags:['3D','FPS','Three.js'], demo:'demos/strike-3d/', code:REPO+'strike-3d' },
+    { num:'04', title:'Polvo Estelar', bg:'#4A2F63', status:'Demo jugable', cats:['movil','web'],
+      desc:'Juego incremental inactivo pensado para Android, con mecánicas propias que no vas a encontrar en otros idle. La demo se juega en el navegador.',
+      feats:['Progreso mientras no jugás','Funciones únicas','Pensado para pantalla de celular'],
+      tags:['Android','Idle','Móvil'], demo:'demos/polvo-estelar/', code:REPO+'polvo-estelar' },
+    { num:'05', title:'El faro de Marea', bg:'#5A4A16', status:'Demo jugable', cats:['web'],
       desc:'Un juego que enseña conceptos de programación a través de una historia, para aprender sin sentir que es una clase.',
       feats:['Conceptos de programación contados como historia','Visual e interactivo'],
-      tags:['Narrativa','Educativo'], demo:'', code:'' },
+      tags:['Narrativa','Educativo'], demo:'demos/faro-de-marea/', code:REPO+'faro-de-marea' },
     { num:'06', title:'La Banda del Barrio', bg:'#1F4E5C', status:'Serie en curso', cats:['video'],
       desc:'Serie de videos para YouTube creada con prompts, con Toño, Camperita, Pika y Javier como protagonistas.',
       feats:['Personajes: Toño, Camperita, Pika y Javier','Historias armadas con prompts'],
@@ -424,7 +425,7 @@
           <span class="c-title">${esc(p.title)}</span>
           <span class="c-desc">${esc(p.desc)}</span>
           <span class="tags">${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</span>
-          <span class="more">Ver detalles →</span>
+          <span class="more">${p.demo ? '▶ Ver detalles y jugar →' : 'Ver detalles →'}</span>
         </span>
       </button>`).join('') : `<div class="empty">No hay proyectos que coincidan con “${esc(query)}”.</div>`;
   }

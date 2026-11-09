@@ -1,0 +1,2411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#070818">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Polvo Estelar — Idle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Exo+2:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070818; --panel:rgba(22,24,58,.78); --panel2:rgba(34,36,82,.85);
+  --line:rgba(150,160,255,.16); --text:#eceeff; --muted:#9295c8;
+  --gold:#ffd36b; --orange:#ff9a3d; --cyan:#6fe3ff; --violet:#a77bff; --good:#6dffb0; --bad:#ff6b8a; --gem:#6ff0ff;
+  --st:env(safe-area-inset-top,0px); --sb:env(safe-area-inset-bottom,0px);
+  --F:'Exo 2',system-ui,sans-serif; --N:'Orbitron',monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--F);overflow:hidden;
+  user-select:none;-webkit-user-select:none;overscroll-behavior:none}
+button{font-family:var(--F)}
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none}
+#app{position:relative;z-index:1;height:100dvh;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
+.num{font-family:var(--N);letter-spacing:.02em}
+.hidden{display:none!important}
+
+/* header */
+.top{padding:calc(var(--st) + 8px) 10px 2px;text-align:center}
+.hrow{display:flex;gap:6px;align-items:center}
+.pill{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:99px;padding:5px 10px;font:700 12.5px var(--F);
+  display:flex;align-items:center;gap:5px;touch-action:manipulation;white-space:nowrap;overflow:hidden;flex:0 0 auto}
+.pill .num{font-size:12px;color:var(--gem)}
+.pill.stage{flex:1 1 auto;min-width:0;justify-content:center}
+.pill.stage span{overflow:hidden;text-overflow:ellipsis}
+.pill.icon{padding:5px 9px;font-size:15px}
+.dust{font-family:var(--N);font-weight:800;font-size:clamp(25px,7.5vw,36px);color:var(--gold);margin-top:3px;
+  text-shadow:0 0 18px rgba(255,190,80,.45);display:flex;gap:8px;justify-content:center;align-items:center;line-height:1.1}
+.dust .ico{font-size:.8em;color:var(--cyan);text-shadow:0 0 14px var(--cyan)}
+.rate{color:var(--muted);font-size:14px;margin-top:1px}
+.rate b{color:var(--text);font-family:var(--N);font-weight:600}
+.chips{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:4px}
+.chip{padding:2px 9px;border-radius:99px;font-weight:700;font-size:11.5px;border:0;font-family:var(--F)}
+.chip.fr{background:linear-gradient(90deg,#ff6b3d,#ffcc4d);color:#2a1300;box-shadow:0 0 14px rgba(255,150,60,.6)}
+.chip.bo{background:linear-gradient(90deg,#3d7bff,#6ff0ff);color:#001a2a;box-shadow:0 0 14px rgba(80,180,255,.5)}
+.chip.re{background:linear-gradient(90deg,#b44dff,#ff7ad9);color:#24002a;box-shadow:0 0 14px rgba(200,90,255,.55)}
+.chip.ev{background:linear-gradient(90deg,#2b2f7a,#5a3fd0);color:#fff;border:1px solid rgba(255,255,255,.25)}
+.chip.ev.neg{background:linear-gradient(90deg,#6a1530,#c23a5a)}
+
+/* star */
+#starZone{position:relative;flex:0 0 auto;height:min(26vh,230px);overflow:hidden}
+#star{--c1:#fffbe8;--c2:#ffe08a;--c3:#ffa94d;--c4:#e2551b;--c5:#9a2c0a;--glow:#ffb84d;--sc:1;
+  position:absolute;left:50%;top:48%;width:min(33vw,145px);aspect-ratio:1;transform:translate(-50%,-50%) scale(var(--sc));
+  border-radius:50%;touch-action:manipulation;cursor:pointer;transition:transform .6s}
+#star::before{content:'';position:absolute;inset:-38%;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,color-mix(in srgb,var(--glow) 45%,transparent),color-mix(in srgb,var(--c4) 12%,transparent) 45%,transparent 70%);animation:pulse 3.2s ease-in-out infinite}
+#star::after{content:'';position:absolute;inset:-26%;border-radius:50%;pointer-events:none;
+  background:repeating-conic-gradient(color-mix(in srgb,var(--c2) 26%,transparent) 0 5deg,transparent 5deg 24deg);
+  -webkit-mask:radial-gradient(circle,transparent 34%,#000 46%,transparent 71%);mask:radial-gradient(circle,transparent 34%,#000 46%,transparent 71%);
+  animation:spin 40s linear infinite}
+#star .core{position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,var(--c1),var(--c2) 22%,var(--c3) 55%,var(--c4) 85%,var(--c5));
+  box-shadow:0 0 40px var(--glow),0 0 100px color-mix(in srgb,var(--glow) 55%,transparent),inset -12px -16px 34px color-mix(in srgb,var(--c5) 60%,transparent);transition:transform .07s,filter .6s}
+#star.press .core{transform:scale(.9)}
+#app.frenzyOn #star{--c1:#fff;--c2:#b8f3ff;--c3:#6fe3ff;--c4:#7b5cff;--c5:#3a1f9a;--glow:#6fe3ff}
+#app.eclipse #star .core{filter:brightness(.18) saturate(.4)}
+#app.eclipse #star::before{opacity:.25}
+#ring{position:absolute;inset:-3px;border-radius:50%;border:2.5px solid rgba(111,227,255,.45);pointer-events:none;z-index:2}
+#ring.hit{border-color:#aaffff;box-shadow:0 0 16px #6fe3ff,inset 0 0 12px #6fe3ff}
+#app.eclipse #ring{opacity:0}
+@keyframes pulse{50%{transform:scale(1.08);opacity:.8}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tapval{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);pointer-events:none}
+#combo{position:absolute;right:12px;top:8px;font:800 13px var(--N);color:var(--gold);text-shadow:0 0 10px rgba(255,180,60,.8);pointer-events:none;transition:transform .1s}
+#reso{position:absolute;left:12px;top:8px;font:700 12px var(--F);color:#e3b8ff;pointer-events:none;text-shadow:0 0 8px rgba(190,100,255,.8)}
+#reso i{display:inline-block;width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.15);margin-left:2px}
+#reso i.on{background:#e48bff;box-shadow:0 0 6px #e48bff}
+.fl{position:absolute;pointer-events:none;font-family:var(--N);font-weight:800;font-size:17px;color:var(--gold);
+  text-shadow:0 0 8px rgba(255,180,60,.8);animation:up .9s ease-out forwards;transform:translate(-50%,-50%);white-space:nowrap;z-index:4}
+.fl.pf{color:#eaffff;text-shadow:0 0 3px #001a33,0 0 3px #001a33,0 0 12px #6fe3ff;font-size:19px}
+@keyframes up{to{transform:translate(-50%,-140%);opacity:0}}
+.spark{position:absolute;width:5px;height:5px;border-radius:50%;background:#ffe9a8;box-shadow:0 0 6px #ffcf66;pointer-events:none;animation:sp .6s ease-out forwards}
+@keyframes sp{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.meteor{position:absolute;font-size:40px;padding:14px;cursor:pointer;z-index:5;filter:drop-shadow(0 0 10px #8fe8ff);
+  animation:drift 12s linear forwards, bob 1.2s ease-in-out infinite alternate}
+@keyframes drift{from{left:var(--x0)}to{left:var(--x1)}}
+@keyframes bob{to{margin-top:-14px}}
+.bh{position:absolute;width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;z-index:6;cursor:pointer;touch-action:manipulation;
+  background:radial-gradient(circle,#000 34%,#2a0e55 52%,rgba(123,60,255,.35) 62%,transparent 71%);transition:left 1.8s ease-in-out,top 1.8s ease-in-out}
+.bh::after{content:'';position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(from 0deg,transparent,rgba(190,120,255,.8),transparent 40%,rgba(120,200,255,.6),transparent 75%);
+  -webkit-mask:radial-gradient(circle,transparent 42%,#000 50%,transparent 70%);mask:radial-gradient(circle,transparent 42%,#000 50%,transparent 70%);animation:spin 1.4s linear infinite}
+.bh b{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font:700 11px var(--N);color:#e3b8ff;white-space:nowrap}
+.bh.hurt{animation:shake .15s}
+@keyframes shake{25%{margin-left:-31px}75%{margin-left:-39px}}
+
+/* panel */
+main{flex:1;overflow-y:auto;padding:0 12px 14px;-webkit-overflow-scrolling:touch}
+.tab{display:none}.tab.on{display:block}
+.seg{position:sticky;top:0;z-index:3;display:flex;gap:6px;padding:8px 0;background:linear-gradient(var(--bg) 70%,transparent)}
+.seg button{flex:1;padding:9px 0;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font:700 14px var(--F);touch-action:manipulation}
+.seg button.on{background:linear-gradient(135deg,#4a3bb0,#7b5cff);color:#fff;border-color:transparent;box-shadow:0 0 12px rgba(123,92,255,.5)}
+.h{font:800 13px var(--N);letter-spacing:.08em;color:var(--muted);margin:16px 4px 8px;text-transform:uppercase;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.h small{font:600 11.5px var(--F);letter-spacing:0;text-transform:none;text-align:right}
+.note{font-size:12.5px;color:var(--muted);margin:-2px 4px 12px;line-height:1.4}
+
+.row{display:flex;align-items:center;gap:10px;padding:10px;margin-bottom:8px;border-radius:16px;background:var(--panel);
+  border:1px solid var(--line);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.row.lock{opacity:.45}
+.row.done{border-color:rgba(109,255,176,.5)}
+.ic{flex:0 0 46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:26px;
+  background:radial-gradient(circle at 30% 25%,rgba(167,123,255,.35),rgba(30,32,80,.9));border:1px solid var(--line)}
+.info{flex:1;min-width:0}
+.nm{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lv{font:600 10px var(--N);color:var(--cyan);background:rgba(111,227,255,.12);padding:2px 6px;border-radius:6px;margin-left:4px;vertical-align:2px}
+.dn{font:700 10px var(--F);color:#ffe08a;background:rgba(255,211,107,.14);padding:2px 6px;border-radius:6px;margin-left:4px;vertical-align:2px}
+.sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+.sub b{color:var(--text)}
+.bar{height:4px;border-radius:4px;background:rgba(255,255,255,.08);margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:4px;transition:width .2s}
+.bar.g i{background:linear-gradient(90deg,#2fbf7f,var(--good))}
+.buy{flex:0 0 auto;min-width:92px;padding:8px 10px;border-radius:13px;border:0;font:700 13px var(--F);color:#2a1600;
+  background:linear-gradient(135deg,#ffe08a,#ff9a3d);box-shadow:0 3px 0 #b65a12;touch-action:pan-y;display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.buy .q{font-size:11px;opacity:.75}
+.buy .c{font-family:var(--N);font-size:12.5px}
+.buy:active{transform:translateY(2px);box-shadow:0 1px 0 #b65a12}
+.buy.no{background:#2a2c5a;color:#7d80b5;box-shadow:0 3px 0 #17183a}
+.buy.gem{background:linear-gradient(135deg,#a8fbff,#3db8ff);color:#00223a;box-shadow:0 3px 0 #1a6aa0}
+.buy.go{background:linear-gradient(135deg,#9dffcf,#2fbf7f);color:#00321c;box-shadow:0 3px 0 #17784c}
+.btn{width:100%;padding:13px;border-radius:14px;border:0;font:700 15px var(--F);color:#fff;touch-action:manipulation;
+  background:linear-gradient(135deg,#4a3bb0,#7b5cff);box-shadow:0 3px 0 #2c2275;margin-top:6px}
+.btn.alt{background:var(--panel2);box-shadow:0 3px 0 #15163a;border:1px solid var(--line)}
+.btn.danger{background:linear-gradient(135deg,#a3274a,#ff6b8a);box-shadow:0 3px 0 #5e1229}
+.btn.gem{background:linear-gradient(135deg,#1f7ad1,#3fd0ff);box-shadow:0 3px 0 #0f4a80}
+.btn.ok{background:linear-gradient(135deg,#17885a,#3fdc95);box-shadow:0 3px 0 #0c5a39}
+.btn.sm{padding:10px 4px;font-size:13.5px}
+.btn:disabled{opacity:.4}
+.empty{text-align:center;color:var(--muted);padding:30px 10px;font-size:14px}
+
+/* prestige */
+.nova{padding:16px;border-radius:20px;text-align:center;margin-top:10px;
+  background:radial-gradient(circle at 50% 0%,rgba(255,120,60,.35),rgba(22,24,58,.9) 70%);border:1px solid rgba(255,150,80,.3)}
+.nova .big{font:800 30px var(--N);color:var(--gold)}
+.nova p{margin:6px 0;color:var(--muted);font-size:13.5px;line-height:1.4}
+.nova p b{color:var(--text)}
+.tree{display:grid;grid-template-columns:repeat(3,1fr);gap:22px 8px;margin-top:6px;padding-bottom:6px}
+.sk{position:relative;padding:10px 6px 8px;border-radius:16px;background:var(--panel);border:1px solid var(--line);text-align:center;touch-action:manipulation}
+.sk .e{font-size:24px}
+.sk .t{font-weight:700;font-size:12.5px;margin-top:2px;line-height:1.15}
+.sk .d{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.25;min-height:26px}
+.sk .p{font:700 11px var(--N);margin-top:5px;color:var(--gold)}
+.sk.own{border-color:rgba(109,255,176,.55);background:linear-gradient(160deg,rgba(40,120,90,.45),rgba(22,24,58,.9));box-shadow:0 0 14px rgba(109,255,176,.2)}
+.sk.own .p{color:var(--good)}
+.sk.ok{border-color:rgba(255,211,107,.6);box-shadow:0 0 14px rgba(255,200,90,.25)}
+.sk.lockd{opacity:.4}
+.sk.up::before{content:'';position:absolute;left:50%;top:-23px;width:2px;height:22px;background:var(--line);transform:translateX(-50%)}
+.sk.up.lit::before{background:var(--good);box-shadow:0 0 6px var(--good)}
+
+/* grids */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.cell{padding:10px 6px;border-radius:14px;background:var(--panel);border:1px solid var(--line);text-align:center;font-size:11.5px;color:var(--muted);line-height:1.25;position:relative;touch-action:manipulation}
+.cell .e{font-size:24px;display:block;margin-bottom:4px;filter:grayscale(1);opacity:.4}
+.cell.got{color:var(--text);border-color:rgba(255,211,107,.45)}
+.cell.got .e{filter:none;opacity:1}
+.cell .tag{position:absolute;top:5px;right:6px;font:700 9.5px var(--N);color:var(--cyan)}
+.cell .ef{display:block;color:var(--good);font-size:10.5px;margin-top:3px}
+.cell .cost{display:block;color:var(--gold);font:700 10.5px var(--N);margin-top:4px}
+.cell.ready{border-color:rgba(111,227,255,.6);box-shadow:0 0 12px rgba(111,227,255,.25);color:var(--text)}
+.cell.ready .e{filter:none;opacity:.9}
+
+/* cosmos */
+.ccard{padding:13px;border-radius:16px;background:var(--panel);border:1px solid var(--line);margin-bottom:8px}
+.ccard .t{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+.ccard .t .big{font-size:24px}
+.ccard .d{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.4}
+.ccard .d b{color:var(--text)}
+.mk{padding:13px;border-radius:16px;background:linear-gradient(170deg,rgba(40,20,80,.85),rgba(18,20,50,.9));border:1px solid rgba(167,123,255,.3)}
+.mkTop{display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
+.mkP{font:800 20px var(--N);color:#e3b8ff}
+.mkCh{font:700 12px var(--N)}
+.up{color:var(--good)}.dw{color:var(--bad)}
+#mkChart{width:100%;height:120px;display:block;margin:8px 0;border-radius:10px;background:rgba(0,0,0,.25)}
+.mkInfo{font-size:12.5px;color:var(--muted);line-height:1.6}
+.mkInfo b{color:var(--text);font-family:var(--N);font-size:11.5px}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+.bgrid .btn{margin:0}
+
+/* drawing board */
+#board{position:fixed;inset:0;z-index:25;background:rgba(2,3,12,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+#board h3{margin:0;font:800 18px var(--N)}
+#board .bd{color:var(--muted);font-size:13px;margin:6px 0 10px;text-align:center;line-height:1.4;max-width:420px}
+#cv{width:min(92vw,420px);height:min(92vw,420px);border-radius:20px;background:radial-gradient(circle at 50% 40%,#151a4a,#070818);border:1px solid rgba(167,123,255,.35);touch-action:none}
+#board .mbtns{width:min(92vw,420px)}
+
+/* daily */
+.daily{padding:14px;border-radius:18px;background:radial-gradient(circle at 50% 0%,rgba(63,208,255,.25),rgba(22,24,58,.9) 70%);border:1px solid rgba(111,240,255,.3);margin-top:10px}
+.days{display:flex;gap:5px;margin:10px 0 4px}
+.day{flex:1;border-radius:10px;padding:6px 0;text-align:center;font-size:10.5px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted)}
+.day b{display:block;font:700 11px var(--N);color:var(--gem);margin-top:2px}
+.day.done{background:rgba(109,255,176,.15);border-color:rgba(109,255,176,.5);color:var(--text)}
+.day.next{border-color:var(--gold);box-shadow:0 0 10px rgba(255,211,107,.35);color:var(--text)}
+
+/* settings */
+.card{padding:14px;border-radius:16px;background:var(--panel);border:1px solid var(--line);margin-bottom:10px}
+.tg{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14.5px}
+.sw{width:50px;height:28px;border-radius:99px;background:#2a2c5a;position:relative;border:0;transition:.2s;flex:0 0 auto}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#c9cbef;transition:.2s}
+.sw.on{background:var(--violet)}.sw.on::after{left:25px;background:#fff}
+textarea{width:100%;height:74px;border-radius:12px;background:#0d0f2a;color:var(--text);border:1px solid var(--line);padding:8px;font:12px monospace;resize:none;user-select:text;-webkit-user-select:text}
+.stats{font-size:13.5px;color:var(--muted);line-height:1.8}
+.stats b{color:var(--text);font-family:var(--N);font-weight:600;font-size:12.5px}
+.mbtns{display:flex;gap:8px}
+
+/* nav */
+nav{flex:0 0 auto;display:flex;padding:5px 4px calc(var(--sb) + 5px);background:rgba(10,11,32,.92);border-top:1px solid var(--line);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+nav button{flex:1;min-width:0;position:relative;background:none;border:0;color:var(--muted);font:600 10.5px var(--F);padding:5px 0;display:flex;flex-direction:column;align-items:center;gap:2px;touch-action:manipulation;border-radius:12px}
+nav button .i{font-size:20px;filter:grayscale(.7);opacity:.7}
+nav button.on{color:#fff;background:rgba(123,92,255,.18)}
+nav button.on .i{filter:none;opacity:1}
+nav .dot{position:absolute;top:3px;right:calc(50% - 17px);width:9px;height:9px;border-radius:50%;background:var(--bad);box-shadow:0 0 6px var(--bad)}
+
+/* modal + toast */
+#modal{position:fixed;inset:0;z-index:30;background:rgba(3,4,14,.72);display:grid;place-items:center;padding:20px;backdrop-filter:blur(4px)}
+.mbox{width:100%;max-width:380px;max-height:86vh;overflow-y:auto;padding:22px 18px 16px;border-radius:22px;background:linear-gradient(170deg,#1d1f52,#0f1030);border:1px solid rgba(167,123,255,.35);
+  text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:pop .25s ease-out}
+@keyframes pop{from{transform:scale(.85);opacity:0}}
+.mbox .e{font-size:44px}
+.mbox h3{margin:6px 0;font:800 18px var(--N)}
+.mbox .mb{color:var(--muted);font-size:14px;line-height:1.45;margin:8px 0 12px}
+.mbox .mb b{color:var(--gold)}
+.mbox .mb .gm{color:var(--gem)}
+.slist{text-align:left;font-size:13px;line-height:1.9}
+.slist .cur{color:var(--gold);font-weight:700}
+.slist .no{opacity:.45}
+#toast{position:fixed;left:50%;bottom:calc(var(--sb) + 76px);transform:translate(-50%,200%);opacity:0;z-index:35;padding:10px 16px;border-radius:14px;
+  background:linear-gradient(135deg,#2c2470,#4a3bb0);border:1px solid rgba(255,211,107,.5);font-size:13.5px;font-weight:600;
+  box-shadow:0 10px 30px rgba(0,0,0,.5);transition:transform .35s,opacity .35s;max-width:90vw;text-align:center;pointer-events:none}
+#toast.show{transform:translate(-50%,0);opacity:1}
+
+/* compañero */
+#pet{--p1:#e2c8ff;--p2:#7b4cff;position:absolute;left:8px;bottom:18px;width:50px;height:50px;z-index:5;cursor:pointer;touch-action:manipulation;animation:petf 2.6s ease-in-out infinite}
+#pet.jump{animation:petj .45s ease-out, petf 2.6s ease-in-out .45s infinite}
+@keyframes petf{50%{transform:translateY(-6px)}}
+@keyframes petj{30%{transform:translateY(-22px) scale(1.1,.9)}60%{transform:translateY(0) scale(.9,1.1)}}
+.evo{--p1:#c8fff4!important;--p2:#1497c8!important}
+.fin{--p1:#fff3b0!important;--p2:#ff6a3d!important}
+.petsvg .eyes{transform-origin:30px 30px;animation:blink 4.5s infinite}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+#pet .bub{position:absolute;top:-20px;right:-8px;font-size:20px;animation:bob .8s ease-in-out infinite alternate;filter:drop-shadow(0 0 6px #ffd36b)}
+#petBig{--p1:#e2c8ff;--p2:#7b4cff;width:74px;height:74px;flex:0 0 auto}
+.inp{width:100%;padding:11px;border-radius:12px;border:1px solid var(--line);background:#0d0f2a;color:var(--text);font:600 16px var(--F);-webkit-user-select:text;user-select:text;text-align:center}
+/* rueda */
+#wheel{position:fixed;inset:0;z-index:25;background:rgba(2,3,12,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);text-align:center}
+#wheel h3{margin:0 0 10px;font:800 19px var(--N)}
+.wwrap{position:relative;width:min(84vw,340px);height:min(84vw,340px)}
+#wcv{width:100%;height:100%;border-radius:50%;transition:transform 4.2s cubic-bezier(.12,.68,.08,1);box-shadow:0 0 0 6px #2a1f6a,0 0 0 9px #ffd36b,0 0 40px rgba(167,123,255,.5)}
+.wptr{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:30px;color:#ffd36b;z-index:2;text-shadow:0 2px 6px #000}
+.wcenter{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6c8,#ffb84d 60%,#c2410c);box-shadow:0 0 18px #ffb84d;display:grid;place-items:center;font-size:22px}
+#wInfo{color:var(--muted);font-size:14px;margin:14px 0 6px;min-height:40px;line-height:1.4;max-width:360px}
+#wInfo b{color:var(--gold)}
+#wheel .mbtns{width:min(84vw,340px)}
+
+/* jefes */
+#boss{position:absolute;right:5%;top:10%;font-size:56px;z-index:4;pointer-events:none;filter:drop-shadow(0 0 14px rgba(255,60,90,.85));animation:bossf 2.2s ease-in-out infinite}
+#boss .bs{display:inline-block}
+#boss.hit .bs{animation:bhit .15s}
+@keyframes bossf{50%{transform:translateY(-10px) rotate(-5deg)}}
+@keyframes bhit{50%{transform:scale(.84) translateX(6px);filter:brightness(2.2)}}
+#bossBar{position:absolute;left:18%;right:18%;bottom:22px;z-index:4;pointer-events:none}
+#bossBar .bn{display:flex;justify-content:space-between;gap:6px;font:700 11.5px var(--F);color:#ffc2cf;margin-bottom:3px;text-shadow:0 1px 3px #000}
+#bossBar .hp{height:9px;border-radius:6px;background:rgba(0,0,0,.55);border:1px solid rgba(255,107,138,.55);overflow:hidden}
+#bossBar .hp i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff3d6a,#ffa06b);transition:width .15s}
+#app.bossOn .tapval{opacity:0}
+.bolt{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 10px #6fe3ff,0 0 4px #fff;z-index:4;pointer-events:none;transition:transform .22s ease-in,opacity .22s}
+/* tutorial */
+#tut{position:fixed;inset:0;z-index:28;pointer-events:none}
+#tutSpot{position:absolute;border-radius:16px;box-shadow:0 0 0 9999px rgba(3,4,14,.64);border:2px solid #ffd36b;transition:left .3s,top .3s,width .3s,height .3s,border-radius .3s;pointer-events:none;animation:tutp 1.4s ease-in-out infinite}
+@keyframes tutp{50%{border-color:rgba(255,211,107,.35)}}
+#tutBox{position:absolute;left:12px;right:12px;max-width:420px;margin:0 auto;pointer-events:auto;background:linear-gradient(170deg,#22245e,#0f1030);border:1px solid rgba(255,211,107,.55);
+  border-radius:18px;padding:14px;box-shadow:0 14px 40px rgba(0,0,0,.6);font-size:14.5px;line-height:1.45}
+#tutBox b{color:var(--gold)}
+#tutBox .tp{margin-top:6px;font:700 12px var(--N);color:var(--cyan)}
+#tutBox .tst{font:700 10.5px var(--N);color:var(--muted);margin-bottom:4px;letter-spacing:.06em}
+.tutBtns{display:flex;gap:8px;margin-top:10px}
+.tutBtns .btn{margin:0}
+
+/* avisos */
+.pill.bell{position:relative;padding:5px 9px;font-size:15px}
+.pill.bell .bdg{position:absolute;top:-4px;right:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--bad);color:#fff;font:700 10.5px var(--F);display:grid;place-items:center;box-shadow:0 0 8px var(--bad)}
+.pill.bell.ring{animation:bellr .6s ease-in-out 2}
+@keyframes bellr{25%{transform:rotate(14deg)}75%{transform:rotate(-14deg)}}
+.alrow{display:flex;align-items:center;gap:10px;text-align:left;padding:10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);margin-bottom:6px;cursor:pointer;color:var(--text);font-size:13.5px}
+.alrow .ae{font-size:20px;flex:0 0 auto}
+.alrow .ago{margin-left:auto;color:var(--gold);font-weight:700;font-size:12px;flex:0 0 auto}
+.uprow{display:flex;gap:8px;text-align:left;font-size:12.5px;padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--muted)}
+.uprow b{color:var(--text);margin-left:auto;white-space:nowrap;font-family:var(--N);font-size:11px}
+.alh{font:800 11px var(--N);letter-spacing:.08em;color:var(--muted);text-align:left;margin:10px 2px 6px}
+/* forja */
+.cell.rar{border-width:1.5px}
+.cell .rn{display:block;font:700 10px var(--F);margin-top:2px}
+.cell .fr{position:absolute;top:5px;left:6px;font:700 9.5px var(--N);color:#e3b8ff}
+
+/* pase de temporada */
+.pass{padding:14px;border-radius:18px;margin-top:10px;background:radial-gradient(circle at 50% 0%,rgba(255,180,60,.28),rgba(22,24,58,.92) 70%);border:1px solid rgba(255,211,107,.4)}
+.pass .pt{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pass .pl{font:800 15px var(--N)}
+.pass .pbadge{font:800 22px var(--N);color:var(--gold);min-width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:rgba(255,211,107,.12);border:1px solid rgba(255,211,107,.45)}
+.prow{display:grid;grid-template-columns:40px 1fr 1fr;gap:6px;align-items:stretch;margin-bottom:6px}
+.prow .plv{display:grid;place-items:center;border-radius:10px;font:800 13px var(--N);background:var(--panel);border:1px solid var(--line);color:var(--muted)}
+.prow.reach .plv{color:var(--gold);border-color:rgba(255,211,107,.5)}
+.pcell{border-radius:12px;padding:7px 6px;background:var(--panel);border:1px solid var(--line);font-size:11.5px;text-align:center;color:var(--muted);line-height:1.2;touch-action:manipulation;position:relative}
+.pcell .pe{font-size:18px;display:block}
+.pcell.prem{background:linear-gradient(160deg,rgba(120,70,20,.5),rgba(22,24,58,.9));border-color:rgba(255,190,80,.3)}
+.pcell.can{border-color:var(--gold);color:var(--text);box-shadow:0 0 12px rgba(255,211,107,.35);cursor:pointer}
+.pcell.done{opacity:.55}
+.pcell.done::after{content:'✓';position:absolute;top:3px;right:6px;color:var(--good);font-weight:800}
+.pcell.lockp::after{content:'🔒';position:absolute;top:3px;right:5px;font-size:10px}
+.phead{display:grid;grid-template-columns:40px 1fr 1fr;gap:6px;font:800 11px var(--N);color:var(--muted);margin:12px 0 6px;text-align:center}
+.paybtn{background:linear-gradient(135deg,#ffcf5a,#ff8a3d);color:#2a1300;box-shadow:0 3px 0 #a5520f}
+.tagx{display:inline-block;margin-left:5px;padding:1px 6px;border-radius:6px;background:rgba(109,255,176,.18);color:var(--good);font:700 10px var(--F)}
+/* compartir */
+#shareImg{width:100%;border-radius:14px;margin:4px 0 6px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+/* cosméticos */
+#auraFx{position:absolute;inset:-16%;border-radius:50%;pointer-events:none;display:none;
+  background:conic-gradient(from 0deg,transparent,rgba(255,215,90,.9),transparent 25%,rgba(255,240,170,.8),transparent 50%,rgba(255,200,60,.9),transparent 75%);
+  -webkit-mask:radial-gradient(circle,transparent 58%,#000 62%,transparent 70%);mask:radial-gradient(circle,transparent 58%,#000 62%,transparent 70%);animation:spin 5s linear infinite}
+#app.aura #auraFx{display:block}
+.gold{--p1:#fff6c8!important;--p2:#d99a00!important}
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<div id="app">
+  <header class="top">
+    <div class="hrow">
+      <button class="pill" id="gemPill">💎 <span id="gems" class="num">0</span></button>
+      <button class="pill" id="dayPill">🌙 <span id="dayName">Noche</span></button>
+      <button class="pill stage" id="stagePill">⭐ <span id="stageName">Protoestrella</span></button>
+      <button class="pill bell" id="bellBtn" aria-label="Avisos">🔔<span class="bdg hidden" id="bellN">0</span></button>
+      <button class="pill icon" id="gearBtn" aria-label="Ajustes">⚙️</button>
+    </div>
+    <div class="dust"><span class="ico">✦</span><span id="dust" class="num">0</span></div>
+    <div class="rate"><b id="dps">0</b> por segundo</div>
+    <div class="chips">
+      <button id="chipEv" class="chip ev hidden"></button>
+      <span id="chipCh" class="chip ev hidden"></span>
+      <span id="chipRe" class="chip re hidden">🎵 Resonancia x3 · <span id="reT">20</span>s</span>
+      <span id="chipFr" class="chip fr hidden">⚡ Frenesí x7 · <span id="frT">30</span>s</span>
+      <span id="chipBo" class="chip bo hidden">🚀 x2 · <span id="boT">15:00</span></span>
+    </div>
+  </header>
+
+  <section id="starZone">
+    <div id="star"><div class="core"></div><div id="auraFx"></div><div id="ring"></div></div>
+    <div id="combo"></div>
+    <div id="boss" class="hidden"><span class="bs" id="bossSpr">🐙</span></div>
+    <div id="bossBar" class="hidden"><div class="bn"><span id="bossName"></span><span id="bossT"></span></div><div class="hp"><i id="bossHp"></i></div></div>
+    <div id="reso"></div>
+    <div id="pet"><div class="bub hidden" id="petBub">🎁</div><span class="petsvg" id="petSm"></span></div>
+    <div class="tapval" id="tapLine">Tocá la estrella · <span id="tapv" class="num">+1</span> por toque</div>
+  </section>
+
+  <main id="main">
+    <div class="tab on" id="t-gen">
+      <div class="seg" id="seg">
+        <button data-m="1" class="on">x1</button><button data-m="10">x10</button><button data-m="100">x100</button><button data-m="max">MÁX</button>
+      </div>
+      <div id="genList"></div>
+    </div>
+
+    <div class="tab" id="t-upg">
+      <button class="btn" id="buyAllUpg" style="margin-top:10px">Comprar todas las disponibles</button>
+      <div id="upgList" style="margin-top:10px"></div>
+    </div>
+
+    <div class="tab" id="t-exp">
+      <div class="seg" id="expSeg"><button data-p="viajes" class="on">Expediciones</button><button data-p="lab">Laboratorio<span class="dot hidden" id="dotLab" style="position:static;display:inline-block;margin-left:5px;width:8px;height:8px;border-radius:50%;background:var(--bad)"></span></button></div>
+      <div id="p-viajes">
+      <div class="h" style="margin-top:4px">Expediciones <small>siguen aunque cierres el juego</small></div>
+      <div id="expList"></div>
+      <div class="h">Reliquias <small id="relCount">0/8</small></div>
+      <p class="note">Las expediciones, los jefes y la rueda pueden traer reliquias. Las repetidas suben de nivel y dan <b style="color:#e3b8ff">fragmentos ✧</b>. Tocá una reliquia para <b>forjarla</b> y subir su rareza: Común → Rara → Épica → Legendaria.</p>
+      <div class="grid" id="relList"></div>
+      </div>
+      <div id="p-lab" class="hidden">
+        <div class="ccard" id="labCur" style="margin-top:4px"></div>
+        <div class="h">Proyectos <small>permanentes: no se pierden nunca</small></div>
+        <div id="labList"></div>
+      </div>
+    </div>
+
+    <div class="tab" id="t-cos">
+      <div class="h">Ahora en el cosmos</div>
+      <div class="ccard" id="evCard"></div>
+      <div class="ccard" id="dnCard"></div>
+      <div class="ccard" id="bossCard"><div class="t"><span class="big" id="bcE">🐙</span><span id="bcT">Jefes cósmicos</span></div><div class="d" id="bcD"></div>
+        <button class="btn sm danger" id="bcBtn" style="margin-top:8px">⚔️ Llamarlo ya · 💎5</button></div>
+      <div class="ccard"><div class="t"><span class="big">🎯</span>Pulso estelar</div>
+        <div class="d">Un anillo se cierra sobre la estrella una y otra vez. Tocá (o pulsá la barra espaciadora) justo cuando la alcanza (brilla celeste) para un <b>toque perfecto x<span id="pfX">5</span></b>. Encadená <b>10 perfectos</b> seguidos y entrás en <b>Resonancia</b>: producción x<span id="reX">3</span> por <span id="reDur">20</span>s. Un toque fuera de ritmo corta la cadena.</div></div>
+
+      <div class="h">Tu compañero</div>
+      <div class="ccard" id="petCard">
+        <div style="display:flex;gap:12px;align-items:center"><div id="petBig" class="petsvg"></div>
+          <div style="flex:1;min-width:0"><div class="t"><span id="petName">Cosmo</span><span class="lv" id="petLv">Nv 1</span></div><div class="bar g"><i id="petXp"></i></div><div class="d" id="petXpT"></div></div></div>
+        <div class="d" id="petPerks" style="margin-top:8px;line-height:1.7"></div>
+        <div class="bgrid"><button class="btn sm" id="petFeed">Alimentar</button><button class="btn sm gem" id="petTreat">Golosina 💎5</button><button class="btn sm alt" id="petRename">Nombre</button></div>
+      </div>
+
+      <div class="h">Bolsa de materia oscura <small>sobrevive a la Supernova</small></div>
+      <div class="mk">
+        <div class="mkTop"><div><div style="font-size:12px;color:var(--muted)">1 unidad de materia oscura</div><div class="mkP" id="mkP">—</div></div>
+          <div style="text-align:right"><div class="mkCh" id="mkCh">0%</div><div style="font-size:11px;color:var(--muted)" id="mkSec">— s de producción</div></div></div>
+        <canvas id="mkChart"></canvas>
+        <div class="mkInfo" id="mkInfo"></div>
+        <div class="bgrid">
+          <button class="btn sm" data-mk="b1">Comprar 1</button><button class="btn sm" data-mk="b10">Comprar 10</button><button class="btn sm" data-mk="bmax">Comprar máx</button>
+          <button class="btn sm alt" data-mk="s1">Vender 1</button><button class="btn sm alt" data-mk="s10">Vender 10</button><button class="btn sm danger" data-mk="sall">Vender todo</button>
+        </div>
+        <p class="note" style="margin:10px 2px 0">El precio se mide en segundos de tu mejor producción histórica y fluctúa en vivo. Comprar y vender cuesta un <span id="mkFee">3%</span>. Máximo 500 unidades. Lo que vendés no cuenta para los núcleos de la Supernova.</p>
+      </div>
+
+      <div class="h">Constelaciones <small id="consCount">0/6</small></div>
+      <p class="note">Pagá polvo para observar una constelación y uní sus estrellas con el dedo. Cada una da un poder permanente y queda dibujada en tu cielo.</p>
+      <div class="grid" id="consList"></div>
+    </div>
+
+    <div class="tab" id="t-nova">
+      <div class="seg" id="novaSeg"><button data-p="nova" class="on">Supernova</button><button data-p="chal">Desafíos</button><button data-p="mv">Multiverso</button></div>
+      <div id="p-nova">
+      <div class="nova" style="margin-top:2px">
+        <div style="font-size:13px;color:var(--muted)">Núcleos estelares</div>
+        <div class="big num" id="nuc">0</div>
+        <p>Cada núcleo sin gastar da <b id="nucRate">+2%</b> de producción · Bono actual: <b id="nucBonus">+0%</b></p>
+        <p>Si hacés <b>Supernova</b> ahora ganás <b id="nucGain" class="num">0</b> núcleos.<br>Reinicia polvo, generadores y mejoras.</p>
+        <button class="btn danger" id="novaBtn">💥 Supernova</button>
+        <p id="novaNext" style="font-size:12px"></p>
+      </div>
+      <div class="h">Árbol de constelaciones</div>
+      <p class="note">Las habilidades cuestan núcleos y duran hasta el próximo Colapso universal. Gastar núcleos reduce su bono: elegí bien. El árbol tiene 9 filas: las de abajo son carísimas pero muy poderosas.</p>
+      <div class="tree" id="tree"></div>
+      </div>
+      <div id="p-chal" class="hidden">
+        <p class="note" style="margin-top:6px">Un desafío reinicia el ciclo con una regla difícil. Si llegás a la meta ganás un premio permanente y 💎10. Hacer Supernova durante un desafío lo abandona.</p>
+        <div id="chalList"></div>
+      </div>
+      <div id="p-mv" class="hidden">
+        <div class="nova" style="margin-top:2px;background:radial-gradient(circle at 50% 0%,rgba(140,80,255,.42),rgba(22,24,58,.9) 70%);border-color:rgba(167,123,255,.45)">
+          <div style="font-size:13px;color:var(--muted)">Materia primordial</div>
+          <div class="big num" id="mp" style="color:#dcc0ff">0</div>
+          <p>Cada una obtenida da <b>+10%</b> de producción para siempre · Bono: <b id="mpBonus">+0%</b></p>
+          <p>Un <b>Colapso universal</b> ahora te da <b id="mpGain" class="num">0</b>.<br>Reinicia núcleos, árbol de habilidades y el ciclo. Mantenés gemas, reliquias, constelaciones, logros, desafíos, compañero y etapa estelar.</p>
+          <button class="btn" id="colBtn" style="background:linear-gradient(135deg,#3a1d8a,#b44dff);box-shadow:0 3px 0 #22104f">🌌 Colapso universal</button>
+          <p id="mpNext" style="font-size:12px"></p>
+        </div>
+        <div class="h">Mejoras del multiverso</div>
+        <div id="mvList"></div>
+      </div>
+    </div>
+
+    <div class="tab" id="t-mis">
+      <div class="daily">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font:800 15px var(--N)">Premio diario</div><div style="font-size:12.5px;color:var(--muted)">Racha: <b id="streak" style="color:var(--text)">0</b> <span id="streakU">días</span></div></div>
+          <button class="buy gem" id="dailyBtn" style="min-width:100px"><span class="q">Hoy</span><span class="c">Reclamar</span></button>
+        </div>
+        <div class="days" id="days"></div>
+      </div>
+      <div class="row" style="margin-top:8px"><div class="ic">🎡</div><div class="info"><div class="nm">Rueda cósmica</div><div class="sub" id="wSub"></div></div>
+        <button class="buy gem" id="wOpen"><span class="q">Premios</span><span class="c">Girar</span></button></div>
+      <div class="h">Misiones del día <small id="misReset"></small></div>
+      <div id="misList"></div>
+      <div class="pass" id="passCard"><div class="pt"><div><div class="pl">🎟️ Pase de temporada</div><div style="font-size:12.5px;color:var(--muted)" id="passSub"></div></div><div class="pbadge" id="passLvl">1</div></div>
+        <div class="bar" style="height:7px"><i id="passBar" style="background:linear-gradient(90deg,#ffcf5a,#ff8a3d)"></i></div>
+        <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:4px"><span id="passXpT"></span><span id="passLeft"></span></div>
+        <button class="btn" id="passOpen" style="margin-top:8px;background:linear-gradient(135deg,#b4621c,#ffb347);box-shadow:0 3px 0 #6b3608">Ver recompensas</button></div>
+      <button class="btn gem" id="shopBtn2">💎 Abrir tienda de gemas</button>
+      <button class="btn alt" id="shareBtn">📤 Compartir mi progreso</button>
+      <div class="h">Logros <small><span id="achCount">0</span> · +1% producción y 💎2 cada uno</small></div>
+      <div class="grid" id="achList"></div>
+    </div>
+
+    <div class="tab" id="t-shop">
+      <div class="h">Tienda de gemas <small>Tenés 💎 <span id="gems2">0</span></small></div>
+      <p class="note">Ganás gemas con misiones, premios diarios, expediciones, logros, agujeros negros y a veces con meteoros.</p>
+      <div id="shopList"></div>
+      <div class="h">Comprar gemas <small id="payNote"></small></div>
+      <div id="payList"></div>
+    </div>
+
+    <div class="tab" id="t-pass">
+      <div class="pass" style="margin-top:10px"><div class="pt"><div><div class="pl" id="passTitle">Pase de temporada</div><div style="font-size:12.5px;color:var(--muted)" id="passSub2"></div></div><div class="pbadge" id="passLvl2">1</div></div>
+        <div class="bar" style="height:7px"><i id="passBar2" style="background:linear-gradient(90deg,#ffcf5a,#ff8a3d)"></i></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;line-height:1.45">Ganás experiencia con misiones, premio diario, jefes, expediciones, investigaciones, Supernovas, meteoros, resonancias y jugando. Se reinicia el día 1 de cada mes.</div>
+        <div id="premBox" style="margin-top:10px"></div>
+        <button class="btn alt sm" id="passAll" style="margin-top:8px">Reclamar todo lo disponible</button></div>
+      <div class="phead"><span>NV</span><span>GRATIS</span><span>⭐ PREMIUM</span></div>
+      <div id="passList"></div>
+    </div>
+
+    <div class="tab" id="t-set">
+      <div class="h">Opciones</div>
+      <div class="card">
+        <div class="tg">Sonido <button class="sw" data-s="snd"></button></div>
+        <div class="tg">Vibración al tocar <button class="sw" data-s="vib"></button></div>
+        <div class="tg">Números flotantes <button class="sw" data-s="fx"></button></div>
+        <div class="tg">Anillo del pulso estelar <button class="sw" data-s="ring"></button></div>
+        <div class="tg">Avisos dentro del juego <button class="sw" data-s="alerts"></button></div>
+        <div class="tg" id="autoRow">Automatización <button class="sw" data-s="auto"></button></div>
+        <div class="tg" id="auraRow">Aura de temporada ✨ <button class="sw" data-s="aura"></button></div>
+        <div class="tg" id="goldRow">Compañero dorado 👾 <button class="sw" data-s="gold"></button></div>
+      </div>
+      <div class="h">Estadísticas</div>
+      <button class="btn alt" id="shareBtn2" style="margin:0 0 8px">📤 Compartir mi progreso</button>
+      <div class="card stats" id="stats"></div>
+      <div id="gpBox" class="hidden"><div class="h">Google Play Juegos</div>
+      <div class="card"><div class="stats" id="gpSt" style="line-height:1.5"></div>
+        <div class="mbtns"><button class="btn alt" id="gpUp">▶️ Guardar en Google Play</button><button class="btn alt" id="gpDown">⬇️ Cargar de Google Play</button></div>
+        <button class="btn alt sm" id="gpSign" style="margin-top:8px">Iniciar sesión en Google Play Juegos</button></div></div>
+      <div class="h">Guardado en la nube</div>
+      <div class="card"><div class="stats" id="cloudSt" style="line-height:1.5">Conectando…</div>
+        <div class="mbtns"><button class="btn alt" id="cloudUp">☁️ Guardar ahora</button><button class="btn alt" id="cloudDown">⬇️ Cargar de la nube</button></div></div>
+      <div class="h">Copia de seguridad</div>
+      <div class="card">
+        <p style="margin:0 0 8px;font-size:13px;color:var(--muted)">El progreso se guarda solo en este navegador. Copiá el código para no perderlo o pasarlo a otro dispositivo.</p>
+        <textarea id="saveBox" placeholder="Pegá acá un código para cargarlo"></textarea>
+        <div class="mbtns"><button class="btn alt" id="expBtn">Copiar código</button><button class="btn alt" id="impBtn">Cargar código</button></div>
+      </div>
+      <button class="btn alt" id="tutAgain" style="margin-bottom:10px">📖 Ver el tutorial otra vez</button>
+      <button class="btn danger" id="resetBtn" style="margin-bottom:10px">Borrar todo el progreso</button>
+    </div>
+  </main>
+
+  <nav id="nav">
+    <button data-t="gen" class="on"><span class="i">🏭</span>Generar</button>
+    <button data-t="upg"><span class="i">⬆️</span>Mejoras<span class="dot hidden" id="dotUpg"></span></button>
+    <button data-t="exp"><span class="i">🛰️</span>Viajes<span class="dot hidden" id="dotExp"></span></button>
+    <button data-t="cos"><span class="i">🔭</span>Cosmos<span class="dot hidden" id="dotCos"></span></button>
+    <button data-t="nova"><span class="i">💥</span>Supernova<span class="dot hidden" id="dotNova"></span></button>
+    <button data-t="mis"><span class="i">📜</span>Misiones<span class="dot hidden" id="dotMis"></span></button>
+  </nav>
+</div>
+
+<div id="board" class="hidden">
+  <h3 id="bdT">Constelación</h3>
+  <div class="bd" id="bdD">Uní las estrellas siguiendo las líneas punteadas.</div>
+  <canvas id="cv"></canvas>
+  <div class="mbtns"><button class="btn alt" id="bdUndo">Deshacer</button><button class="btn alt" id="bdClose">Cerrar</button></div>
+</div>
+<div id="wheel" class="hidden">
+  <h3>🎡 Rueda cósmica</h3>
+  <div class="wwrap"><div class="wptr">▼</div><canvas id="wcv"></canvas><div class="wcenter">✦</div></div>
+  <div id="wInfo"></div>
+  <div id="wOdds" style="font-size:11px;color:var(--muted);max-width:340px;margin:0 0 8px;line-height:1.5"></div>
+  <div class="mbtns"><button class="btn gem" id="wSpin">Girar</button><button class="btn alt" id="wClose">Cerrar</button></div>
+</div>
+<div id="tut" class="hidden"><div id="tutSpot"></div><div id="tutBox"><div class="tst" id="tutStep"></div><div id="tutTxt"></div>
+  <div class="tutBtns"><button class="btn alt sm" id="tutSkip">Saltar</button><button class="btn sm" id="tutNext">Siguiente</button></div></div></div>
+<div id="modal" class="hidden"><div class="mbox" id="mbox"></div></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ================= utilidades ================= */
+const $=s=>document.querySelector(s);
+const SUF=['','K','M','B','T','Qa','Qi','Sx','Sp','Oc','No','Dc','UDc','DDc','TDc','QaDc','QiDc'];
+function fmt(n){
+  if(!isFinite(n)) return '∞';
+  if(n<0) return '-'+fmt(-n);
+  if(n<1000){ return (n<100 && n%1!==0) ? (Math.floor(n*10)/10).toString() : Math.floor(n).toString(); }
+  const e=Math.floor(Math.log10(n)/3);
+  if(e<SUF.length){ const v=n/Math.pow(1000,e); return (v<10?v.toFixed(2):v<100?v.toFixed(1):Math.floor(v))+' '+SUF[e]; }
+  return n.toExponential(2).replace('+','');
+}
+function fmtTime(s){ s=Math.max(0,Math.floor(s)); const h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60;
+  return h? `${h}h ${m}m` : m? `${m}m ${x}s` : `${x}s`; }
+function clock(s){ s=Math.max(0,Math.ceil(s)); const h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60;
+  return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0'); }
+const todayKey=()=>new Date().toLocaleDateString('en-CA');
+const yesterdayKey=()=>{ const d=new Date(); d.setDate(d.getDate()-1); return d.toLocaleDateString('en-CA'); };
+function seeded(str){ let h=1779033703^str.length; for(let i=0;i<str.length;i++){ h=Math.imul(h^str.charCodeAt(i),3432918353); h=h<<13|h>>>19; }
+  return function(){ h=Math.imul(h^h>>>16,2246822507); h=Math.imul(h^h>>>13,3266489909); return ((h^=h>>>16)>>>0)/4294967296; }; }
+const gauss=()=>{ let u=0,v=0; while(!u) u=Math.random(); while(!v) v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(6.283*v); };
+
+/* ================= datos ================= */
+const GENS=[
+  {n:'Recolector',e:'🤖',c:15,p:0.1},
+  {n:'Sonda',e:'🚀',c:100,p:1},
+  {n:'Satélite',e:'🛰️',c:1100,p:8,sun:true},
+  {n:'Estación orbital',e:'🛸',c:12000,p:47},
+  {n:'Planeta minero',e:'🪐',c:130000,p:260},
+  {n:'Esfera de Dyson',e:'☀️',c:1.4e6,p:1400,sun:true},
+  {n:'Agujero de gusano',e:'🌀',c:2e7,p:7800},
+  {n:'Motor de quásar',e:'💫',c:3.3e8,p:44000},
+  {n:'Fábrica galáctica',e:'🌌',c:5.1e9,p:260000},
+  {n:'Singularidad',e:'⚫',c:7.5e10,p:1.6e6},
+];
+const R0=1.15; const Rr=()=>S.chal==='infl'?1.25:R0;
+const MILES=[25,50,100,200,300,400,500,750,1000,1500,2000,3000];
+
+const UPG=[];
+const TIERS=[{t:10,k:50,m:2,n:'Calibración'},{t:25,k:500,m:2,n:'Aleación cuántica'},{t:50,k:25000,m:2,n:'Núcleo de plasma'},
+             {t:100,k:5e6,m:3,n:'Sobrecarga'},{t:200,k:5e10,m:3,n:'Trascendencia'}];
+GENS.forEach((g,i)=>TIERS.forEach((t,j)=>UPG.push({id:`g${i}_${j}`,name:`${t.n} · ${g.n}`,e:g.e,desc:`${g.n}: producción x${t.m}`,
+  cost:g.c*t.k,type:'gen',gen:i,m:t.m,req:()=>S.gens[i]>=t.t})));
+[[100,'tapx',2,'Guantes de fotón'],[2500,'tapx',2,'Dedos magnéticos'],[5e4,'tappct',.01,'Toque cósmico'],[2e6,'tappct',.02,'Pulso gravitatorio'],
+ [5e8,'tapx',5,'Mano de titán'],[1e11,'tappct',.05,'Toque divino'],[1e14,'tappct',.1,'Dedo del creador']]
+ .forEach(([c,t,v,n],k)=>UPG.push({id:'tap'+k,name:n,e:'👆',desc:t==='tapx'?`Toques x${v}`:`Cada toque suma +${v*100}% de tu producción/s`,
+   cost:c,type:t,v,req:()=>S.runEarned>=c*.25}));
+[[1e6,1.5,'Cartografía estelar'],[1e8,2,'Red neuronal'],[1e10,2,'Teoría unificada'],[1e13,3,'Motor de improbabilidad'],
+ [1e16,3,'Conciencia cósmica'],[1e19,5,'Omnipresencia']]
+ .forEach(([c,v,n],k)=>UPG.push({id:'glo'+k,name:n,e:'🌠',desc:`Toda la producción x${v}`,cost:c,type:'glob',v,req:()=>S.runEarned>=c*.25}));
+const UPG_BY={}; UPG.forEach(u=>UPG_BY[u.id]=u);
+
+const SK=[
+  {id:'ign',col:0,row:0,n:'Ignición',e:'🔥',d:'Toques x3',c:1},
+  {id:'ine',col:1,row:0,n:'Inercia',e:'🌙',d:'Ganancia inactiva 50% → 80%',c:1},
+  {id:'efi',col:2,row:0,n:'Eficiencia',e:'⚙️',d:'Producción x1.5',c:2},
+  {id:'man',col:0,row:1,n:'Manos de fuego',e:'✋',d:'Toques +3% de tu producción/s',c:3,req:['ign']},
+  {id:'sue',col:1,row:1,n:'Sueño profundo',e:'💤',d:'Tiempo inactivo máx. +6h',c:3,req:['ine']},
+  {id:'eco',col:2,row:1,n:'Economía',e:'💰',d:'Generadores 10% más baratos',c:4,req:['efi']},
+  {id:'llu',col:0,row:2,n:'Lluvia de meteoros',e:'☄️',d:'Meteoros el doble de seguido',c:6,req:['man']},
+  {id:'her',col:1,row:2,n:'Herencia',e:'🧬',d:'Empezás con 10 Recolectores y 5 Sondas',c:5,req:['sue']},
+  {id:'sin',col:2,row:2,n:'Sinergia',e:'🔗',d:'+10% por cada tipo de generador',c:8,req:['eco']},
+  {id:'aut',col:0,row:3,n:'Auto-toque',e:'👆',d:'La estrella se toca sola 5 veces/s',c:12,req:['llu']},
+  {id:'bot',col:1,row:3,n:'Automatización',e:'🦾',d:'Compra generadores y mejoras solo',c:15,req:['her']},
+  {id:'big',col:2,row:3,n:'Big Bang',e:'💥',d:'Producción x3',c:25,req:['sin']},
+  {id:'ete',col:1,row:4,n:'Eternidad',e:'♾️',d:'Cada núcleo da +4% (requiere fila 4)',c:50,req:['aut','bot','big']},
+  {id:'tdd',col:0,row:4,n:'Tormenta de dedos',e:'🌪️',d:'El toque perfecto vale el doble',c:40,req:['aut']},
+  {id:'xpn',col:2,row:4,n:'Expansión',e:'🌌',d:'Producción x5',c:60,req:['big']},
+  {id:'caz',col:0,row:5,n:'Cazador de jefes',e:'🏹',d:'Daño a jefes x2',c:80,req:['tdd']},
+  {id:'cro',col:1,row:5,n:'Cronoesfera',e:'⌛',d:'Tiempo inactivo máx. +12h',c:100,req:['ete']},
+  {id:'grv',col:2,row:5,n:'Gravedad',e:'🪨',d:'Generadores 25% más baratos',c:90,req:['xpn']},
+  {id:'imn',col:0,row:6,n:'Imán estelar',e:'🧲',d:'Los meteoros dan x3',c:150,req:['caz']},
+  {id:'cmp',col:1,row:6,n:'Lazo astral',e:'👾',d:'Compañero: XP x2 y regalo cada 10 min',c:150,req:['cro']},
+  {id:'fus',col:2,row:6,n:'Fusión',e:'⚛️',d:'Producción x10',c:200,req:['grv']},
+  {id:'rit',col:0,row:7,n:'Ritmo eterno',e:'🎶',d:'Resonancia x5 (en vez de x3)',c:300,req:['imn']},
+  {id:'rlm',col:1,row:7,n:'Viajes relámpago',e:'⚡',d:'Expediciones 50% más cortas',c:300,req:['cmp']},
+  {id:'den',col:2,row:7,n:'Núcleo denso',e:'⬢',d:'Supernova da +50% núcleos',c:400,req:['fus']},
+  {id:'sng',col:1,row:8,n:'Singularidad',e:'🕳️',d:'Producción y toques x25 (requiere fila 8)',c:1000,req:['rit','rlm','den']},
+];
+
+const STAGES=[
+  {n:'Protoestrella',t:0,     c:['#ffe0d0','#ff9a7a','#d9534f','#7a1f2b','#3a0d14'],g:'#ff6b5a',sc:.86},
+  {n:'Enana roja',t:1e4,      c:['#fff0e0','#ffb38a','#ff6a3d','#b8321a','#5e1408'],g:'#ff7a45',sc:.9},
+  {n:'Enana amarilla',t:1e7,  c:['#fffbe8','#ffe08a','#ffa94d','#e2551b','#9a2c0a'],g:'#ffb84d',sc:.94},
+  {n:'Gigante blanca',t:1e10, c:['#ffffff','#fff6dc','#ffe7a8','#e6b45a','#8a6420'],g:'#ffe9a8',sc:.98},
+  {n:'Gigante azul',t:1e13,   c:['#ffffff','#cfe9ff','#7cc4ff','#2f6fe0','#132f80'],g:'#6fb8ff',sc:1.02},
+  {n:'Supergigante',t:1e16,   c:['#ffffff','#e4d4ff','#b08cff','#6a3fe0','#2c1477'],g:'#b08cff',sc:1.06},
+  {n:'Púlsar',t:1e19,         c:['#ffffff','#c8fff4','#5ff2d6','#14a090','#0a4a48'],g:'#5ff2d6',sc:1.08},
+  {n:'Magnetar',t:1e22,       c:['#ffffff','#ffd0f4','#ff6ad5','#b01d8e','#4a0a3c'],g:'#ff6ad5',sc:1.1},
+  {n:'Estrella de quarks',t:1e25,c:['#ffffff','#fffbd0','#ffe36b','#ff3d7a','#3a0aa0'],g:'#fff0a0',sc:1.12},
+];
+
+const RELICS=[
+  {id:'cri',n:'Cristal de Orión',e:'💠',f:l=>`+${Math.round(l*10)}% producción`},
+  {id:'gua',n:'Guante de Andrómeda',e:'🧤',f:l=>`+${Math.round(l*25)}% por toque`},
+  {id:'rel',n:'Reloj cósmico',e:'⏳',f:l=>`+${+l.toFixed(1)}h tiempo inactivo`},
+  {id:'bru',n:'Brújula de nebulosa',e:'🧭',f:l=>`Viajes ${Math.min(50,Math.round(l*8))}% más cortos`},
+  {id:'ima',n:'Imán de cometas',e:'🧲',f:l=>`Meteoros ${Math.min(50,Math.round(l*10))}% más seguido`},
+  {id:'pri',n:'Prisma de Vega',e:'🔷',f:l=>`Generadores ${Math.min(30,Math.round(l*3))}% más baratos`},
+  {id:'ojo',n:'Ojo del vacío',e:'👁️',f:l=>`Frenesí +${Math.round(l*3)}s`},
+  {id:'cor',n:'Corona solar',e:'👑',f:l=>`+${Math.round(l*5)}% núcleos en Supernova`},
+];
+
+const EXPS=[
+  {id:'x0',n:'Exploración cercana',e:'🛰️',dur:5*60,gem:1,rel:.12,k:.6,need:0},
+  {id:'x1',n:'Patrulla del cinturón',e:'☄️',dur:30*60,gem:3,rel:.35,k:.5,need:1},
+  {id:'x2',n:'Viaje a la nebulosa',e:'🔭',dur:2*3600,gem:8,rel:.7,k:.45,need:4},
+  {id:'x3',n:'Odisea intergaláctica',e:'🌌',dur:8*3600,gem:25,rel:1,k:.4,need:10,relN:2},
+];
+
+const SHOP=[
+  {id:'boost',n:'Impulso x2',e:'🚀',d:'Producción x2 durante 15 min (se acumula)',c:20},
+  {id:'warp1',n:'Salto temporal 1h',e:'⏩',d:'Recibís al instante 1 hora de producción',c:30},
+  {id:'warp8',n:'Salto temporal 8h',e:'⏭️',d:'Recibís al instante 8 horas de producción',c:180},
+  {id:'met',n:'Llamar meteoro',e:'☄️',d:'Aparece un meteoro ahora mismo',c:8},
+  {id:'evt',n:'Invocar evento cósmico',e:'🌈',d:'Empieza un evento cósmico positivo al azar',c:15},
+  {id:'expf',n:'Hiperimpulso',e:'⚡',d:'Termina al instante todas las expediciones en curso',c:25},
+  {id:'nuc',n:'Fragmento de núcleo',e:'⬢',d:'+3 núcleos estelares',c:120},
+];
+
+const DAILY=[{g:5,h:.25},{g:5,h:.5},{g:10,h:.75},{g:10,h:1},{g:15,h:1.5},{g:20,h:2},{g:40,h:4}];
+
+const MTYPES=[
+  {k:'taps',n:t=>`Tocá la estrella ${t} veces`,e:'👆',ts:[150,300,500]},
+  {k:'gens',n:t=>`Comprá ${t} generadores`,e:'🏭',ts:[15,30,60]},
+  {k:'upgs',n:t=>`Comprá ${t} mejoras`,e:'⬆️',ts:[2,4,6]},
+  {k:'meteors',n:t=>`Atrapá ${t} meteoro${t>1?'s':''}`,e:'☄️',ts:[1,2,4]},
+  {k:'earned',n:t=>`Ganá ${fmt(t)} de polvo`,e:'✨',ts:null},
+  {k:'exps',n:t=>`Completá ${t} expedicion${t>1?'es':''}`,e:'🛰️',ts:[1,2,3]},
+  {k:'perfects',n:t=>`Hacé ${t} toques perfectos`,e:'🎯',ts:[15,30,60]},
+  {k:'sells',n:t=>`Vendé materia oscura con ganancia ${t} ${t>1?'veces':'vez'}`,e:'📈',ts:[1,1,2]},
+  {k:'bosses',n:t=>`Derrotá ${t} jefe${t>1?'s':''} cósmico${t>1?'s':''}`,e:'⚔️',ts:[1,1,2]},
+  {k:'research',n:t=>`Completá ${t} investigacion${t>1?'es':''}`,e:'🔬',ts:[1,1,2]},
+];
+
+/* constelaciones: puntos normalizados y aristas */
+const CONS=[
+  {id:'cru',n:'Cruz del Sur',e:'✝️',cost:5e4,d:'Ganancia inactiva +15% y +2h de tiempo máximo',
+    p:[[.5,.1],[.5,.9],[.2,.47],[.8,.43],[.64,.62]],ed:[[0,1],[2,3]],sky:[.03,.07,.17]},
+  {id:'cas',n:'Casiopea',e:'👑',cost:5e6,d:'Los meteoros dan el doble',
+    p:[[.06,.35],[.28,.7],[.5,.42],[.72,.72],[.94,.3]],ed:[[0,1],[1,2],[2,3],[3,4]],sky:[.77,.08,.17]},
+  {id:'osa',n:'Osa Mayor',e:'🐻',cost:5e8,d:'Toda la producción x2',
+    p:[[.55,.45],[.86,.4],[.92,.72],[.6,.76],[.4,.36],[.24,.28],[.07,.4]],ed:[[0,1],[1,2],[2,3],[3,0],[0,4],[4,5],[5,6]],sky:[.02,.18,.18]},
+  {id:'ori',n:'Orión',e:'🏹',cost:5e10,d:'Toques x3 y el toque perfecto pasa a x8',
+    p:[[.27,.17],[.72,.2],[.42,.5],[.5,.48],[.58,.46],[.3,.88],[.76,.84],[.5,.05]],ed:[[0,7],[7,1],[0,2],[1,4],[2,3],[3,4],[2,5],[4,6]],sky:[.79,.18,.16]},
+  {id:'esc',n:'Escorpio',e:'🦂',cost:5e12,d:'Eventos buenos duran +50% y los malos pegan la mitad',
+    p:[[.12,.15],[.26,.06],[.22,.28],[.35,.36],[.45,.49],[.5,.63],[.55,.78],[.68,.9],[.83,.84],[.9,.69],[.81,.6]],
+    ed:[[0,2],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,8],[8,9],[9,10]],sky:[.03,.29,.16]},
+  {id:'lir',n:'Lira',e:'🎵',cost:5e14,d:'La Resonancia dura el doble y la Bolsa no cobra comisión',
+    p:[[.5,.1],[.4,.34],[.6,.32],[.36,.6],[.58,.57],[.39,.87],[.61,.84]],ed:[[0,1],[0,2],[1,2],[1,3],[2,4],[3,4],[3,5],[4,6],[5,6]],sky:[.81,.29,.15]},
+];
+const hasC=id=>!!S.cons[id];
+
+const EVENTS=[
+  {id:'storm',n:'Tormenta solar',e:'🌞',d:'Toques x5, pero la producción baja a la mitad.',dur:60,neg:true},
+  {id:'eclipse',n:'Eclipse',e:'🌑',d:'Producción x3, pero la estrella queda a oscuras y no se puede tocar.',dur:60},
+  {id:'rain',n:'Lluvia de meteoros',e:'🌠',d:'Cae un meteoro cada pocos segundos. ¡Atrapalos!',dur:40},
+  {id:'align',n:'Alineación planetaria',e:'🪐',d:'Todos los generadores cuestan la mitad.',dur:60},
+  {id:'bh',n:'Agujero negro errante',e:'🕳️',d:'Se traga 1% de tu polvo por segundo. ¡Tocalo 15 veces para destruirlo y recuperar el doble!',dur:30,neg:true},
+  {id:'aurora',n:'Aurora cósmica',e:'🌈',d:'La ventana del toque perfecto se agranda y la resonancia carga el doble.',dur:60},
+];
+const EV_BY={}; EVENTS.forEach(e=>EV_BY[e.id]=e);
+
+const PHASES={
+  amanecer:{n:'Amanecer',e:'🌅',d:'Hora dorada: producción y toques x1.25.'},
+  dia:{n:'Día',e:'☀️',d:'Energía solar: Satélites y Esferas de Dyson producen x2.'},
+  atardecer:{n:'Atardecer',e:'🌇',d:'Hora dorada: producción y toques x1.25.'},
+  noche:{n:'Noche',e:'🌙',d:'Cielo despejado: toques x2 y meteoros 30% más seguido.'},
+};
+function phaseKey(){ const h=new Date().getHours(); return h>=6&&h<8?'amanecer':h>=8&&h<19?'dia':h>=19&&h<21?'atardecer':'noche'; }
+function nextPhaseIn(){ const d=new Date(), h=d.getHours(), nb=[6,8,19,21].find(b=>b>h), t=new Date(d);
+  if(nb===undefined){ t.setDate(t.getDate()+1); t.setHours(6,0,0,0); } else t.setHours(nb,0,0,0); return (t-d)/1000; }
+
+const ACH=[];
+[1,100,1000,10000,50000].forEach(v=>ACH.push({id:'t'+v,n:v===1?'Primer toque':`${fmt(v)} toques`,e:'👆',ok:()=>S.taps>=v}));
+[1e3,1e6,1e9,1e12,1e15,1e18,1e21].forEach(v=>ACH.push({id:'e'+v,n:`Ganá ${fmt(v)} de polvo`,e:'✨',ok:()=>S.totalEarned>=v}));
+[10,1e3,1e6,1e9,1e12].forEach(v=>ACH.push({id:'d'+v,n:`${fmt(v)} por segundo`,e:'⚡',ok:()=>dps(true)>=v}));
+GENS.forEach((g,i)=>[1,50,100,250].forEach(v=>ACH.push({id:`a${i}_${v}`,n:`${v} ${g.n}`,e:g.e,ok:()=>S.gens[i]>=v})));
+[1,5,10,25].forEach(v=>ACH.push({id:'s'+v,n:`${v} supernova${v>1?'s':''}`,e:'💥',ok:()=>S.supernovas>=v}));
+[1,10,50].forEach(v=>ACH.push({id:'m'+v,n:`Atrapá ${v} meteoro${v>1?'s':''}`,e:'☄️',ok:()=>S.meteors>=v}));
+[1,10,50].forEach(v=>ACH.push({id:'x'+v,n:`${v} expedicion${v>1?'es':''}`,e:'🛰️',ok:()=>S.expDone>=v}));
+[1,4,8].forEach(v=>ACH.push({id:'r'+v,n:`${v} reliquia${v>1?'s':''} distinta${v>1?'s':''}`,e:'💠',ok:()=>relicKinds()>=v}));
+[3,7,30].forEach(v=>ACH.push({id:'k'+v,n:`Racha de ${v} días`,e:'📅',ok:()=>S.bestStreak>=v}));
+[10,30].forEach(v=>ACH.push({id:'q'+v,n:`${v} misiones diarias`,e:'📜',ok:()=>S.misDone>=v}));
+[2,4,6,8].forEach(v=>ACH.push({id:'st'+v,n:`Estrella: ${STAGES[v].n}`,e:'⭐',ok:()=>stageIdx()>=v}));
+[1e3,1e5,1e7].forEach(v=>ACH.push({id:'c'+v,n:`${fmt(v)} toques en combo máximo`,e:'🔥',ok:()=>S.comboTaps>=v}));
+[10,250,2000].forEach(v=>ACH.push({id:'pf'+v,n:`${fmt(v)} toques perfectos`,e:'🎯',ok:()=>S.perfects>=v}));
+[1,20].forEach(v=>ACH.push({id:'re'+v,n:`${v} resonancia${v>1?'s':''}`,e:'🎵',ok:()=>S.resonances>=v}));
+[1,3,6].forEach(v=>ACH.push({id:'co'+v,n:`${v} constelacion${v>1?'es':''}`,e:'✨',ok:()=>Object.keys(S.cons).length>=v}));
+[5,25].forEach(v=>ACH.push({id:'ev'+v,n:`Viví ${v} eventos cósmicos`,e:'🌈',ok:()=>S.evDone>=v}));
+[1,10].forEach(v=>ACH.push({id:'bh'+v,n:`Destruí ${v} agujero${v>1?'s':''} negro${v>1?'s':''}`,e:'🕳️',ok:()=>S.bhKilled>=v}));
+[1,10].forEach(v=>ACH.push({id:'tr'+v,n:`${v} venta${v>1?'s':''} con ganancia`,e:'📈',ok:()=>S.sells>=v}));
+ACH.push({id:'owl',n:'Búho nocturno: 500 toques de noche',e:'🦉',ok:()=>S.nightTaps>=500});
+[1,3,5].forEach(v=>ACH.push({id:'ch'+v,n:`${v} desafío${v>1?'s':''} superado${v>1?'s':''}`,e:'🏅',ok:()=>Object.keys(S.chDone).length>=v}));
+[1,5].forEach(v=>ACH.push({id:'col'+v,n:`${v} colapso${v>1?'s':''} universal${v>1?'es':''}`,e:'🌌',ok:()=>S.collapses>=v}));
+[5,12,20].forEach(v=>ACH.push({id:'pet'+v,n:`Compañero Nv ${v}`,e:'👾',ok:()=>S.pet.lv>=v}));
+[1,10,50].forEach(v=>ACH.push({id:'bo'+v,n:`Derrotá ${v} jefe${v>1?'s':''}`,e:'⚔️',ok:()=>S.boss.kills>=v}));
+[10,50,100].forEach(v=>ACH.push({id:'la'+v,n:`${v} niveles de investigación`,e:'🔬',ok:()=>labTotal()>=v}));
+ACH.push({id:'tut',n:'Terminá el tutorial',e:'🎓',ok:()=>!!S.tutRew});
+[1,5].forEach(v=>ACH.push({id:'fo'+v,n:`Forjá ${v} reliquia${v>1?'s':''}`,e:'⚒️',ok:()=>(S.forged||0)>=v}));
+ACH.push({id:'leg',n:'Una reliquia legendaria',e:'🌟',ok:()=>RELICS.some(r=>rtier(r.id)>=3)});
+ACH.push({id:'cloud',n:'Partida guardada en la nube',e:'☁️',ok:()=>!!S.cloudOk});
+[10,30].forEach(v=>ACH.push({id:'ps'+v,n:`Nivel ${v} del pase de temporada`,e:'🎟️',ok:()=>passLevel()>=v}));
+ACH.push({id:'shr',n:'Compartí tu progreso',e:'📤',ok:()=>!!S.shared});
+ACH.push({id:'tree',n:'Árbol de constelaciones completo',e:'🌳',ok:()=>SK.every(k=>S.skills[k.id])});
+[10,50].forEach(v=>ACH.push({id:'wh'+v,n:`${v} giros de la rueda`,e:'🎡',ok:()=>S.spins>=v}));
+
+/* ================= estado ================= */
+const KEY='polvoEstelar_v1';
+function fresh(){ return {dust:0,runEarned:0,totalEarned:0,taps:0,gens:GENS.map(()=>0),upg:{},nucleos:0,nucleosTotal:0,skills:{},ach:{},
+  supernovas:0,meteors:0,last:Date.now(),started:Date.now(),runStart:Date.now(),buy:'1',frenzyUntil:0,
+  gems:0,gemsTotal:0,boostUntil:0,relics:{},exp:{},expDone:0,stageSeen:-1,
+  daily:{last:'',streak:0},bestStreak:0,day:{key:'',c:{}},missions:[],misDone:0,comboTaps:0,
+  perfects:0,resonances:0,resUntil:0,cons:{},consPaid:{},ev:null,evNext:Date.now()+120000,evDone:0,bhKilled:0,
+  mkt:{p:30,u:0,avg:0},peakDps:0,sells:0,nightTaps:0,
+  chal:null,chDone:{},mp:0,mpTotal:0,mv:{},collapses:0,pet:{lv:1,xp:0,name:'Cosmo',giftAt:0},wheelAt:0,spins:0,
+  boss:{lv:1,next:Date.now()+6*60000,kills:0},lab:{lv:{},cur:null,done:0},tutDone:0,tutRew:0,newsV:7,relicTier:{},relicFrag:{},forged:0,cloudOk:0,
+  pass:{key:'',xp:0,cf:{},cp:{}},passPrem:{},cosm:{},tokens:[],starterDone:0,shared:0,activeSec:0,
+  set:{vib:true,fx:true,auto:true,snd:true,ring:true,alerts:true,aura:true,gold:true}}; }
+let S=fresh();
+function merge(o){
+  const f=fresh(); S=Object.assign(f,o||{});
+  S.gens=GENS.map((_,i)=>(o&&o.gens&&o.gens[i])||0);
+  S.set=Object.assign(fresh().set,(o&&o.set)||{});
+  S.daily=Object.assign({last:'',streak:0},(o&&o.daily)||{});
+  S.mkt=Object.assign({p:30,u:0,avg:0},(o&&o.mkt)||{});
+  S.pet=Object.assign({lv:1,xp:0,name:'Cosmo',giftAt:0},(o&&o.pet)||{});
+  S.chDone=S.chDone||{}; S.mv=S.mv||{};
+  S.boss=Object.assign({lv:1,next:Date.now()+6*60000,kills:0},(o&&o.boss)||{});
+  S.lab=Object.assign({lv:{},cur:null,done:0},(o&&o.lab)||{});
+  if(o&&o.tutDone===undefined){ S.tutDone=(o.taps||0)>0?1:0; S.newsV=S.tutDone?5:7; }
+  if(o&&o.newsV===undefined&&S.tutDone) S.newsV=6;
+  S.relicTier=S.relicTier||{};
+  S.pass=Object.assign({key:'',xp:0,cf:{},cp:{}},(o&&o.pass)||{}); S.passPrem=S.passPrem||{}; S.cosm=S.cosm||{}; S.tokens=S.tokens||[];
+  if(o&&!o.relicFrag){ S.relicFrag={}; for(const k in S.relics) if(S.relics[k]>1) S.relicFrag[k]=S.relics[k]-1; }   // repetidas viejas = fragmentos
+  if(!S.day||!S.day.c) S.day={key:'',c:{}};
+  S.ev=null; if(!(S.evNext>0)) S.evNext=Date.now()+120000;
+  if(o&&o.stageSeen===undefined) S.stageSeen=stageIdx();
+}
+function load(){ try{ const raw=localStorage.getItem(KEY); if(raw) merge(JSON.parse(raw)); }catch(e){} }
+function save(){ S.last=Date.now(); try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+
+/* ================= fórmulas ================= */
+const has=id=>!!S.skills[id]||(mvl('perm')>0&&(id==='ign'||id==='ine'||id==='efi'));
+const RAR=[{n:'Común',c:'#9aa0c8',m:1},{n:'Rara',c:'#4da3ff',m:1.5},{n:'Épica',c:'#b46bff',m:2.25},{n:'Legendaria',c:'#ffc23d',m:3.5}];
+const FORGE=[{f:2,g:10},{f:4,g:25},{f:8,g:60}];   // fragmentos y gemas para subir de rareza
+const rlv=id=>S.relics[id]||0;                       // nivel (copias encontradas)
+const rtier=id=>(S.relicTier&&S.relicTier[id])||0;
+const rfrag=id=>(S.relicFrag&&S.relicFrag[id])||0;
+const rl=id=>rlv(id)*RAR[rtier(id)].m;              // poder efectivo = nivel × rareza
+function gainRelic(r){ if(rlv(r.id)>0) S.relicFrag[r.id]=rfrag(r.id)+1; S.relics[r.id]=rlv(r.id)+1; }
+function canForge(id){ const t=rtier(id); if(t>=3||rlv(id)<1) return false; const c=FORGE[t]; return rfrag(id)>=c.f&&S.gems>=c.g; }
+const relicKinds=()=>RELICS.filter(r=>rl(r.id)>0).length;
+const nucRate=()=>has('ete')?0.04:0.02;
+const achMult=()=>1+0.01*Object.keys(S.ach).length;
+const frenzyOn=()=>Date.now()<S.frenzyUntil;
+const boostOn=()=>Date.now()<S.boostUntil;
+const resOn=()=>Date.now()<S.resUntil;
+const evOn=id=>S.ev&&S.ev.id===id&&Date.now()<S.ev.end;
+const PH=()=>phaseKey();
+function stageIdx(){ let s=0; for(let i=0;i<STAGES.length;i++) if(S.totalEarned>=STAGES[i].t) s=i; return s; }
+function costMult(){ return (has('eco')?0.9:1)*(1-Math.min(.3,rl('pri')*.03))*(evOn('align')?0.5:1)*(S.chDone.infl?0.85:1)*(has('grv')?0.75:1); }
+function offlineCap(){ return (2+(has('sue')?6:0)+rl('rel')+(hasC('cru')?2:0)+mvl('time')*2+lab('chrono')*0.5+(has('cro')?12:0))*3600; }
+function offlineRate(){ return Math.min(1,(has('ine')?0.8:0.5)+(hasC('cru')?0.15:0)+mvl('time')*0.1); }
+function genMult(i){
+  let m=1; const o=S.gens[i];
+  for(const t of MILES) if(o>=t) m*=2;
+  for(let j=0;j<TIERS.length;j++) if(S.upg[`g${i}_${j}`]) m*=TIERS[j].m;
+  if(GENS[i].sun && PH()==='dia') m*=2;
+  if(i<4 && S.chDone.mini) m*=5;
+  return m;
+}
+function genLevel(i){ let l=1; for(const t of MILES) if(S.gens[i]>=t) l++; return l; }
+function globalMult(noTemp){
+  let m=1;
+  for(const u of UPG) if(u.type==='glob'&&S.upg[u.id]) m*=u.v;
+  m*=1+S.nucleos*nucRate();
+  if(has('efi')) m*=1.5;
+  if(has('big')) m*=3;
+  if(has('sin')) m*=1+0.1*S.gens.filter(x=>x>0).length;
+  if(hasC('osa')) m*=2;
+  if(has('xpn')) m*=5; if(has('fus')) m*=10; if(has('sng')) m*=25;
+  m*=1+0.1*lab('chem');
+  m*=Math.pow(2,mvl('fert'))*(1+0.1*(S.mpTotal||0));
+  m*=1+0.05*S.pet.lv; if(S.pet.lv>=12) m*=1.5;
+  if(S.chDone.hands) m*=1.5;
+  m*=achMult();
+  m*=Math.pow(1.2,stageIdx());
+  m*=1+0.1*rl('cri');
+  const ph=PH(); if(ph==='amanecer'||ph==='atardecer') m*=1.25;
+  if(!noTemp){
+    if(frenzyOn()) m*=7; if(boostOn()) m*=2; if(resOn()) m*=has('rit')?5:3;
+    if(evOn('storm')) m*=hasC('esc')?0.75:0.5;
+    if(evOn('eclipse')) m*=3;
+  }
+  return m;
+}
+function genProd(i){ return GENS[i].p*S.gens[i]*genMult(i)*globalMult(); }
+function dps(noTemp){ let s=0; for(let i=0;i<GENS.length;i++) s+=GENS[i].p*S.gens[i]*genMult(i); return s*globalMult(noTemp); }
+let combo=0, lastTapT=0;
+const comboMult=()=>1+Math.min(50,combo)*0.02;
+const perfMult=()=>(hasC('ori')?8:5)*(has('tdd')?2:1);
+function tapValue(manual){
+  if(evOn('eclipse')||S.chal==='hands') return 0;
+  let base=1, pct=0;
+  for(const u of UPG){ if(!S.upg[u.id]) continue; if(u.type==='tapx') base*=u.v; if(u.type==='tappct') pct+=u.v; }
+  if(has('ign')) base*=3;
+  if(has('man')) pct+=0.03;
+  if(hasC('ori')) base*=3;
+  if(S.chDone.aust) base*=3; if(S.pet.lv>=20) base*=3;
+  base*=1+0.25*rl('gua');
+  base*=1+0.2*lab('bio');
+  if(has('sng')) base*=25;
+  const ph=PH(); if(ph==='noche') base*=2; else if(ph!=='dia') base*=1.25;
+  if(evOn('storm')) base*=5;
+  const v=base*(frenzyOn()?7:1)*achMult()*Math.pow(1.2,stageIdx())+pct*dps();
+  return v*(manual?comboMult():1);
+}
+function unitCost(i){ return GENS[i].c*Math.pow(Rr(),S.gens[i])*costMult(); }
+function costN(i,n){ const R=Rr(); return unitCost(i)*(Math.pow(R,n)-1)/(R-1); }
+function maxAfford(i){ const R=Rr(), c0=unitCost(i); return Math.max(0,Math.floor(Math.log(S.dust*(R-1)/c0+1)/Math.log(R))); }
+function buyQty(i){ return S.buy==='max'? Math.max(1,maxAfford(i)) : +S.buy; }
+function nucMult(){ return (1+0.05*rl('cor'))*(S.chDone.ent?1.25:1)*Math.pow(1.5,mvl('mem'))*(has('den')?1.5:1); }
+function pendingNuc(){ return Math.floor(Math.sqrt(S.runEarned/1e6)*nucMult()); }
+function expDur(x){ return x.dur*(1-Math.min(.5,rl('bru')*.08))*(has('rlm')?0.5:1); }
+function meteorFactor(){ return (has('llu')?0.5:1)*(1-Math.min(.5,rl('ima')*.1))*(PH()==='noche'?0.7:1)*(1-Math.min(.4,.05*lab('radio'))); }
+
+function earn(x,noMis){ if(!(x>0)) return; S.dust+=x; S.runEarned+=x; S.totalEarned+=x; if(!noMis) S.day.c.earned=(S.day.c.earned||0)+x; }
+function addGems(n){ S.gems+=n; S.gemsTotal+=n; }
+const cnt=(k,n=1)=>{ S.day.c[k]=(S.day.c[k]||0)+n; };
+
+/* ================= sonido ================= */
+let AC=null;
+function snd(f,d=.06,type='sine',vol=.05,delay=0){
+  if(!S.set.snd) return;
+  try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume();
+    const t=AC.currentTime+delay, o=AC.createOscillator(), g=AC.createGain(); o.type=type; o.frequency.setValueAtTime(f,t);
+    g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+d); o.connect(g).connect(AC.destination); o.start(t); o.stop(t+d+.02); }catch(e){}
+}
+const jingle=()=>[523,659,784,1047].forEach((f,i)=>snd(f,.18,'triangle',.05,i*.08));
+function vib(ms){ if(S.set.vib) try{ navigator.vibrate&&navigator.vibrate(ms); }catch(e){} }
+
+/* ================= acciones ================= */
+function buyGen(i){
+  if(S.chal==='mini'&&i>=4) return false;
+  if(S.buy==='max'&&maxAfford(i)===0) return false;
+  const n=buyQty(i), c=costN(i,n); if(c>S.dust) return false;
+  S.dust-=c; S.gens[i]+=n; cnt('gens',n); snd(520+i*30,.07,'square',.02); return true;
+}
+function buyUpg(id,quiet){ if(S.chal==='aust') return false; const u=UPG_BY[id]; if(S.upg[id]||u.cost>S.dust||!u.req()) return false; S.dust-=u.cost; S.upg[id]=1; cnt('upgs'); upgDirty=true; if(!quiet) snd(880,.1,'triangle',.04); return true; }
+function buySkill(id){
+  const k=SK.find(s=>s.id===id); if(has(id)) return;
+  if((k.req||[]).some(r=>!has(r))) return toast('🔒 Primero desbloqueá las habilidades anteriores');
+  if(S.nucleos<k.c) return toast(`Necesitás ${k.c} núcleos`);
+  S.nucleos-=k.c; S.skills[id]=1; renderTree(); jingle(); toast(`${k.e} ${k.n} desbloqueada`); save();
+}
+function supernova(){
+  const g=pendingNuc(); if(g<1) return;
+  S.nucleos+=g; S.nucleosTotal+=g; S.supernovas++; S.chal=null; passXp(80);
+  resetRun(); save(); flash(); snd(110,.8,'sawtooth',.06); jingle();
+  showModal('💥','¡Supernova!',`La estrella explotó y renació. Ganaste <b>${fmt(g)}</b> núcleos estelares.${S.mkt.u?`<br>Tu materia oscura (${S.mkt.u} u.) sigue intacta en la Bolsa.`:''}`,[['Seguir',null]]);
+}
+
+/* ================= toque, pulso, combo ================= */
+const star=$('#star'), zone=$('#starZone'), comboEl=$('#combo'), ring=$('#ring'), resoEl=$('#reso');
+const PULSE=1600;
+const perfWin=()=>evOn('aurora')?0.24:0.14;
+function pulsePhase(t){ return (t%PULSE)/PULSE; }
+function isPerfect(t){ const ph=pulsePhase(t), w=perfWin(); return ph>=1-w*0.75 || ph<=w*0.25; }
+let resStreak=0;
+function floatText(px,py,txt,cls){
+  if(zone.querySelectorAll('.fl').length>=25) return;
+  const f=document.createElement('div'); f.className='fl'+(cls?' '+cls:''); f.textContent=txt;
+  f.style.left=px+'px'; f.style.top=py+'px'; zone.appendChild(f); setTimeout(()=>f.remove(),900);
+}
+function doTap(x,y,auto){
+  const now=performance.now();
+  if(evOn('eclipse')){ if(!auto&&x!=null){ const r=zone.getBoundingClientRect(); floatText(x-r.left,y-r.top,'🌑'); } return; }
+  let perfect=false;
+  if(!auto){
+    combo=(now-lastTapT<450)?combo+1:0; lastTapT=now; if(combo>=50) S.comboTaps++;
+    if(S.set.ring){
+      perfect=isPerfect(now);
+      if(perfect){ S.perfects++; cnt('perfects'); if(!resOn()){ resStreak+=evOn('aurora')?2:1; if(resStreak>=10){ startResonance(); } } }
+      else if(!resOn()) resStreak=0;
+    }
+  }
+  const v=tapValue(!auto)*(perfect?perfMult():1); earn(v);
+  if(BOSS){ if(!auto) bolt(); hurtBoss(v+0.15*dps(true)*(auto?0.2:comboMult()*(perfect?perfMult():1))); }
+  if(!auto){ S.taps++; cnt('taps'); if(PH()==='noche') S.nightTaps++; vib(perfect?[6,20,6]:8);
+    snd(perfect?1100:420+Math.min(50,combo)*14,perfect?.09:.05,'triangle',perfect?.05:.035); }
+  if(S.set.fx && x!=null){
+    const r=zone.getBoundingClientRect(), px=x-r.left, py=y-r.top;
+    floatText(px,py,(perfect?'¡PERFECTO! +':'+')+fmt(v),perfect?'pf':(combo>=50?'':null));
+    for(let k=0;k<(perfect?9:5);k++){ const s=document.createElement('div'); s.className='spark'; const a=Math.random()*6.28, d=30+Math.random()*40;
+      if(perfect) s.style.background='#bff';
+      s.style.left=px+'px'; s.style.top=py+'px'; s.style.setProperty('--dx',Math.cos(a)*d+'px'); s.style.setProperty('--dy',Math.sin(a)*d+'px');
+      zone.appendChild(s); setTimeout(()=>s.remove(),600); }
+  }
+  star.classList.add('press'); clearTimeout(doTap.t); doTap.t=setTimeout(()=>star.classList.remove('press'),70);
+}
+function startResonance(){
+  resStreak=0; S.resonances++; passXp(10); S.resUntil=Date.now()+(hasC('lir')?40:20)*1000;
+  jingle(); vib([30,40,30]); toast(`🎵 ¡Resonancia! Producción x3 durante ${hasC('lir')?40:20}s`);
+}
+star.addEventListener('pointerdown',e=>{ e.preventDefault(); doTap(e.clientX,e.clientY,false); });
+/* barra espaciadora = tocar la estrella */
+const KB=matchMedia('(hover:hover) and (pointer:fine)').matches;
+const overlayOpen=()=>['#modal','#board','#wheel'].some(q=>!$(q).classList.contains('hidden'));
+const typing=e=>{ const t=e.target; return !!t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable); };
+const isSpace=e=>e.code==='Space'||e.key===' '||e.key==='Spacebar';
+let spaceDown=false;
+document.addEventListener('keydown',e=>{
+  if(!isSpace(e)||typing(e)) return;
+  e.preventDefault();                       // sin scroll ni "click" en el botón con foco
+  if(e.repeat||spaceDown||overlayOpen()) return;   // mantenerla apretada no cuenta: cada pulsación es un toque
+  spaceDown=true;
+  const ae=document.activeElement; if(ae&&ae!==document.body&&ae.blur) ae.blur();
+  const r=star.getBoundingClientRect(), ang=Math.random()*6.283, d=Math.random()*r.width*.3;
+  doTap(r.left+r.width/2+Math.cos(ang)*d, r.top+r.height/2+Math.sin(ang)*d, false);
+});
+document.addEventListener('keyup',e=>{ if(!isSpace(e)) return; spaceDown=false; if(!typing(e)) e.preventDefault(); });
+window.addEventListener('blur',()=>{ spaceDown=false; });
+function renderCombo(){
+  if(performance.now()-lastTapT>600) combo=0;
+  if(combo>=5){ comboEl.textContent=`COMBO x${comboMult().toFixed(2)}`; comboEl.style.transform=`scale(${1+Math.min(combo,50)/120})`; }
+  else comboEl.textContent='';
+  if(resOn()||!S.set.ring) resoEl.innerHTML='';
+  else if(resStreak>0){ let h='🎵'; for(let i=0;i<10;i++) h+=`<i class="${i<resStreak?'on':''}"></i>`; resoEl.innerHTML=h; }
+  else resoEl.innerHTML='';
+}
+function animRing(){
+  if(S.set.ring && !document.hidden){
+    ring.classList.remove('hidden');
+    const t=performance.now(), ph=pulsePhase(t);
+    ring.style.transform=`scale(${1.9-0.9*ph})`;
+    ring.style.opacity=(0.25+0.75*ph).toFixed(2);
+    ring.classList.toggle('hit',isPerfect(t));
+  } else ring.classList.add('hidden');
+  requestAnimationFrame(animRing);
+}
+
+/* ================= meteoros ================= */
+let nextMeteor=Date.now()+40000, rainNext=0;
+function scheduleMeteor(){ nextMeteor=Date.now()+(60+Math.random()*90)*1000*meteorFactor(); }
+function spawnMeteor(){
+  const m=document.createElement('div'); m.className='meteor'; m.textContent='☄️';
+  const ltr=Math.random()<.5, w=zone.clientWidth;
+  m.style.setProperty('--x0',(ltr?-60:w)+'px'); m.style.setProperty('--x1',(ltr?w:-60)+'px');
+  m.style.top=(6+Math.random()*Math.max(10,zone.clientHeight-90))+'px';
+  if(!ltr) m.style.transform='scaleX(-1)';
+  m.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); catchMeteor(m); });
+  zone.appendChild(m); setTimeout(()=>m.remove(),12000);
+  if(S.pet.lv>=3) setTimeout(()=>{ if(m.isConnected && Math.random()<.6){ petJump(); catchMeteor(m); toast(`🐾 ${S.pet.name} atrapó un meteoro`); } },9000);
+}
+function catchMeteor(m){
+  m.remove(); S.meteors++; cnt('meteors'); passXp(5); vib([20,40,20]); jingle();
+  const k=(hasC('cas')?2:1)*(has('imn')?3:1), r=Math.random();
+  if(r<.12){ const g=(2+Math.floor(Math.random()*4))*k; addGems(g); toast(`💎 ¡Meteoro de cristal! +${g} gemas`); }
+  else if(r<.56){ const s=Math.round((30+3*rl('ojo'))*(k===2?1.5:1)); S.frenzyUntil=Date.now()+s*1000; toast(`⚡ ¡Frenesí! Todo x7 durante ${s} segundos`); }
+  else { const g=(Math.min(S.dust*0.15, dps(true)*900)+13*tapValue())*k; earn(g); toast(`☄️ ¡Meteoro! +${fmt(g)} de polvo`); }
+}
+
+/* ================= eventos cósmicos ================= */
+let bhEl=null;
+function startEvent(id){
+  const ev=EV_BY[id]; let dur=ev.dur; if(hasC('esc')&&!ev.neg) dur*=1.5;
+  S.ev={id,end:Date.now()+dur*1000,absorbed:0,hp:15};
+  vib([40,60,40]); snd(200,.5,'sine',.05); snd(300,.5,'sine',.04,.15);
+  toast(`${ev.e} ${ev.n}: ${ev.d}`);
+  if(id==='bh') spawnBH();
+  if(id==='rain') rainNext=Date.now()+1500;
+}
+function endEvent(){
+  if(!S.ev) return;
+  const id=S.ev.id;
+  if(id==='bh'&&bhEl){ bhEl.remove(); bhEl=null; if(S.ev.absorbed>0) toast(`🕳️ El agujero negro se fue con ${fmt(S.ev.absorbed)} de polvo`); }
+  S.ev=null; S.evDone++; S.evNext=Date.now()+(240+Math.random()*240)*1000;
+}
+function spawnBH(){
+  bhEl=document.createElement('div'); bhEl.className='bh'; bhEl.innerHTML='<b>15</b>';
+  zone.appendChild(bhEl); moveBH();
+  bhEl.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); hitBH(); });
+}
+function moveBH(){ if(!bhEl) return; const w=zone.clientWidth,h=zone.clientHeight;
+  bhEl.style.left=(45+Math.random()*(w-90))+'px'; bhEl.style.top=(40+Math.random()*(h-90))+'px'; }
+function hitBH(){
+  if(!evOn('bh')) return;
+  S.ev.hp--; bhEl.querySelector('b').textContent=S.ev.hp; bhEl.classList.remove('hurt'); void bhEl.offsetWidth; bhEl.classList.add('hurt');
+  vib(15); snd(150+S.ev.hp*20,.08,'sawtooth',.04);
+  if(S.ev.hp<=0){
+    const back=S.ev.absorbed*2; earn(back,true); addGems(3); S.bhKilled++;
+    bhEl.remove(); bhEl=null; S.ev.absorbed=0; S.ev.end=Date.now(); jingle(); flash();
+    toast(`💥 ¡Agujero negro destruido! +${fmt(back)} de polvo y 💎3`);
+  }
+}
+function tickEvents(dt){
+  const now=Date.now();
+  if(S.ev){
+    if(now>=S.ev.end) endEvent();
+    else if(S.ev.id==='bh'){ const a=S.dust*(hasC('esc')?0.005:0.01)*dt; S.dust-=a; S.ev.absorbed+=a; }
+    else if(S.ev.id==='rain' && now>=rainNext){ spawnMeteor(); rainNext=now+3500+Math.random()*1500; }
+  } else if(now>=S.evNext && !document.hidden && !BOSS && !tutActive()){
+    startEvent(EVENTS[Math.floor(Math.random()*EVENTS.length)].id);
+  }
+}
+let bhMoveT=0;
+$('#chipEv').addEventListener('click',()=>{ if(!S.ev) return; const ev=EV_BY[S.ev.id];
+  showModal(ev.e,ev.n,`${ev.d}<br><br>Termina en <b>${clock((S.ev.end-Date.now())/1000)}</b>.`,[['Entendido',null]]); });
+
+/* ================= bolsa de materia oscura ================= */
+const mkHist=[]; let mkDrift=0, mkDriftT=0, mkAcc=0;
+const mkBase=()=>Math.max(1,S.peakDps);
+const mkFee=()=>hasC('lir')?0:0.03;
+const mkUnit=()=>S.mkt.p*mkBase();
+function mkStep(){
+  if(Date.now()>mkDriftT){ mkDrift=(Math.random()-.5)*0.03; mkDriftT=Date.now()+15000+Math.random()*30000; }
+  let x=Math.log(S.mkt.p); x+=0.06*(Math.log(30)-x)+mkDrift+0.045*gauss();
+  S.mkt.p=Math.min(150,Math.max(5,Math.exp(x)));
+  mkHist.push(S.mkt.p); if(mkHist.length>90) mkHist.shift();
+}
+function mkTrade(a){
+  if(S.peakDps<=0) return toast('Necesitás producir algo antes de operar en la Bolsa');
+  const unit=mkUnit(), fee=mkFee();
+  if(a[0]==='b'){
+    const buyP=unit*(1+fee), room=500-S.mkt.u;
+    let n=a==='b1'?1:a==='b10'?10:Math.floor(S.dust/buyP);
+    n=Math.min(n,room,Math.floor(S.dust/buyP));
+    if(room<=0) return toast('Llegaste al máximo de 500 unidades');
+    if(n<=0) return toast('No te alcanza el polvo');
+    S.dust-=n*buyP; S.mkt.avg=(S.mkt.avg*S.mkt.u+n*buyP)/(S.mkt.u+n); S.mkt.u+=n;
+    snd(500,.08,'square',.03); toast(`📥 Compraste ${n} de materia oscura`);
+  } else {
+    let n=a==='s1'?1:a==='s10'?10:S.mkt.u; n=Math.min(n,S.mkt.u);
+    if(n<=0) return toast('No tenés materia oscura');
+    const sellP=unit*(1-fee), got=n*sellP, profit=got-n*S.mkt.avg;
+    S.dust+=got; S.mkt.u-=n; if(!S.mkt.u) S.mkt.avg=0;
+    if(profit>0){ S.sells++; cnt('sells'); jingle(); toast(`📈 Vendiste ${n} con ganancia de ${fmt(profit)}`); }
+    else { snd(300,.12,'square',.03); toast(`📉 Vendiste ${n}: ${fmt(profit)} de diferencia`); }
+  }
+  renderMk(true); save();
+}
+document.querySelectorAll('[data-mk]').forEach(b=>b.addEventListener('click',()=>mkTrade(b.dataset.mk)));
+function renderMk(chart){
+  const unit=mkUnit(), p=S.mkt.p, old=mkHist[Math.max(0,mkHist.length-31)]||p, ch=(p/old-1)*100;
+  $('#mkP').textContent=fmt(unit*(1+mkFee()))+' ✦';
+  $('#mkSec').textContent=`${p.toFixed(1)} s de producción`;
+  const c=$('#mkCh'); c.textContent=(ch>=0?'▲ ':'▼ ')+Math.abs(ch).toFixed(1)+'% · 1 min'; c.className='mkCh '+(ch>=0?'up':'dw');
+  $('#mkFee').textContent=hasC('lir')?'0%':'3%';
+  const val=S.mkt.u*unit*(1-mkFee()), pl=val-S.mkt.u*S.mkt.avg;
+  $('#mkInfo').innerHTML=`Tenés <b>${S.mkt.u}</b>/500 u. · valen <b>${fmt(val)}</b><br>${S.mkt.u?`Costo promedio <b>${fmt(S.mkt.avg)}</b> · Resultado <b class="${pl>=0?'up':'dw'}">${pl>=0?'+':''}${fmt(pl)}</b>`:'Comprá barato, vendé caro.'}`;
+  if(chart) drawMk();
+}
+function drawMk(){
+  const cv=$('#mkChart'), d=Math.min(devicePixelRatio||1,2), w=cv.clientWidth, h=cv.clientHeight; if(!w) return;
+  cv.width=w*d; cv.height=h*d; const x=cv.getContext('2d'); x.scale(d,d);
+  const mn=Math.min(...mkHist)*0.95, mx=Math.max(...mkHist)*1.05, n=mkHist.length;
+  const X=i=>6+(w-12)*i/(n-1), Y=v=>h-8-(h-16)*(v-mn)/(mx-mn||1);
+  if(S.mkt.u&&S.mkt.avg){ const av=S.mkt.avg/mkBase(); if(av>mn&&av<mx){ x.strokeStyle='rgba(255,211,107,.45)'; x.setLineDash([4,4]); x.beginPath(); x.moveTo(0,Y(av)); x.lineTo(w,Y(av)); x.stroke(); x.setLineDash([]); } }
+  const up=mkHist[n-1]>=mkHist[0], col=up?'#6dffb0':'#ff6b8a';
+  const g=x.createLinearGradient(0,0,0,h); g.addColorStop(0,up?'rgba(109,255,176,.3)':'rgba(255,107,138,.3)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  x.beginPath(); mkHist.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v))); x.lineTo(X(n-1),h); x.lineTo(X(0),h); x.closePath(); x.fillStyle=g; x.fill();
+  x.beginPath(); mkHist.forEach((v,i)=>i?x.lineTo(X(i),Y(v)):x.moveTo(X(i),Y(v))); x.strokeStyle=col; x.lineWidth=2; x.stroke();
+  x.fillStyle=col; x.beginPath(); x.arc(X(n-1),Y(mkHist[n-1]),3.5,0,6.28); x.fill();
+}
+
+/* ================= constelaciones (dibujo) ================= */
+function buildCons(){
+  const L=$('#consList'); L.innerHTML='';
+  CONS.forEach((c,i)=>{ const done=hasC(c.id), paid=S.consPaid[c.id], d=document.createElement('div');
+    const can=!done&&(paid||S.dust>=c.cost);
+    d.className='cell'+(done?' got':can?' ready':'');
+    d.innerHTML=`<span class="e">${done?c.e:'✧'}</span><b style="color:var(--text)">${c.n}</b><span class="ef" style="color:${done?'var(--good)':'var(--muted)'}">${c.d}</span>${done?'':`<span class="cost">${paid?'Lista para dibujar':'✦ '+fmt(c.cost)}</span>`}`;
+    d.addEventListener('click',()=>openCons(c)); L.appendChild(d); });
+  $('#consCount').textContent=`${Object.keys(S.cons).length}/${CONS.length}`;
+}
+function openCons(c){
+  if(hasC(c.id)) return showModal(c.e,c.n,`Ya la completaste.<br><b>${c.d}</b>.<br>La podés ver dibujada en tu cielo.`,[['Cerrar',null]]);
+  if(!S.consPaid[c.id]){
+    if(S.dust<c.cost) return toast(`Necesitás ${fmt(c.cost)} de polvo para observarla`);
+    return showModal('🔭',`Observar ${c.n}`,`Cuesta <b>${fmt(c.cost)}</b> de polvo (una sola vez).<br>Después uní sus estrellas con el dedo para obtener:<br><b>${c.d}</b>.`,
+      [['Cancelar',null,'alt'],['Observar',()=>{ if(S.dust<c.cost) return; S.dust-=c.cost; S.consPaid[c.id]=1; save(); openBoard(c); }]]);
+  }
+  openBoard(c);
+}
+let BD=null;
+const cv=$('#cv');
+function openBoard(c){
+  BD={c,done:[],sel:-1,drag:null};
+  $('#bdT').textContent=`${c.e} ${c.n}`;
+  $('#bdD').innerHTML=`Uní las estrellas siguiendo las líneas punteadas (arrastrá o tocá una y después otra).<br>Premio: <b style="color:var(--gold)">${c.d}</b>`;
+  $('#board').classList.remove('hidden'); drawBoard();
+}
+function bdPts(){ const w=cv.clientWidth, pad=34; return BD.c.p.map(([x,y])=>[pad+x*(w-2*pad),pad+y*(w-2*pad)]); }
+function bdHit(px,py){ const P=bdPts(); let best=-1,bd=34; P.forEach(([x,y],i)=>{ const d=Math.hypot(x-px,y-py); if(d<bd){ bd=d; best=i; } }); return best; }
+const edgeKey=(a,b)=>a<b?a+'-'+b:b+'-'+a;
+function drawBoard(){
+  if(!BD) return;
+  const d=Math.min(devicePixelRatio||1,2), w=cv.clientWidth; cv.width=w*d; cv.height=w*d; const x=cv.getContext('2d'); x.scale(d,d);
+  const P=bdPts(), done=new Set(BD.done);
+  x.setLineDash([3,6]); x.lineWidth=1.5; x.strokeStyle='rgba(170,180,255,.35)';
+  BD.c.ed.forEach(([a,b])=>{ if(done.has(edgeKey(a,b))) return; x.beginPath(); x.moveTo(...P[a]); x.lineTo(...P[b]); x.stroke(); });
+  x.setLineDash([]); x.lineWidth=3; x.strokeStyle='#ffd36b'; x.shadowColor='#ffb84d'; x.shadowBlur=12;
+  BD.c.ed.forEach(([a,b])=>{ if(!done.has(edgeKey(a,b))) return; x.beginPath(); x.moveTo(...P[a]); x.lineTo(...P[b]); x.stroke(); });
+  if(BD.sel>=0&&BD.drag){ x.strokeStyle='rgba(111,227,255,.8)'; x.shadowColor='#6fe3ff'; x.beginPath(); x.moveTo(...P[BD.sel]); x.lineTo(BD.drag[0],BD.drag[1]); x.stroke(); }
+  x.shadowBlur=0;
+  P.forEach(([px,py],i)=>{ const r=i===BD.sel?10:7;
+    const g=x.createRadialGradient(px,py,0,px,py,r*3); g.addColorStop(0,'rgba(255,255,255,.9)'); g.addColorStop(.3,i===BD.sel?'rgba(111,227,255,.7)':'rgba(255,230,170,.5)'); g.addColorStop(1,'rgba(0,0,0,0)');
+    x.fillStyle=g; x.beginPath(); x.arc(px,py,r*3,0,6.28); x.fill(); x.fillStyle='#fff'; x.beginPath(); x.arc(px,py,r/2.2,0,6.28); x.fill(); });
+}
+function tryEdge(a,b){
+  if(a<0||b<0||a===b) return;
+  const k=edgeKey(a,b);
+  if(BD.done.includes(k)) return;
+  if(BD.c.ed.some(([p,q])=>edgeKey(p,q)===k)){
+    BD.done.push(k); vib(12); snd(600+BD.done.length*60,.12,'triangle',.05);
+    if(BD.done.length===BD.c.ed.length) finishCons();
+  } else { vib([10,30,10]); snd(140,.15,'sawtooth',.04); cv.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:200}); }
+}
+function finishCons(){
+  const c=BD.c; S.cons[c.id]=1; delete S.consPaid[c.id]; save(); jingle(); flash();
+  setTimeout(()=>{ closeBoard(); showModal(c.e,`¡${c.n} completada!`,`Nuevo poder permanente:<br><b>${c.d}</b>.<br>Mirá tu cielo: ahora brilla ahí.`,[['¡Hermosa!',null]]); buildCons(); },700);
+}
+function closeBoard(){ BD=null; $('#board').classList.add('hidden'); }
+const cpos=e=>{ const r=cv.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top]; };
+cv.addEventListener('pointerdown',e=>{ if(!BD) return; e.preventDefault(); cv.setPointerCapture(e.pointerId);
+  const [px,py]=cpos(e), h=bdHit(px,py);
+  if(h<0){ BD.sel=-1; drawBoard(); return; }
+  if(BD.sel>=0 && h!==BD.sel){ tryEdge(BD.sel,h); BD.sel=h; BD.drag=[px,py]; if(BD) drawBoard(); return; }
+  BD.sel=h; BD.drag=[px,py]; drawBoard(); });
+cv.addEventListener('pointermove',e=>{ if(!BD||BD.sel<0||!BD.drag) return; BD.drag=cpos(e);
+  const h=bdHit(...BD.drag); if(h>=0&&h!==BD.sel&&BD.c.ed.some(([p,q])=>edgeKey(p,q)===edgeKey(h,BD.sel))&&!BD.done.includes(edgeKey(h,BD.sel))){ tryEdge(BD.sel,h); if(BD){ BD.sel=h; } }
+  if(BD) drawBoard(); });
+cv.addEventListener('pointerup',e=>{ if(!BD) return; const [px,py]=cpos(e), h=bdHit(px,py);
+  if(BD.sel>=0&&h>=0&&h!==BD.sel) { tryEdge(BD.sel,h); if(BD) BD.sel=-1; }
+  if(BD){ BD.drag=null; drawBoard(); } });
+$('#bdUndo').addEventListener('click',()=>{ if(BD&&BD.done.length){ BD.done.pop(); BD.sel=-1; drawBoard(); } });
+$('#bdClose').addEventListener('click',closeBoard);
+
+
+/* ================= reinicio de ciclo compartido ================= */
+function resetRun(){
+  S.dust=0; S.runEarned=0; S.gens=GENS.map(()=>0); S.upg={}; S.frenzyUntil=0; S.runStart=Date.now();
+  if(has('her')){ S.gens[0]+=10; S.gens[1]+=5; }
+  const a=mvl('arq')*10; if(a){ S.gens[0]+=a; S.gens[1]+=a; S.gens[2]+=a; }
+  if(mvl('gem')) addGems(mvl('gem')*5);
+  upgDirty=true; upgKey=''; buildGens();
+}
+
+/* ================= desafíos ================= */
+const CHAL=[
+  {id:'hands',n:'Sin manos',e:'🙌',d:'Los toques no generan nada (ni los automáticos).',goal:1e8,r:'Producción x1.5'},
+  {id:'mini',n:'Minimalista',e:'🔹',d:'Solo podés usar los 4 primeros generadores.',goal:1e8,r:'Los 4 primeros generadores x5'},
+  {id:'aust',n:'Austeridad',e:'🚫',d:'No podés comprar mejoras.',goal:1e9,r:'Toques x3'},
+  {id:'infl',n:'Inflación',e:'📈',d:'Cada generador sube 25% de precio por unidad (en vez de 15%).',goal:1e9,r:'Generadores 15% más baratos'},
+  {id:'ent',n:'Entropía',e:'🌪️',d:'Perdés 1% de tu polvo cada segundo.',goal:1e10,r:'Supernova da +25% núcleos'},
+];
+const CH_BY={}; CHAL.forEach(c=>CH_BY[c.id]=c);
+function startChallenge(id){
+  const c=CH_BY[id], g=pendingNuc();
+  showModal(c.e,`Desafío: ${c.n}`,`${c.d}<br>Meta: ganar <b>${fmt(c.goal)}</b> de polvo en el ciclo.<br>Premio permanente: <b>${c.r}</b> + <span class="gm">💎10</span>.<br><br>Empezar reinicia el ciclo como una Supernova${g>=1?` (y te llevás tus <b>${fmt(g)}</b> núcleos)`:''}.`,
+    [['Cancelar',null,'alt'],['Empezar',()=>{ if(g>=1){ S.nucleos+=g; S.nucleosTotal+=g; S.supernovas++; } resetRun(); S.chal=id; upgKey=''; flash(); jingle(); save(); go('gen'); toast(`${c.e} Desafío ${c.n} en curso`); },'danger']]);
+}
+function abandonChallenge(){
+  showModal('🏳️','¿Abandonar el desafío?','Se quita la restricción y seguís el ciclo normalmente, sin premio.',
+    [['Seguir intentando',null,'alt'],['Abandonar',()=>{ S.chal=null; upgDirty=true; upgKey=''; $('#chalList').dataset.k=''; save(); render(); }]]);
+}
+function checkChallenge(){
+  if(!S.chal) return; const c=CH_BY[S.chal];
+  if(S.runEarned>=c.goal){ S.chDone[c.id]=1; S.chal=null; upgDirty=true; upgKey=''; addGems(10); flash(); jingle(); vib([30,50,30]);
+    showModal('🏅',`¡Desafío ${c.n} superado!`,`Premio permanente: <b>${c.r}</b> y <span class="gm">💎 10</span>.`,[['¡Vamos!',null]]); save(); }
+}
+function renderChal(){
+  const L=$('#chalList');
+  if(S.supernovas<1&&!Object.keys(S.chDone).length){ if(L.dataset.k!=='lock'){ L.dataset.k='lock'; L.innerHTML='<div class="empty">🔒 Los desafíos se desbloquean después de tu primera Supernova.</div>'; } return; }
+  const key=JSON.stringify([S.chal,S.chDone]);
+  if(L.dataset.k!==key){ L.dataset.k=key; L.innerHTML='';
+    CHAL.forEach(c=>{ const done=S.chDone[c.id], act=S.chal===c.id, r=document.createElement('div');
+      r.className='row'+(done?' done':'')+(act?' act':'')+(S.chal&&!act&&!done?' lock':'');
+      r.innerHTML=`<div class="ic">${c.e}</div><div class="info"><div class="nm">${c.n}</div><div class="sub" style="white-space:normal">${c.d}<br>Meta <b>${fmt(c.goal)}</b> · Premio <b style="color:var(--good)">${c.r}</b>${act?'<br>Progreso: <b class="pg"></b>':''}</div>${act?'<div class="bar g"><i></i></div>':''}</div>
+        <button class="buy ${done?'no':act?'':'go'}"><span class="q">${done?'Superado':act?'En curso':'Desafío'}</span><span class="c">${done?'✓':act?'Abandonar':'Empezar'}</span></button>`;
+      r.querySelector('.buy').addEventListener('click',()=>{ if(done) return; if(act) abandonChallenge(); else if(S.chal) toast('Ya tenés un desafío en curso'); else startChallenge(c.id); });
+      L.appendChild(r); });
+  }
+  const a=L.querySelector('.act'); if(a&&S.chal){ const c=CH_BY[S.chal]; a.querySelector('.bar i').style.width=Math.min(100,100*S.runEarned/c.goal)+'%'; a.querySelector('.pg').textContent=`${fmt(S.runEarned)} / ${fmt(c.goal)}`; }
+}
+
+/* ================= multiverso (colapso universal) ================= */
+const MV=[
+  {id:'fert',n:'Universo fértil',e:'🌱',d:l=>`Producción x${fmt(Math.pow(2,l))}`,c:l=>Math.pow(2,l),max:20},
+  {id:'mem',n:'Memoria estelar',e:'🧠',d:l=>`Núcleos x${Math.pow(1.5,l).toFixed(2)} en cada Supernova`,c:l=>2+l*2,max:10},
+  {id:'perm',n:'Fundamentos',e:'🏛️',d:()=>'Ignición, Inercia y Eficiencia siempre activas y gratis',c:()=>3,max:1},
+  {id:'arq',n:'Arquitecto',e:'🏗️',d:l=>`Empezás cada ciclo con ${l*10} de los 3 primeros generadores`,c:l=>l+2,max:5},
+  {id:'time',n:'Tiempo dilatado',e:'⏳',d:l=>`Ganancia inactiva +${l*10}% y +${l*2}h`,c:l=>l+1,max:3},
+  {id:'gem',n:'Gemas del vacío',e:'💎',d:l=>`+💎${l*5} en cada Supernova`,c:l=>l+1,max:5},
+];
+const mvl=id=>(S.mv&&S.mv[id])||0;
+const mpGain=()=>Math.floor(Math.sqrt(S.nucleosTotal/50));
+function collapse(){
+  const g=mpGain(); if(g<1) return;
+  S.mp+=g; S.mpTotal+=g; S.collapses++; S.nucleos=0; S.nucleosTotal=0; S.skills={}; S.chal=null;
+  resetRun(); renderTree(); save(); flash(); setTimeout(flash,450); snd(70,1.4,'sawtooth',.06); setTimeout(jingle,500); vib([60,80,60,80,120]);
+  showModal('🌌','¡Colapso universal!',`El universo se plegó sobre sí mismo y volvió a nacer.<br>Ganaste <b>${g}</b> de materia primordial (+${g*10}% de producción para siempre).`,[['Renacer',null]]);
+}
+$('#colBtn').addEventListener('click',()=>{ const g=mpGain(); if(g<1) return;
+  showModal('🌌','¿Colapso universal?',`Vas a ganar <b>${g}</b> de materia primordial.<br>Perdés núcleos, el árbol de habilidades y el ciclo actual.${S.chal?'<br>⚠️ También el desafío en curso.':''}`,[['Todavía no',null,'alt'],['Colapsar',collapse,'danger']]); });
+function buyMV(u){ const l=mvl(u.id); if(l>=u.max) return; const c=u.c(l); if(S.mp<c) return toast(`Necesitás ${c} de materia primordial`);
+  S.mp-=c; S.mv[u.id]=l+1; jingle(); toast(`${u.e} ${u.n} Nv ${l+1}`); renderMV(); renderTree(); save(); }
+function renderMV(){
+  const g=mpGain();
+  $('#mp').textContent=fmt(S.mp); $('#mpBonus').textContent='+'+fmt(S.mpTotal*10)+'%';
+  $('#mpGain').textContent=fmt(g); $('#colBtn').disabled=g<1;
+  $('#mpNext').textContent=g<1?`Necesitás 50 núcleos obtenidos desde el último colapso (llevás ${fmt(S.nucleosTotal)}).`:`La próxima llega con ${fmt(Math.pow(g+1,2)*50)} núcleos obtenidos.`;
+  const L=$('#mvList'), key=JSON.stringify(S.mv)+'|'+S.mp;
+  if(L.dataset.k===key) return; L.dataset.k=key; L.innerHTML='';
+  MV.forEach(u=>{ const l=mvl(u.id), mx=l>=u.max, c=mx?0:u.c(l), r=document.createElement('div'); r.className='row'+(mx?' done':'');
+    r.innerHTML=`<div class="ic">${u.e}</div><div class="info"><div class="nm">${u.n}<span class="lv">Nv ${l}/${u.max}</span></div><div class="sub" style="white-space:normal">${l?'Ahora: <b>'+u.d(l)+'</b><br>':''}${mx?'Nivel máximo':'Siguiente: '+u.d(l+1)}</div></div>
+      <button class="buy ${mx||S.mp<c?'no':'gem'}"><span class="q">${mx?'Máx':'Mejorar'}</span><span class="c">${mx?'✓':'◈ '+c}</span></button>`;
+    r.querySelector('.buy').addEventListener('click',()=>buyMV(u)); L.appendChild(r); });
+}
+let novaPane='nova';
+$('#novaSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; novaPane=b.dataset.p;
+  document.querySelectorAll('#novaSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  ['nova','chal','mv'].forEach(q=>$('#p-'+q).classList.toggle('hidden',q!==novaPane));
+  $('#chalList').dataset.k=''; $('#mvList').dataset.k=''; if(novaPane==='nova') renderTree(); renderNovaAll(); });
+function renderNovaAll(){ if(novaPane==='nova') renderNova(); else if(novaPane==='chal') renderChal(); else renderMV(); }
+
+/* ================= compañero ================= */
+const PET_PERKS=[[1,'+5% producción por nivel'],[3,'Atrapa los meteoros que se te escapan'],[5,'Trae un regalo cada 15 min (tocalo)'],[8,'Ataca a los agujeros negros'],[12,'Evoluciona: producción x1.5'],[20,'Forma final: toques x3']];
+function petSvg(k){ return `<svg viewBox="0 0 60 60" width="100%" height="100%"><defs><radialGradient id="pg${k}" cx="40%" cy="35%"><stop offset="0" style="stop-color:var(--p1)"/><stop offset="1" style="stop-color:var(--p2)"/></radialGradient></defs>
+  <ellipse cx="30" cy="56" rx="14" ry="3" fill="rgba(0,0,0,.35)"/><path d="M11 40 Q9 13 30 12 Q51 13 49 40 Q49 51 30 51 Q11 51 11 40Z" fill="url(#pg${k})"/>
+  <line x1="24" y1="13" x2="19" y2="4" stroke="var(--p1)" stroke-width="2"/><circle cx="19" cy="4" r="3" fill="#ffd36b"/><line x1="36" y1="13" x2="41" y2="4" stroke="var(--p1)" stroke-width="2"/><circle cx="41" cy="4" r="3" fill="#6fe3ff"/>
+  <g class="eyes"><ellipse cx="23" cy="30" rx="4.2" ry="5.2" fill="#fff"/><ellipse cx="37" cy="30" rx="4.2" ry="5.2" fill="#fff"/><circle cx="24" cy="31" r="2.3" fill="#1a1040"/><circle cx="38" cy="31" r="2.3" fill="#1a1040"/><circle cx="25" cy="29.5" r=".9" fill="#fff"/><circle cx="39" cy="29.5" r=".9" fill="#fff"/></g>
+  <ellipse cx="17" cy="38" rx="3" ry="1.8" fill="rgba(255,120,170,.55)"/><ellipse cx="43" cy="38" rx="3" ry="1.8" fill="rgba(255,120,170,.55)"/><path d="M25 40 Q30 44 35 40" stroke="#1a1040" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`; }
+$('#petSm').innerHTML=petSvg('a'); $('#petBig').innerHTML=petSvg('b');
+const petNeed=()=>100*S.pet.lv;
+const petFeedCost=()=>Math.max(50,dps(true)*90);
+function petJump(){ const p=$('#pet'); p.classList.remove('jump'); void p.offsetWidth; p.classList.add('jump'); }
+function petXp(x){
+  if(S.pet.lv>=20) return; S.pet.xp+=Math.round(x*(1+0.2*lab('gen'))*(has('cmp')?2:1)); let up=false;
+  while(S.pet.lv<20&&S.pet.xp>=petNeed()){ S.pet.xp-=petNeed(); S.pet.lv++; up=true; }
+  if(S.pet.lv>=20) S.pet.xp=0;
+  if(up){ jingle(); const perk=PET_PERKS.find(q=>q[0]===S.pet.lv); toast(`🐾 ${S.pet.name} subió a Nv ${S.pet.lv}${perk?' · '+perk[1]:''}`);
+    if(S.pet.lv===12||S.pet.lv===20){ flash(); showModal('👾',`¡${S.pet.name} evolucionó!`,S.pet.lv===12?'Ahora brilla como un púlsar: <b>producción x1.5</b>.':'Alcanzó su forma final: <b>toques x3</b>.',[['¡Genial!',null]]); } }
+  renderPet();
+}
+function petFeed(){ if(S.pet.lv>=20) return toast('¡Ya está en su forma final!'); const c=petFeedCost(); if(S.dust<c) return toast(`Necesitás ${fmt(c)} de polvo`);
+  S.dust-=c; snd(700,.08,'triangle',.04); petJump(); petXp(20); save(); }
+function petTreat(){ if(S.pet.lv>=20) return toast('¡Ya está en su forma final!'); if(S.gems<5) return toast('Te faltan gemas');
+  S.gems-=5; snd(900,.1,'triangle',.05); petJump(); petXp(100); save(); }
+const petGiftReady=()=>S.pet.lv>=5&&Date.now()>=S.pet.giftAt;
+function petClaimGift(){ S.pet.giftAt=Date.now()+(has('cmp')?10:15)*60000; petJump(); jingle();
+  if(Math.random()<.35){ const g=2+Math.floor(Math.random()*3); addGems(g); toast(`🎁 ${S.pet.name} te trajo 💎${g}`); }
+  else { const d=Math.max(100,dps(true)*600); earn(d); toast(`🎁 ${S.pet.name} te trajo ${fmt(d)} de polvo`); }
+  renderPet(); save(); }
+$('#pet').addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation();
+  if(petGiftReady()) return petClaimGift();
+  petJump(); snd(900,.06,'sine',.04); go('cos'); setTimeout(()=>$('#petCard').scrollIntoView({behavior:'smooth',block:'center'}),60); });
+$('#petFeed').addEventListener('click',petFeed);
+$('#petTreat').addEventListener('click',petTreat);
+$('#petRename').addEventListener('click',()=>{ const esc=S.pet.name.replace(/"/g,'');
+  showModal('👾','Ponele nombre',`<input class="inp" id="petIn" maxlength="14" value="${esc}">`,[['Cancelar',null,'alt'],['Guardar',()=>{
+    const v=($('#petIn').value||'').replace(/[<>&"]/g,'').trim().slice(0,14); if(v){ S.pet.name=v; renderPet(); save(); toast(`🐾 Hola, ${v}`); } }]]); });
+function renderPet(){
+  const lv=S.pet.lv, f=lv>=20?'fin':lv>=12?'evo':'';
+  ['#pet','#petBig'].forEach(q=>{ const e=$(q); e.classList.toggle('evo',f==='evo'); e.classList.toggle('fin',f==='fin'); });
+  const sz=44+Math.min(lv,20)*1.3; $('#pet').style.width=sz+'px'; $('#pet').style.height=sz+'px';
+  $('#petBub').classList.toggle('hidden',!petGiftReady());
+  if(cur!=='cos') return;
+  $('#petName').textContent=S.pet.name; $('#petLv').textContent='Nv '+lv+(lv>=20?' · máx':'');
+  $('#petXp').style.width=(lv>=20?100:100*S.pet.xp/petNeed())+'%';
+  $('#petXpT').innerHTML=lv>=20?'Forma final alcanzada':`${fmt(S.pet.xp)} / ${fmt(petNeed())} XP<br>Alimentar cuesta <b>${fmt(petFeedCost())}</b> de polvo (+20 XP)`;
+  $('#petPerks').innerHTML=PET_PERKS.map(([l,t])=>`<div style="opacity:${lv>=l?1:.45}">${lv>=l?'✓':'🔒'} Nv ${l}: ${t}</div>`).join('');
+  $('#petFeed').disabled=lv>=20||S.dust<petFeedCost(); $('#petTreat').disabled=lv>=20||S.gems<5;
+}
+
+/* ================= rueda cósmica ================= */
+const WHEEL=[
+  {t:'1h prod.',e:'⏩',w:20,c:'#3b2f8f',f:()=>{ const g=Math.max(500,dps(true)*3600); earn(g); return `+${fmt(g)} de polvo`; }},
+  {t:'5 gemas',e:'💎',w:18,c:'#1f5a98',f:()=>{ addGems(5); return '+5 gemas'; }},
+  {t:'Frenesí',e:'⚡',w:14,c:'#9a4a1c',f:()=>{ S.frenzyUntil=Date.now()+60000; return 'Frenesí x7 durante 60 segundos'; }},
+  {t:'3h prod.',e:'⏭️',w:10,c:'#55289a',f:()=>{ const g=Math.max(1500,dps(true)*10800); earn(g); return `+${fmt(g)} de polvo`; }},
+  {t:'Impulso',e:'🚀',w:12,c:'#17705f',f:()=>{ S.boostUntil=Math.max(Date.now(),S.boostUntil)+15*60000; return 'Impulso x2 durante 15 minutos'; }},
+  {t:'15 gemas',e:'💎',w:8,c:'#174a8a',f:()=>{ addGems(15); return '+15 gemas'; }},
+  {t:'Materia',e:'🌑',w:12,c:'#3d1656',f:()=>{ const n=Math.min(10,500-S.mkt.u); if(n<=0){ addGems(3); return 'Bolsa llena: +💎3'; } S.mkt.avg=S.mkt.avg*S.mkt.u/(S.mkt.u+n); S.mkt.u+=n; return `+${n} de materia oscura gratis`; }},
+  {t:'Reliquia',e:'🏺',w:6,c:'#8a6612',f:()=>{ const r=RELICS[Math.floor(Math.random()*RELICS.length)]; gainRelic(r); return `${r.e} ${r.n} (Nv ${rlv(r.id)})`; }},
+];
+const WTOT=WHEEL.reduce((a,b)=>a+b.w,0);
+let wRot=0, spinning=false, wMsgUntil=0;
+const wheelFree=()=>Date.now()>=S.wheelAt;
+function drawWheel(){
+  const cv=$('#wcv'), d=Math.min(devicePixelRatio||1,2), w=cv.clientWidth; if(!w) return; cv.width=w*d; cv.height=w*d;
+  const x=cv.getContext('2d'); x.scale(d,d); const r=w/2; let a=-Math.PI/2;
+  WHEEL.forEach(sl=>{ const da=sl.w/WTOT*Math.PI*2;
+    x.beginPath(); x.moveTo(r,r); x.arc(r,r,r,a,a+da); x.closePath(); x.fillStyle=sl.c; x.fill(); x.strokeStyle='rgba(255,211,107,.6)'; x.lineWidth=1.5; x.stroke();
+    const mid=a+da/2, flip=Math.cos(mid)<0, k=flip?-1:1;
+    x.save(); x.translate(r,r); x.rotate(flip?mid+Math.PI:mid); x.textAlign='center'; x.textBaseline='middle';
+    x.font=`${Math.round(r*.15)}px sans-serif`; x.fillText(sl.e,k*r*.74,0);
+    x.fillStyle='#fff'; x.font=`700 ${Math.round(r*.075)}px 'Exo 2',sans-serif`; x.fillText(sl.t,k*r*.48,0); x.restore();
+    a+=da; });
+}
+function renderWheelUI(){
+  const b=$('#wSpin'); b.disabled=spinning; b.textContent=wheelFree()?'Girar gratis':'Girar por 💎10';
+  if(Date.now()>wMsgUntil) $('#wInfo').innerHTML=wheelFree()?'¡Tenés un giro gratis!<br><span style="font-size:12px">Las porciones más grandes salen más seguido.</span>':`Próximo giro gratis en <b>${clock((S.wheelAt-Date.now())/1000)}</b><br><span style="font-size:12px">o girá ahora por 💎10</span>`;
+}
+function openWheel(){ $('#wOdds').textContent='Probabilidades: '+WHEEL.map(w=>`${w.e} ${w.t} ${(100*w.w/WTOT).toFixed(0)}%`).join(' · '); $('#wheel').classList.remove('hidden'); requestAnimationFrame(()=>{ drawWheel(); renderWheelUI(); }); }
+function spinWheel(){
+  if(spinning) return;
+  if(wheelFree()) S.wheelAt=Date.now()+4*3600e3; else { if(S.gems<10) return toast('Te faltan gemas'); S.gems-=10; }
+  let r=Math.random()*WTOT, idx=0; for(;idx<WHEEL.length-1;idx++){ r-=WHEEL[idx].w; if(r<0) break; }
+  let a0=0; for(let i=0;i<idx;i++) a0+=WHEEL[i].w/WTOT*360;
+  const sw=WHEEL[idx].w/WTOT*360, c=a0+sw/2+(Math.random()-.5)*sw*.7;
+  wRot=wRot-(wRot%360)+360*6+(360-c);
+  spinning=true; S.spins++; $('#wcv').style.transform=`rotate(${wRot}deg)`; $('#wInfo').innerHTML='Girando…'; wMsgUntil=Date.now()+5000; renderWheelUI(); save();
+  [0,.08,.17,.27,.38,.5,.64,.8,.98,1.2,1.45,1.75,2.1,2.5,2.95,3.45].forEach(t=>snd(1300,.02,'square',.015,t));
+  setTimeout(()=>{ spinning=false; const msg=WHEEL[idx].f(); jingle(); vib([20,40,20]); wMsgUntil=Date.now()+4000;
+    $('#wInfo').innerHTML=`${WHEEL[idx].e} <b>${msg}</b>`; renderWheelUI(); toast(`🎡 ${msg}`); save(); },4300);
+}
+$('#wOpen').addEventListener('click',openWheel);
+$('#wSpin').addEventListener('click',spinWheel);
+$('#wClose').addEventListener('click',()=>{ if(!spinning) $('#wheel').classList.add('hidden'); });
+
+
+/* ================= jefes cósmicos ================= */
+const BOSSES=[{n:'Kraken del vacío',e:'🐙'},{n:'Dragón de plasma',e:'🐉'},{n:'Plaga cósmica',e:'🦠'},{n:'Titán mecánico',e:'🤖'},{n:'Devorador de estrellas',e:'💀'}];
+let BOSS=null, boltN=0, petBossT=0;
+const bossOf=lv=>BOSSES[(lv-1)%BOSSES.length];
+const bossUnit=()=>Math.max(1,tapValue(false))+0.15*dps(true);   // daño de un toque normal
+const bossBlocked=()=>!!S.ev||tutActive()||S.chal==='hands';
+function startBoss(){
+  const lv=S.boss.lv, b=bossOf(lv), max=bossUnit()*(90+20*lv);
+  BOSS={lv,hp:max,max,end:Date.now()+30000,n:b.n,e:b.e};
+  $('#bossSpr').textContent=b.e; $('#bossName').textContent=`${b.e} ${b.n} · Nv ${lv}`;
+  $('#boss').classList.remove('hidden'); $('#bossBar').classList.remove('hidden'); $('#app').classList.add('bossOn');
+  vib([50,60,50]); snd(90,.6,'sawtooth',.06); snd(70,.8,'sawtooth',.05,.2);
+  toast(`⚔️ ¡${b.n} atacó! Tocá la estrella para dispararle (30 s)`);
+}
+function hideBoss(){ BOSS=null; $('#boss').classList.add('hidden'); $('#bossBar').classList.add('hidden'); $('#app').classList.remove('bossOn'); }
+function hurtBoss(x){
+  if(!BOSS||!(x>0)) return;
+  BOSS.hp-=x*(1+0.15*lab('arm'))*(has('caz')?2:1);
+  const el=$('#boss'); el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit');
+  if(BOSS.hp<=0) winBoss();
+}
+function winBoss(){
+  const B=BOSS, lv=B.lv; hideBoss();
+  const dust=Math.max(500,dps(true)*600*(1+0.15*lv)), gems=3+Math.floor(lv/2);
+  earn(dust); addGems(gems); S.boss.lv++; S.boss.kills++; cnt('bosses'); passXp(40); S.boss.next=Date.now()+(8+Math.random()*6)*60000;
+  let rt=''; if(Math.random()<Math.min(.6,.25+lv*.01)){ const r=RELICS[Math.floor(Math.random()*RELICS.length)]; gainRelic(r); rt=`<br>${r.e} <b>${r.n}</b> (Nv ${rlv(r.id)})`; }
+  flash(); jingle(); vib([30,50,30,50,80]);
+  showModal(B.e,`¡${B.n} derrotado!`,`Botín: <b>${fmt(dust)}</b> de polvo y <span class="gm">💎 ${gems}</span>.${rt}<br><span style="font-size:12px">El próximo jefe será más fuerte (Nv ${lv+1}).</span>`,[['¡Victoria!',null]]);
+  save();
+}
+function loseBoss(quiet){
+  const B=BOSS; if(!B) return; hideBoss(); S.boss.next=Date.now()+(quiet?3:5)*60000;
+  if(!quiet){ snd(160,.4,'sawtooth',.04); toast(`${B.e} ${B.n} escapó. Volverá en unos minutos`); }
+}
+function bolt(){
+  if(boltN>12) return;
+  const zr=zone.getBoundingClientRect(), sr=star.getBoundingClientRect(), br=$('#boss').getBoundingClientRect();
+  const x0=sr.left+sr.width/2-zr.left, y0=sr.top+sr.height/2-zr.top, x1=br.left+br.width/2-zr.left, y1=br.top+br.height/2-zr.top;
+  const b=document.createElement('div'); b.className='bolt'; b.style.left=(x0-4)+'px'; b.style.top=(y0-4)+'px'; zone.appendChild(b); boltN++;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ b.style.transform=`translate(${x1-x0}px,${y1-y0}px)`; b.style.opacity='.35'; }));
+  setTimeout(()=>{ b.remove(); boltN--; },260);
+}
+function tickBoss(dt,now){
+  if(BOSS){
+    hurtBoss(dps()*0.1*dt);
+    if(BOSS&&S.pet.lv>=8&&now>petBossT){ petBossT=now+500; petJump(); hurtBoss(bossUnit()*2); }
+    if(BOSS&&now>BOSS.end) loseBoss(false);
+    if(BOSS){ $('#bossHp').style.width=Math.max(0,100*BOSS.hp/BOSS.max)+'%'; $('#bossT').textContent=Math.ceil((BOSS.end-now)/1000)+'s'; }
+  } else if(now>=S.boss.next && !document.hidden && !bossBlocked() && !overlayOpen() && S.totalEarned>=300) startBoss();
+}
+function renderBossCard(){
+  const btn=$('#bcBtn');
+  if(BOSS){ $('#bcE').textContent=BOSS.e; $('#bcT').textContent=`¡${BOSS.n} está atacando!`;
+    $('#bcD').innerHTML=`Vida <b>${Math.max(0,Math.ceil(100*BOSS.hp/BOSS.max))}%</b> · quedan <b>${Math.ceil((BOSS.end-Date.now())/1000)}s</b>. Tocá la estrella para dispararle.`; btn.classList.add('hidden'); return; }
+  const nb=bossOf(S.boss.lv); $('#bcE').textContent=nb.e; $('#bcT').textContent=`Próximo jefe: ${nb.n} · Nv ${S.boss.lv}`;
+  $('#bcD').innerHTML=`Llega en <b>${clock((S.boss.next-Date.now())/1000)}</b>. Tenés 30 s para vencerlo tocando la estrella; tu producción${S.pet.lv>=8?` y ${S.pet.name}`:''} también lo dañan. Derrotados: <b>${S.boss.kills}</b>.`;
+  btn.classList.remove('hidden');
+}
+$('#bcBtn').addEventListener('click',()=>{
+  if(BOSS) return; if(bossBlocked()) return toast('Ahora no: hay un evento o un desafío que lo impide');
+  if(S.gems<5) return toast('Te faltan gemas'); S.gems-=5; go('gen'); startBoss(); });
+
+/* ================= laboratorio ================= */
+const LAB=[
+  {id:'chem',n:'Química estelar',e:'⚗️',d:l=>`+${l*10}% producción`,max:25,base:180},
+  {id:'bio',n:'Biomecánica',e:'🖐️',d:l=>`+${l*20}% por toque`,max:20,base:180},
+  {id:'arm',n:'Armamento estelar',e:'⚔️',d:l=>`+${l*15}% daño a jefes`,max:15,base:240},
+  {id:'gen',n:'Xenobiología',e:'🧬',d:l=>`Tu compañero gana +${l*20}% XP`,max:10,base:240},
+  {id:'radio',n:'Radioastronomía',e:'📡',d:l=>`Meteoros ${Math.min(40,l*5)}% más seguido`,max:8,base:300},
+  {id:'chrono',n:'Cronología',e:'⏱️',d:l=>`+${l*30} min de tiempo inactivo`,max:12,base:300},
+  {id:'exp',n:'Logística espacial',e:'📦',d:l=>`Expediciones +${l*10}% polvo y gemas`,max:10,base:360},
+  {id:'labs',n:'Laboratorio automático',e:'🔬',d:l=>`Investigaciones ${l*8}% más rápidas`,max:5,base:600},
+];
+const LAB_BY={}; LAB.forEach(u=>LAB_BY[u.id]=u);
+const lab=id=>(S.lab&&S.lab.lv[id])||0;
+const labTotal=()=>Object.values(S.lab.lv).reduce((a,b)=>a+b,0);
+const labDur=u=>u.base*Math.pow(1.5,lab(u.id))*(1-0.08*lab('labs'));
+const labCost=u=>Math.max(200*(lab(u.id)+1), S.peakDps*u.base*0.5*Math.pow(1.6,lab(u.id)));
+const labGemCost=()=>{ const c=S.lab.cur; return c?Math.max(1,Math.ceil((c.end-Date.now())/600000)):0; };
+function labStart(u){
+  if(S.lab.cur) return toast('El laboratorio ya está investigando algo');
+  if(lab(u.id)>=u.max) return;
+  const c=labCost(u); if(S.dust<c) return toast(`Necesitás ${fmt(c)} de polvo`);
+  S.dust-=c; const d=labDur(u); S.lab.cur={id:u.id,end:Date.now()+d*1000,dur:d};
+  snd(500,.15,'sine',.04); snd(750,.15,'sine',.04,.1); toast(`${u.e} Investigando ${u.n}…`); labKey=''; save(); render();
+}
+function checkLab(){
+  const c=S.lab.cur; if(!c||Date.now()<c.end) return;
+  const u=LAB_BY[c.id]; S.lab.lv[c.id]=lab(c.id)+1; S.lab.cur=null; S.lab.done++; cnt('research'); passXp(30); labKey='';
+  jingle(); toast(`🔬 Investigación lista: ${u.e} ${u.n} Nv ${lab(c.id)} · ${u.d(lab(c.id))}`); save();
+}
+let labKey='', expPane='viajes'; const labBtns={};
+function renderLab(){
+  const c=S.lab.cur, now=Date.now(), cc=$('#labCur');
+  const ck=c?c.id:'-';
+  if(cc.dataset.k!==ck){ cc.dataset.k=ck;
+    if(c){ const u=LAB_BY[c.id];
+      cc.innerHTML=`<div class="t"><span class="big">${u.e}</span>Investigando: ${u.n} → Nv ${lab(u.id)+1}</div><div class="bar g"><i id="labBar"></i></div>
+        <div class="d">Termina en <b id="labT"></b> · sigue aunque cierres el juego</div><button class="btn gem sm" id="labFin" style="margin-top:8px"></button>`;
+      $('#labFin').addEventListener('click',()=>{ const g=labGemCost(); if(!S.lab.cur) return; if(S.gems<g) return toast(`Te faltan 💎${g-S.gems}`);
+        S.gems-=g; S.lab.cur.end=Date.now(); checkLab(); render(); });
+    } else cc.innerHTML=`<div class="t"><span class="big">🔬</span>Laboratorio libre</div><div class="d">Elegí un proyecto. Las investigaciones son <b>permanentes</b>: no se pierden con Supernova ni con Colapso universal.</div>`;
+  }
+  if(c){ const left=(c.end-now)/1000; $('#labBar').style.width=Math.min(100,100*(1-left/c.dur))+'%'; $('#labT').textContent=clock(left); $('#labFin').textContent=`⚡ Terminar ya por 💎${labGemCost()}`; }
+  const key=JSON.stringify(S.lab.lv)+'|'+ck;
+  if(key!==labKey){ labKey=key; const L=$('#labList'); L.innerHTML='';
+    LAB.forEach(u=>{ const l=lab(u.id), mx=l>=u.max, r=document.createElement('div'); r.className='row'+(mx?' done':'');
+      r.innerHTML=`<div class="ic">${u.e}</div><div class="info"><div class="nm">${u.n}<span class="lv">Nv ${l}/${u.max}</span></div>
+        <div class="sub" style="white-space:normal">${l?'Ahora: <b>'+u.d(l)+'</b><br>':''}${mx?'Nivel máximo':'Siguiente: '+u.d(l+1)+' · <b>'+fmtTime(labDur(u))+'</b>'}</div></div>
+        <button class="buy"><span class="q">${mx?'Máx':'Investigar'}</span><span class="c">${mx?'✓':''}</span></button>`;
+      const b=r.querySelector('.buy'); b.addEventListener('click',()=>labStart(u)); labBtns[u.id]=b; L.appendChild(r); });
+  }
+  LAB.forEach(u=>{ const b=labBtns[u.id]; if(!b) return; const mx=lab(u.id)>=u.max;
+    b.classList.toggle('no',mx||!!c||S.dust<labCost(u)); if(!mx) b.querySelector('.c').textContent=fmt(labCost(u)); });
+}
+$('#expSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; expPane=b.dataset.p;
+  document.querySelectorAll('#expSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  $('#p-viajes').classList.toggle('hidden',expPane!=='viajes'); $('#p-lab').classList.toggle('hidden',expPane!=='lab');
+  labKey=''; $('#labCur').dataset.k=''; render(); });
+
+/* ================= tutorial ================= */
+const TUT=[
+  {t:'¡Bienvenido a <b>Polvo Estelar</b>! 🌟<br>Vas a hacer crecer una estrella juntando polvo estelar. Te muestro lo básico en un minuto.',next:'Empezar'},
+  {sel:'#star',pad:16,round:true,tab:'gen',t:'Tocá la estrella para juntar polvo.<br>En computadora también sirve la <b>barra espaciadora</b>.',wait:()=>S.taps>=T0.taps+10,prog:()=>`${Math.min(10,S.taps-T0.taps)}/10 toques`},
+  {sel:'#genList .row:first-child .buy',tab:'gen',t:'Comprá un <b>Recolector</b>: produce polvo solo, aunque no toques.<br>Si no te alcanza, seguí tocando la estrella.',wait:()=>S.gens[0]>=T0.g0+1},
+  {sel:'.top .dust',pad:8,t:'Arriba ves tu polvo y cuánto producís por segundo. Los generadores <b>siguen produciendo aunque cierres el juego</b>.'},
+  {sel:'#star',pad:28,round:true,t:'<b>Pulso estelar:</b> un anillo se cierra sobre la estrella. Tocá justo cuando la alcanza (brilla celeste) para un <b>toque perfecto x5</b>. ¡10 seguidos activan la Resonancia!'},
+  {sel:'#nav button[data-t="upg"]',t:'En <b>Mejoras</b> multiplicás la producción. El punto rojo te avisa cuando podés comprar algo.'},
+  {sel:'#nav button[data-t="exp"]',t:'En <b>Viajes</b> mandás expediciones que vuelven con premios, y en el <b>Laboratorio</b> investigás mejoras permanentes.'},
+  {sel:'#nav button[data-t="cos"]',t:'<b>Cosmos</b>: eventos, <b>jefes cósmicos</b>, tu compañero, la Bolsa y las constelaciones. Cuando llegue un jefe, ¡tocá rápido la estrella para dispararle!'},
+  {sel:'#nav button[data-t="nova"]',t:'Al ganar 1 M de polvo vas a poder hacer <b>Supernova</b>: reiniciás a cambio de núcleos que multiplican todo. Después vienen los desafíos y el multiverso.'},
+  {sel:'#nav button[data-t="mis"]',t:'<b>Misiones</b>: premio diario, misiones, la rueda y los logros. ¡Pasá todos los días!'},
+  {sel:'#gemPill',pad:4,t:'Las <b>gemas 💎</b> se gastan en la tienda. Te regalo 💎10 para empezar. ¡A jugar!',next:'Terminar'},
+];
+let tutI=-1, T0={};
+const tutActive=()=>tutI>=0;
+function startTut(){ tutI=0; $('#tut').classList.remove('hidden'); showTut(); }
+function showTut(){
+  const st=TUT[tutI]; if(st.tab&&cur!==st.tab) go(st.tab);
+  T0={taps:S.taps,g0:S.gens[0]};
+  $('#tutStep').textContent=`PASO ${tutI+1} DE ${TUT.length}`;
+  $('#tutTxt').innerHTML=st.t+(st.prog?'<div class="tp" id="tutProg"></div>':'');
+  const nb=$('#tutNext'); nb.classList.toggle('hidden',!!st.wait); nb.textContent=st.next||'Siguiente';
+  $('#tutSkip').textContent=tutI===0?'Saltar tutorial':'Saltar';
+  placeTut();
+}
+function placeTut(){
+  if(tutI<0) return; const st=TUT[tutI], spot=$('#tutSpot'), box=$('#tutBox');
+  if(!st.sel){ Object.assign(spot.style,{left:'50%',top:'38%',width:'0px',height:'0px'}); box.style.top='42%'; box.style.bottom='auto'; return; }
+  const el=$(st.sel); if(!el) return; const r=el.getBoundingClientRect(), p=st.pad||6;
+  Object.assign(spot.style,{left:(r.left-p)+'px',top:(r.top-p)+'px',width:(r.width+2*p)+'px',height:(r.height+2*p)+'px',borderRadius:st.round?'50%':'16px'});
+  if(r.top+r.height/2<innerHeight/2){ box.style.top=Math.min(innerHeight-200,r.bottom+p+12)+'px'; box.style.bottom='auto'; }
+  else { box.style.bottom=(innerHeight-r.top+p+12)+'px'; box.style.top='auto'; }
+  if(st.prog){ const pe=$('#tutProg'); if(pe) pe.textContent=st.prog(); }
+  if(st.wait&&st.wait()){ jingle(); tutAdvance(); }
+}
+function tutAdvance(){ tutI++; if(tutI>=TUT.length) return endTut(true); showTut(); }
+function endTut(done){
+  $('#tut').classList.add('hidden'); tutI=-1; S.tutDone=1;
+  if(done&&!S.tutRew){ S.tutRew=1; addGems(10); jingle(); toast('🎓 ¡Tutorial completo! +💎10'); }
+  save();
+}
+$('#tutNext').addEventListener('click',tutAdvance);
+$('#tutSkip').addEventListener('click',()=>endTut(false));
+$('#tutAgain').addEventListener('click',()=>{ go('gen'); $('#main').scrollTop=0; startTut(); });
+
+
+/* ================= forja de reliquias ================= */
+function openForge(r){
+  const l=rlv(r.id); if(!l) return toast('Todavía no encontraste esta reliquia');
+  const t=rtier(r.id), R0=RAR[t];
+  if(t>=3) return showModal(r.e,`${r.n}`,`Rareza <b style="color:${R0.c}">${R0.n}</b> (la máxima) · Nivel ${l}<br>Efecto: <b>${r.f(rl(r.id))}</b>`,[['Cerrar',null]]);
+  const c=FORGE[t], R1=RAR[t+1];
+  showModal('⚒️',`Forjar ${r.n}`,`Rareza <b style="color:${R0.c}">${R0.n}</b> → <b style="color:${R1.c}">${R1.n}</b><br>Efecto: ${r.f(rl(r.id))} → <b>${r.f(l*R1.m)}</b><br><span style="font-size:12.5px">Cada nivel pasa a valer x${R1.m} (antes x${R0.m}).</span><br><br>
+    Cuesta <b>${c.f} fragmentos ✧</b> (tenés ${rfrag(r.id)}) y <span class="gm">💎 ${c.g}</span> (tenés ${fmt(S.gems)}).<br><span style="font-size:12px">Los fragmentos salen de las reliquias repetidas.</span>`,
+    [['Cancelar',null,'alt'],['⚒️ Forjar',()=>forgeRelic(r)]]);
+}
+function forgeRelic(r){
+  const t=rtier(r.id); if(t>=3) return; const c=FORGE[t];
+  if(rfrag(r.id)<c.f) return toast(`Te faltan ${c.f-rfrag(r.id)} fragmentos de ${r.n}`);
+  if(S.gems<c.g) return toast(`Te faltan 💎${c.g-S.gems}`);
+  S.relicFrag[r.id]=rfrag(r.id)-c.f; S.gems-=c.g; S.relicTier[r.id]=t+1; S.forged=(S.forged||0)+1;
+  flash(); jingle(); snd(220,.15,'square',.04); snd(330,.15,'square',.04,.12); vib([20,40,20,40]);
+  showModal(r.e,'¡Forja exitosa!',`<b>${r.n}</b> ahora es <b style="color:${RAR[t+1].c}">${RAR[t+1].n}</b>.<br>Nuevo efecto: <b>${r.f(rl(r.id))}</b>`,[['¡Genial!',null]]);
+  buildRelics(); save();
+}
+
+/* ================= avisos dentro del juego ================= */
+const hhmm=t=>new Date(t).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+function readyAlerts(){
+  const A=[];
+  if(dailyAvail()) A.push({k:'daily',e:'📅',t:'Premio diario listo',a:'mis'});
+  const mc=S.missions.filter(m=>!m.ok&&misProg(m)>=m.t).length;
+  if(mc) A.push({k:'mis',e:'📜',t:`${mc} misi${mc>1?'ones':'ón'} para reclamar`,a:'mis'});
+  if(wheelFree()) A.push({k:'wheel',e:'🎡',t:'Giro gratis en la rueda',a:'wheel'});
+  EXPS.forEach(x=>{ if(expState(x)==='done') A.push({k:'exp'+x.id,e:x.e,t:`Volvió la expedición: ${x.n}`,a:'exp'}); });
+  if(!S.lab.cur&&LAB.some(u=>lab(u.id)<u.max&&S.dust>=labCost(u))) A.push({k:'lab',e:'🔬',t:'El laboratorio está libre',a:'lab'});
+  if(petGiftReady()) A.push({k:'gift',e:'🎁',t:`${S.pet.name} te trajo un regalo`,a:'gift'});
+  if(RELICS.some(r=>canForge(r.id))) A.push({k:'forge',e:'⚒️',t:'Podés forjar una reliquia',a:'forge'});
+  const pn=pendingNuc(); if(pn>=1&&pn>=Math.max(1,S.nucleosTotal*0.5)) A.push({k:'nova',e:'💥',t:`Supernova recomendada: +${fmt(pn)} núcleos`,a:'nova'});
+  return A;
+}
+function upcoming(){
+  const U=[], now=Date.now();
+  EXPS.forEach(x=>{ if(expState(x)==='run') U.push({e:x.e,t:`Vuelve ${x.n}`,at:S.exp[x.id].end}); });
+  if(S.lab.cur){ const u=LAB_BY[S.lab.cur.id]; U.push({e:u.e,t:`Termina ${u.n}`,at:S.lab.cur.end}); }
+  if(!wheelFree()) U.push({e:'🎡',t:'Giro gratis',at:S.wheelAt});
+  if(S.pet.lv>=5&&!petGiftReady()) U.push({e:'🎁',t:`Regalo de ${S.pet.name}`,at:S.pet.giftAt});
+  if(!BOSS&&S.boss.next>now) U.push({e:bossOf(S.boss.lv).e,t:`Llega ${bossOf(S.boss.lv).n}`,at:S.boss.next});
+  const mid=new Date(); mid.setHours(24,0,0,0); U.push({e:'📜',t:'Misiones nuevas y premio diario',at:+mid});
+  U.push({e:'🌙',t:'Si cerrás ahora, se llena tu almacenamiento',at:now+offlineCap()*1000});
+  return U.sort((a,b)=>a.at-b.at);
+}
+function openAlerts(){
+  const A=readyAlerts(), U=upcoming(), now=Date.now();
+  const h=(A.length?`<div class="alh">LISTO AHORA</div>${A.map(a=>`<div class="alrow" data-a="${a.a}"><span class="ae">${a.e}</span>${a.t}<span class="ago">Ir ›</span></div>`).join('')}`
+    :'<div style="margin:4px 0 8px">No hay nada pendiente. 👌</div>')
+    +`<div class="alh">PRÓXIMAMENTE</div>${U.map(u=>`<div class="uprow"><span>${u.e}</span><span>${u.t}</span><b>${hhmm(u.at)} · ${fmtTime((u.at-now)/1000)}</b></div>`).join('')}
+    <div style="font-size:11.5px;margin-top:10px">Los avisos aparecen mientras jugás. Con el juego cerrado, mirá estos horarios para saber cuándo volver.</div>`;
+  showModal('🔔','Avisos',h,[['Cerrar',null]]);
+}
+function doAlert(a){
+  if(a==='mis') go('mis');
+  else if(a==='wheel') openWheel();
+  else if(a==='exp'||a==='forge'){ go('exp'); if(expPane!=='viajes') $('#expSeg button[data-p="viajes"]').click(); if(a==='forge') setTimeout(()=>$('#relList').scrollIntoView({behavior:'smooth',block:'center'}),80); }
+  else if(a==='lab'){ go('exp'); if(expPane!=='lab') $('#expSeg button[data-p="lab"]').click(); }
+  else if(a==='gift'){ if(petGiftReady()) petClaimGift(); }
+  else if(a==='nova') go('nova');
+}
+function closeModalNow(){ $('#modal').classList.add('hidden'); const n=modalQ.shift(); if(n) setTimeout(()=>showModal(...n),120); }
+$('#mbox').addEventListener('click',e=>{ const r=e.target.closest('.alrow'); if(!r) return; closeModalNow(); doAlert(r.dataset.a); });
+$('#bellBtn').addEventListener('click',openAlerts);
+let alertKeys=null;
+function tickAlerts(){
+  const A=readyAlerts(), n=A.length, b=$('#bellN');
+  b.textContent=n>9?'9+':n; b.classList.toggle('hidden',!n);
+  const keys=new Set(A.map(a=>a.k));
+  if(alertKeys&&S.set.alerts&&!document.hidden){
+    const fresh=A.filter(a=>!alertKeys.has(a.k)&&a.k!=='nova'&&a.k!=='mis');
+    if(fresh.length){ fresh.forEach(a=>toast(`🔔 ${a.e} ${a.t}`)); vib([15,40,15]); snd(988,.12,'sine',.04); snd(1319,.18,'sine',.04,.1);
+      const bb=$('#bellBtn'); bb.classList.remove('ring'); void bb.offsetWidth; bb.classList.add('ring'); }
+  }
+  alertKeys=keys;
+}
+
+/* ================= guardado en la nube (por cuenta de Claude) ================= */
+const CLOUD={state:'init',ref:null,busy:false,lastSaved:0,lastTotal:-1,msg:''};
+const withTimeout=(pr,ms)=>Promise.race([pr,new Promise((_,rej)=>setTimeout(()=>rej({code:'timeout'}),ms))]);
+async function cloudInit(){
+  if(typeof claude==='undefined'||!claude||typeof claude.use!=='function'){ CLOUD.state='off'; return renderCloud(); }
+  try{
+    const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
+    if(!db||!user){ CLOUD.state='off'; return renderCloud(); }
+    const uid=await user.id(); if(!uid){ CLOUD.state='off'; return renderCloud(); }
+    CLOUD.ref=db.doc('data/users/'+uid+'/save'); CLOUD.bref=db.doc('data/users/'+uid+'/backup'); CLOUD.state='on'; renderCloud();
+    const snap=await withTimeout(CLOUD.ref.get(),10000);
+    const d=snap&&snap.exists?snap.data():null;
+    if(d&&d.s){ CLOUD.lastSaved=d.t||0;
+      if((d.total||0)>S.totalEarned*1.001+100) promptCloudLoad(d,false); else cloudSave(true);
+    } else cloudSave(true);
+  }catch(e){ CLOUD.state='err'; CLOUD.msg=e&&e.code||''; }
+  renderCloud();
+}
+async function cloudSave(force){
+  if(CLOUD.state!=='on'||CLOUD.busy||!CLOUD.ref) return;
+  if(!force&&S.totalEarned===CLOUD.lastTotal) return;
+  CLOUD.busy=true; save();
+  const t=Date.now(), body={v:1,t,total:S.totalEarned,stage:stageIdx(),sn:S.supernovas,col:S.collapses,s:JSON.stringify(S)};
+  try{ await withTimeout(CLOUD.ref.set(body),15000); CLOUD.lastSaved=t; CLOUD.lastTotal=S.totalEarned; if(!S.cloudOk){ S.cloudOk=1; save(); } }
+  catch(e){ const c=e&&e.code; if(c==='revoked'||c==='not_granted'||c==='invalid_argument'){ CLOUD.state='err'; CLOUD.msg=c; } else if(c==='quota_exceeded'){ CLOUD.state='err'; CLOUD.msg='sin espacio en la nube'; } }
+  CLOUD.busy=false; renderCloud();
+}
+function promptCloudLoad(d,manual,src){
+  const gp=src==='gp';
+  const ago=d.t?fmtTime((Date.now()-d.t)/1000):'—';
+  showModal(gp?'▶️':'☁️',gp?(manual?'Partida en Google Play':'Encontramos tu partida en Google Play'):(manual?'Partida en la nube':'Encontramos tu partida en la nube'),
+    `<div class="slist"><b>${gp?'En Google Play':'En la nube'}</b> (guardada hace ${ago}):<br>✦ ${fmt(d.total||0)} polvo total · ${STAGES[d.stage||0].n} · ${d.sn||0} supernovas<br><br><b>En este dispositivo</b>:<br>✦ ${fmt(S.totalEarned)} polvo total · ${STAGES[stageIdx()].n} · ${S.supernovas} supernovas</div><br>¿Cuál querés usar? La otra queda guardada como respaldo.`,
+    [['Usar la de este dispositivo',()=>{ if(gp){ gpSave(true); return; } CLOUD.bref.set(d).catch(()=>{}).then(()=>cloudSave(true)); toast('☁️ Se guardó una copia de respaldo de la partida anterior'); },'alt'],['Cargar la de la nube',()=>{ try{ const o=JSON.parse(d.s); try{ localStorage.setItem(KEY+'_respaldo',JSON.stringify(S)); }catch(_){} merge(o); S.last=Date.now(); lastTick=Date.now(); clearEventFx(); refreshAll(); save(); CLOUD.lastTotal=S.totalEarned; GP.lastTotal=S.totalEarned; toast(gp?'▶️ Partida de Google Play cargada':'☁️ Partida de la nube cargada'); }catch(e){ toast('❌ No se pudo leer la partida de la nube'); } },'gem']]);
+}
+function renderCloud(){
+  const st=$('#cloudSt'); if(!st) return; const on=CLOUD.state==='on';
+  $('#cloudUp').disabled=!on||CLOUD.busy; $('#cloudDown').disabled=!on;
+  if(CLOUD.state==='init') st.innerHTML='Conectando con tu cuenta…';
+  else if(CLOUD.state==='off') st.innerHTML='No disponible acá. Funciona cuando abrís el juego desde Claude (web o app) con tu cuenta iniciada. Mientras tanto se guarda en este dispositivo.';
+  else if(CLOUD.state==='err') st.innerHTML=`⚠️ No se pudo usar la nube${CLOUD.msg?` (${CLOUD.msg})`:''}. Se sigue guardando en este dispositivo.`;
+  else st.innerHTML=`✅ Conectado a tu cuenta de Claude<br>${CLOUD.busy?'Guardando…':CLOUD.lastSaved?`Último guardado en la nube: <b>hace ${fmtTime((Date.now()-CLOUD.lastSaved)/1000)}</b>`:'Todavía no se guardó'}<br><span style="font-size:12px">Se guarda solo cada minuto y al salir. Abrí este mismo juego en otro dispositivo con tu cuenta y vas a poder seguir donde dejaste.</span>`;
+}
+$('#cloudUp').addEventListener('click',()=>cloudSave(true).then(()=>{ if(CLOUD.state==='on') toast('☁️ Guardado en la nube'); }));
+$('#cloudDown').addEventListener('click',async()=>{
+  if(CLOUD.state!=='on') return;
+  try{ const snap=await withTimeout(CLOUD.ref.get(),10000); const d=snap.exists?snap.data():null; if(d&&d.s) promptCloudLoad(d,true); else toast('Todavía no hay una partida en la nube'); }
+  catch(e){ toast('No se pudo leer la nube ahora'); }
+});
+
+
+/* ================= puente nativo (solo dentro de la app de Android) ================= */
+const NATIVE=(typeof window.PolvoNative!=='undefined'&&window.PolvoNative)?window.PolvoNative:null;
+const PRODUCTS={
+  gemas_100:{n:'Bolsa de gemas',e:'💎',g:100,d:'💎100'},
+  gemas_550:{n:'Cofre de gemas',e:'💰',g:550,d:'💎550',tag:'+10%'},
+  gemas_1200:{n:'Tesoro de gemas',e:'👑',g:1200,d:'💎1200',tag:'+20%'},
+  pack_inicio:{n:'Pack de inicio',e:'🎁',g:300,d:'💎300 + 3 reliquias al azar (cada tipo 12,5%) + Impulso x2 por 1 h (una sola vez)',once:true},
+  pase_premium:{n:'Pase premium',e:'🎟️',d:'Desbloquea las recompensas premium de esta temporada'},
+};
+let PRICES={}, GP={signedIn:false,busy:false,last:0,msg:''};
+window.onNativeEvent=function(ev){
+  try{
+    if(typeof ev==='string') ev=JSON.parse(ev);
+    if(ev.type==='products'){ PRICES={}; (ev.list||[]).forEach(x=>PRICES[x.id]=x.price); renderPay(); renderPassPrem(); }
+    else if(ev.type==='purchase') grantPurchase(ev.id,ev.token);
+    else if(ev.type==='purchase_pending') toast('⏳ Compra pendiente: se acreditará cuando se confirme el pago');
+    else if(ev.type==='purchase_cancel') toast('Compra cancelada');
+    else if(ev.type==='purchase_error') toast('❌ No se pudo completar la compra'+(ev.msg?': '+ev.msg:''));
+    else if(ev.type==='pgs'){ GP.signedIn=!!ev.signedIn; GP.msg=ev.msg||''; renderGP(); if(GP.signedIn&&!GP.loaded){ GP.loaded=true; NATIVE.cloudLoad(false); } }
+    else if(ev.type==='cloud'){ GP.busy=false; if(ev.data){ const d=JSON.parse(ev.data); if(d&&d.s){ if(ev.manual||(d.total||0)>S.totalEarned*1.001+100) promptCloudLoad(d,!!ev.manual,'gp'); } } else if(ev.manual) toast('Todavía no hay partida en Google Play'); renderGP(); }
+    else if(ev.type==='cloud_saved'){ GP.busy=false; GP.last=Date.now(); GP.lastTotal=S.totalEarned; if(ev.manual) toast('▶️ Guardado en Google Play Juegos'); renderGP(); }
+    else if(ev.type==='cloud_error'){ GP.busy=false; GP.msg=ev.msg||'error'; renderGP(); if(ev.manual) toast('❌ Google Play Juegos: '+(ev.msg||'error')); }
+    else if(ev.type==='shared'){ S.shared=1; save(); }
+  }catch(e){}
+};
+function cloudBody(){ return {v:1,t:Date.now(),total:S.totalEarned,stage:stageIdx(),sn:S.supernovas,col:S.collapses,s:JSON.stringify(S)}; }
+function gpSave(manual){
+  if(!NATIVE||!GP.signedIn||GP.busy) return; if(!manual&&GP.lastTotal===S.totalEarned) return;
+  GP.busy=true; save(); renderGP();
+  try{ NATIVE.cloudSave(JSON.stringify(cloudBody()),!!manual); }catch(e){ GP.busy=false; }
+}
+function renderGP(){
+  if(!NATIVE) return; $('#gpBox').classList.remove('hidden');
+  $('#gpUp').disabled=!GP.signedIn||GP.busy; $('#gpDown').disabled=!GP.signedIn; $('#gpSign').classList.toggle('hidden',GP.signedIn);
+  $('#gpSt').innerHTML=GP.signedIn?`✅ Conectado a Google Play Juegos<br>${GP.busy?'Guardando…':GP.last?`Último guardado: <b>hace ${fmtTime((Date.now()-GP.last)/1000)}</b>`:'Se guarda solo cada 3 minutos y al salir.'}<br><span style="font-size:12px">Si cambiás de celular, iniciá sesión con la misma cuenta de Google y cargá tu partida.</span>`
+    :`No conectado${GP.msg?` (${GP.msg})`:''}. Iniciá sesión para guardar tu partida en tu cuenta de Google.`;
+}
+$('#gpUp').addEventListener('click',()=>gpSave(true));
+$('#gpDown').addEventListener('click',()=>{ if(NATIVE&&GP.signedIn){ GP.busy=true; renderGP(); NATIVE.cloudLoad(true); } });
+$('#gpSign').addEventListener('click',()=>{ if(NATIVE) NATIVE.signIn(); });
+
+/* ================= micropagos (Google Play Billing a través de la app) ================= */
+function grantPurchase(id,token){
+  if(token&&S.tokens.includes(token)){ try{ NATIVE&&NATIVE.confirm(token,id); }catch(e){} return; }
+  const pr=PRODUCTS[id]; if(!pr) return;
+  if(id==='pase_premium'){ S.passPrem[passKey()]=1; }
+  else{ addGems(pr.g);
+    if(id==='pack_inicio'){ S.starterDone=1; for(let i=0;i<3;i++) gainRelic(RELICS[Math.floor(Math.random()*RELICS.length)]); S.boostUntil=Math.max(Date.now(),S.boostUntil)+3600e3; buildRelics(); } }
+  if(token){ S.tokens.push(token); if(S.tokens.length>80) S.tokens.shift(); }
+  save(); flash(); jingle(); vib([30,50,30]);
+  showModal(pr.e,'¡Gracias por tu compra!',`Recibiste: <b>${pr.d}</b>.`,[['¡Genial!',null]]);
+  try{ if(NATIVE&&token) NATIVE.confirm(token,id); }catch(e){}
+  renderPay(); renderPassPrem(); renderPass(true);
+}
+function nativeBuy(id){
+  if(!NATIVE) return toast('Las compras están disponibles solo en la app de Android');
+  if(id==='pack_inicio'&&S.starterDone) return toast('Ya compraste el pack de inicio');
+  if(id==='pase_premium'&&passIsPrem()) return toast('Ya tenés el pase premium de esta temporada');
+  try{ NATIVE.buy(id); }catch(e){ toast('No se pudo abrir la compra'); }
+}
+function renderPay(){
+  const L=$('#payList'); if(!L) return;
+  $('#payNote').textContent=NATIVE?'compras seguras con Google Play':'solo en la app de Android';
+  L.innerHTML='';
+  ['gemas_100','gemas_550','gemas_1200','pack_inicio'].forEach(id=>{ const pr=PRODUCTS[id]; if(id==='pack_inicio'&&S.starterDone) return;
+    const r=document.createElement('div'); r.className='row';
+    const price=NATIVE?(PRICES[id]||'…'):'App';
+    r.innerHTML=`<div class="ic">${pr.e}</div><div class="info"><div class="nm">${pr.n}${pr.tag?`<span class="tagx">${pr.tag}</span>`:''}</div><div class="sub" style="white-space:normal">${pr.d}</div></div>
+      <button class="buy paybtn ${NATIVE?'':'no'}"><span class="q">Comprar</span><span class="c">${price}</span></button>`;
+    r.querySelector('.buy').addEventListener('click',()=>nativeBuy(id)); L.appendChild(r); });
+  if(!NATIVE){ const n=document.createElement('p'); n.className='note'; n.style.marginTop='6px';
+    n.innerHTML='Las compras con dinero real funcionan solo en la app instalada desde Google Play. Acá podés seguir ganando gemas jugando.'; L.appendChild(n); }
+}
+
+/* ================= pase de temporada ================= */
+const PASS_LV=30, PASS_XP=150;
+const passKey=()=>todayKey().slice(0,7);
+const passIsPrem=()=>!!S.passPrem[passKey()];
+function ensurePass(){ const k=passKey(); if(S.pass.key!==k){ S.pass={key:k,xp:0,cf:{},cp:{}}; passDirty=true; } }
+const passLevel=()=>Math.min(PASS_LV,Math.floor(S.pass.xp/PASS_XP));
+let passDirty=true, activeAcc=0;
+function passXp(n){
+  ensurePass(); const before=passLevel(); S.pass.xp=Math.min(PASS_LV*PASS_XP,S.pass.xp+n); const after=passLevel();
+  if(after>before){ passDirty=true; toast(`🎟️ Pase de temporada: ¡nivel ${after}!`); snd(784,.12,'triangle',.04); snd(1175,.16,'triangle',.04,.1); }
+}
+function passReward(lv,prem){
+  const h=x=>({e:'✦',t:`${x}h de polvo`,give:()=>{ const g=Math.max(300*lv,dps(true)*3600*x); earn(g); return `+${fmt(g)} de polvo`; }});
+  const gm=n=>({e:'💎',t:`${n} gemas`,give:()=>{ addGems(n); return `+💎${n}`; }});
+  const rel=n=>({e:'🏺',t:n>1?`${n} reliquias`:'Reliquia',give:()=>{ const o=[]; for(let i=0;i<n;i++){ const r=RELICS[Math.floor(Math.random()*RELICS.length)]; gainRelic(r); o.push(r.e); } buildRelics(); return 'Reliquias: '+o.join(' '); }});
+  if(!prem){
+    if(lv%10===0) return rel(1);
+    if(lv%5===0) return gm(15);
+    if(lv%2===0) return h(+(0.5+lv*0.05).toFixed(1));
+    return gm(5);
+  }
+  if(lv===15) return {e:'👾',t:'Compañero dorado + 💎50',give:()=>{ S.cosm.gold=1; S.set.gold=true; addGems(50); renderPet(); return 'Compañero dorado y 💎50'; }};
+  if(lv===30) return {e:'✨',t:'Aura de temporada + 💎100',give:()=>{ S.cosm.aura=1; S.set.aura=true; addGems(100); applyCosm(); return 'Aura de temporada y 💎100'; }};
+  if(lv%10===0) return rel(2);
+  if(lv%5===0) return {e:'🚀',t:'Impulso x2 30 min',give:()=>{ S.boostUntil=Math.max(Date.now(),S.boostUntil)+30*60000; return 'Impulso x2 por 30 minutos'; }};
+  if(lv%3===0) return gm(20);
+  return {e:'✦',t:'1h polvo + 💎10',give:()=>{ const g=Math.max(300*lv,dps(true)*3600); earn(g); addGems(10); return `+${fmt(g)} de polvo y 💎10`; }};
+}
+function claimPass(lv,prem,quiet){
+  ensurePass(); const map=prem?S.pass.cp:S.pass.cf;
+  if(map[lv]||lv>passLevel()||(prem&&!passIsPrem())) return null;
+  map[lv]=1; const msg=passReward(lv,prem).give(); passDirty=true;
+  if(!quiet){ jingle(); toast(`🎟️ Nivel ${lv}: ${msg}`); save(); }
+  return msg;
+}
+function renderPassCard(){
+  ensurePass(); const lv=passLevel(), inLv=S.pass.xp-lv*PASS_XP, mx=lv>=PASS_LV;
+  const end=new Date(); end.setMonth(end.getMonth()+1,1); end.setHours(0,0,0,0);
+  const ls=(end-Date.now())/1000, left=ls>172800?`${Math.floor(ls/86400)} días`:fmtTime(ls), name=new Date().toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+  const pend=passPending();
+  [['#passLvl','#passBar','#passSub'],['#passLvl2','#passBar2','#passSub2']].forEach(([a,b,c])=>{ $(a).textContent=lv; $(b).style.width=(mx?100:100*inLv/PASS_XP)+'%';
+    $(c).innerHTML=`Temporada de ${name}${passIsPrem()?' · <b style="color:var(--gold)">⭐ Premium</b>':''}`; });
+  $('#passXpT').textContent=mx?'¡Nivel máximo!':`${inLv}/${PASS_XP} XP`; $('#passLeft').textContent=`termina en ${left}`;
+  $('#passOpen').textContent=pend?`Ver recompensas · ${pend} para reclamar`:'Ver recompensas';
+  $('#passTitle').textContent='🎟️ Pase de temporada';
+}
+function passPending(){ const lv=passLevel(); let n=0; for(let i=1;i<=lv;i++){ if(!S.pass.cf[i]) n++; if(passIsPrem()&&!S.pass.cp[i]) n++; } return n; }
+function renderPassPrem(){
+  const B=$('#premBox'); if(!B) return;
+  if(passIsPrem()){ B.innerHTML='<div style="font-size:13px;color:var(--gold);font-weight:700">⭐ Tenés el pase premium de esta temporada.</div>'; return; }
+  B.innerHTML=`<button class="btn paybtn" id="premBuy" ${NATIVE?'':'disabled'}>⭐ Desbloquear premium · ${NATIVE?(PRICES.pase_premium||'…'):'solo en la app'}</button>
+    <div style="font-size:11.5px;color:var(--muted);margin-top:5px">Incluye más gemas, reliquias, impulsos, el <b>Compañero dorado</b> (nv 15) y el <b>Aura de temporada</b> (nv 30). Lo que ya alcanzaste se puede reclamar al instante.</div>`;
+  const b=$('#premBuy'); if(b) b.addEventListener('click',()=>nativeBuy('pase_premium'));
+}
+function renderPass(force){
+  renderPassCard();
+  const L=$('#passList'); if(!L) return;
+  const key=[S.pass.key,passLevel(),passIsPrem(),JSON.stringify(S.pass.cf),JSON.stringify(S.pass.cp)].join('|');
+  if(!force&&!passDirty&&L.dataset.k===key) return; passDirty=false; L.dataset.k=key; L.innerHTML='';
+  const lv=passLevel(), prem=passIsPrem();
+  for(let i=1;i<=PASS_LV;i++){
+    const f=passReward(i,false), p=passReward(i,true), r=document.createElement('div'); r.className='prow'+(i<=lv?' reach':'');
+    const fc=S.pass.cf[i]?'done':(i<=lv?'can':''), pc=S.pass.cp[i]?'done':(!prem?'lockp':(i<=lv?'can':''));
+    r.innerHTML=`<div class="plv">${i}</div><div class="pcell ${fc}" data-l="${i}" data-p="0"><span class="pe">${f.e}</span>${f.t}</div><div class="pcell prem ${pc}" data-l="${i}" data-p="1"><span class="pe">${p.e}</span>${p.t}</div>`;
+    L.appendChild(r);
+  }
+}
+$('#passList').addEventListener('click',e=>{ const c=e.target.closest('.pcell'); if(!c) return; const lv=+c.dataset.l, pr=c.dataset.p==='1';
+  if(pr&&!passIsPrem()) return toast('⭐ Necesitás el pase premium'); if(lv>passLevel()) return toast(`Llegá al nivel ${lv} del pase`);
+  if(claimPass(lv,pr)) renderPass(true); });
+$('#passAll').addEventListener('click',()=>{ let n=0; for(let i=1;i<=passLevel();i++){ if(claimPass(i,false,true)) n++; if(claimPass(i,true,true)) n++; }
+  if(n){ jingle(); toast(`🎟️ Reclamaste ${n} recompensa${n>1?'s':''}`); save(); } else toast('No hay recompensas para reclamar'); renderPass(true); });
+$('#passOpen').addEventListener('click',()=>go('pass'));
+
+/* ================= cosméticos ================= */
+function applyCosm(){
+  $('#app').classList.toggle('aura',!!(S.cosm.aura&&S.set.aura));
+  ['#pet','#petBig'].forEach(q=>$(q).classList.toggle('gold',!!(S.cosm.gold&&S.set.gold)));
+}
+
+/* ================= compartir progreso ================= */
+function drawShareCard(){
+  const W=1080,H=1350, c=document.createElement('canvas'); c.width=W; c.height=H; const x=c.getContext('2d');
+  const st=STAGES[stageIdx()];
+  const g=x.createRadialGradient(W/2,H*.32,0,W/2,H*.32,H*.9); g.addColorStop(0,'#2a1e6e'); g.addColorStop(.5,'#0d0c2c'); g.addColorStop(1,'#05060f');
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+  let seed=7; const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+  for(let i=0;i<220;i++){ x.globalAlpha=.25+rnd()*.75; x.fillStyle='#dfe3ff'; x.beginPath(); x.arc(rnd()*W,rnd()*H,rnd()*2.2+.4,0,6.28); x.fill(); }
+  x.globalAlpha=1;
+  CONS.forEach(cn=>{ if(!S.cons[cn.id]) return; const [ox,oy,sz]=cn.sky, s=W*sz*1.1, X0=ox*W, Y0=oy*H*.9; const P=cn.p.map(([a,b])=>[X0+a*s,Y0+b*s]);
+    x.globalAlpha=.45; x.strokeStyle='#ffd88a'; x.lineWidth=2.5; cn.ed.forEach(([a,b])=>{ x.beginPath(); x.moveTo(...P[a]); x.lineTo(...P[b]); x.stroke(); });
+    x.globalAlpha=.95; x.fillStyle='#fff6d8'; P.forEach(([px,py])=>{ x.beginPath(); x.arc(px,py,4,0,6.28); x.fill(); }); });
+  x.globalAlpha=1;
+  const cx=W/2, cy=430, R=150*st.sc;
+  const halo=x.createRadialGradient(cx,cy,R*.6,cx,cy,R*2.4); halo.addColorStop(0,st.g+'aa'); halo.addColorStop(1,st.g+'00'); x.fillStyle=halo; x.beginPath(); x.arc(cx,cy,R*2.4,0,6.28); x.fill();
+  const core=x.createRadialGradient(cx-R*.32,cy-R*.4,R*.05,cx,cy,R); [0,.22,.55,.85,1].forEach((o,i)=>core.addColorStop(o,st.c[i])); x.fillStyle=core; x.beginPath(); x.arc(cx,cy,R,0,6.28); x.fill();
+  if(S.cosm.aura&&S.set.aura){ x.strokeStyle='rgba(255,215,90,.85)'; x.lineWidth=6; x.beginPath(); x.arc(cx,cy,R*1.35,0,6.28); x.stroke(); }
+  x.textAlign='center'; x.fillStyle='#ffd36b'; x.font="800 74px Orbitron, monospace"; x.fillText('POLVO ESTELAR',cx,120);
+  x.fillStyle='#eceeff'; x.font="700 40px 'Exo 2', sans-serif"; x.fillText(st.n,cx,cy+R+80);
+  const stats=[['✦ Polvo total',fmt(S.totalEarned)],['⚡ Producción',fmt(Math.max(S.peakDps,dps(true)))+'/s'],['💥 Supernovas',S.supernovas],['⚔️ Jefes vencidos',S.boss.kills],
+    ['💠 Reliquias',`${relicKinds()}/${RELICS.length}`],['✨ Constelaciones',`${Object.keys(S.cons).length}/${CONS.length}`],['🏆 Logros',`${Object.keys(S.ach).length}/${ACH.length}`],['👾 '+S.pet.name,'Nv '+S.pet.lv]];
+  const top=cy+R+130;
+  stats.forEach(([k,v],i)=>{ const col=i%2, row=Math.floor(i/2), bx=70+col*480, by=top+row*112;
+    x.fillStyle='rgba(30,32,80,.85)'; x.strokeStyle='rgba(150,160,255,.3)'; x.lineWidth=2; x.beginPath(); if(x.roundRect) x.roundRect(bx,by,460,96,22); else x.rect(bx,by,460,96); x.fill(); x.stroke();
+    x.textAlign='left'; x.fillStyle='#9295c8'; x.font="600 28px 'Exo 2', sans-serif"; x.fillText(k,bx+26,by+38);
+    x.fillStyle='#ffffff'; x.font="800 34px Orbitron, monospace"; x.fillText(String(v),bx+26,by+80); });
+  x.textAlign='center'; x.fillStyle='#ffd36b'; x.font="700 34px 'Exo 2', sans-serif"; x.fillText('¿Me alcanzás? 🌟',cx,H-60);
+  return c;
+}
+function shareText(){ return `🌟 Mi estrella en Polvo Estelar es una ${STAGES[stageIdx()].n}: ${fmt(S.totalEarned)} de polvo, ${S.supernovas} supernovas y ${S.boss.kills} jefes vencidos. ¿Me alcanzás?`; }
+function openShare(){
+  let url=''; let cv=null;
+  try{ cv=drawShareCard(); url=cv.toDataURL('image/png'); }catch(e){}
+  const btns=[['Cerrar',null,'alt']];
+  if(NATIVE) btns.push(['📤 Compartir',()=>{ try{ NATIVE.share(url.split(',')[1],shareText()); }catch(e){ toast('No se pudo compartir'); } },'gem']);
+  else btns.push(['⬇️ Guardar imagen',()=>saveShareImage(cv),'gem']);
+  showModal('📤','Compartí tu progreso',`${url?`<img id="shareImg" src="${url}" alt="Tarjeta de progreso">`:''}<div style="font-size:12.5px">${shareText()}</div>
+    <button class="btn alt sm" id="shareCopy" style="margin-top:8px">📋 Copiar texto</button>`,btns);
+  const cb=$('#shareCopy'); if(cb) cb.addEventListener('click',async()=>{ let ok=false; try{ await navigator.clipboard.writeText(shareText()); ok=true; }catch(e){} toast(ok?'📋 Texto copiado':'No se pudo copiar'); if(ok){ S.shared=1; save(); } });
+}
+async function saveShareImage(cv){
+  if(!cv) return toast('No se pudo generar la imagen');
+  let dl=null; try{ dl=(typeof claude!=='undefined'&&claude&&claude.use)?await claude.use('downloads'):null; }catch(e){}
+  if(!dl) return toast('Guardar imágenes no está disponible acá: usá "Copiar texto" o una captura de pantalla');
+  cv.toBlob(async b=>{ try{ await dl.save({filename:'polvo-estelar-progreso.png',data:b}); S.shared=1; save(); toast('🖼️ Imagen lista'); }catch(e){ if(e&&e.code!=='declined') toast('No se pudo guardar la imagen'); } },'image/png');
+}
+$('#shareBtn').addEventListener('click',openShare);
+$('#shareBtn2').addEventListener('click',openShare);
+
+/* ================= UI: generadores ================= */
+const genEls=[];
+function buildGens(){
+  const L=$('#genList'); L.innerHTML=''; genEls.length=0;
+  GENS.forEach((g,i)=>{
+    const r=document.createElement('div'); r.className='row';
+    r.innerHTML=`<div class="ic">${g.e}</div><div class="info"><div class="nm"><span class="n">${g.n}</span><span class="lv">Nv 1</span><span class="dn hidden">☀️x2</span></div>
+      <div class="sub"><b class="o">0</b> · +<span class="p">0</span>/s</div><div class="bar"><i></i></div></div>
+      <button class="buy"><span class="q">x1</span><span class="c">0</span></button>`;
+    L.appendChild(r);
+    const b=r.querySelector('.buy'); holdBuy(b,()=>buyGen(i));
+    genEls.push({r,n:r.querySelector('.n'),lv:r.querySelector('.lv'),dn:r.querySelector('.dn'),o:r.querySelector('.o'),p:r.querySelector('.p'),bar:r.querySelector('.bar i'),b,q:b.querySelector('.q'),c:b.querySelector('.c'),ic:r.querySelector('.ic')});
+  });
+}
+function holdBuy(btn,fn){
+  let sx=0,sy=0,timer=null,rep=null,repeated=false,dead=false;
+  const stop=()=>{ clearTimeout(timer); clearInterval(rep); timer=rep=null; };
+  btn.addEventListener('pointerdown',e=>{ sx=e.clientX; sy=e.clientY; repeated=false; dead=false;
+    timer=setTimeout(()=>{ repeated=true; if(fn()) vib(6); rep=setInterval(()=>{ if(fn()) vib(4); else stop(); },90); },420); });
+  btn.addEventListener('pointermove',e=>{ if(Math.abs(e.clientX-sx)>10||Math.abs(e.clientY-sy)>10){ dead=true; stop(); } });
+  btn.addEventListener('pointerup',()=>{ stop(); if(!repeated&&!dead){ if(fn()) vib(10); } });
+  btn.addEventListener('pointercancel',()=>{ dead=true; stop(); });
+  btn.addEventListener('pointerleave',stop);
+  btn.addEventListener('contextmenu',e=>e.preventDefault());
+}
+function renderGens(){
+  let shownLocked=false; const day=PH()==='dia';
+  for(let i=0;i<GENS.length;i++){
+    const el=genEls[i], g=GENS[i];
+    if(S.chal==='mini'&&i>=4){ el.r.classList.add('hidden'); continue; }
+    const unlocked=S.gens[i]>0 || i===0 || S.gens[i-1]>0 || S.runEarned>=g.c*0.5;
+    if(!unlocked){ if(shownLocked){ el.r.classList.add('hidden'); continue; } shownLocked=true;
+      el.r.classList.remove('hidden'); el.r.classList.add('lock'); el.n.textContent='???'; el.ic.textContent='❔';
+      el.lv.classList.add('hidden'); el.dn.classList.add('hidden'); el.o.textContent='0'; el.p.textContent='?'; el.bar.style.width='0';
+      el.q.textContent='x1'; el.c.textContent=fmt(unitCost(i)); el.b.classList.add('no'); continue; }
+    el.r.classList.remove('hidden','lock'); el.n.textContent=g.n; el.ic.textContent=g.e; el.lv.classList.remove('hidden');
+    el.dn.classList.toggle('hidden',!(g.sun&&day));
+    el.lv.textContent='Nv '+genLevel(i);
+    el.o.textContent=S.gens[i];
+    el.p.textContent=fmt(genProd(i));
+    const o=S.gens[i]; let prev=0,next=MILES[MILES.length-1];
+    for(const t of MILES){ if(o<t){ next=t; break; } prev=t; }
+    el.bar.style.width=(o>=MILES[MILES.length-1]?100:((o-prev)/(next-prev)*100))+'%';
+    const n=buyQty(i), c=costN(i,n), afford=S.buy==='max'?maxAfford(i)>0:c<=S.dust;
+    el.q.textContent='x'+(S.buy==='max'?Math.max(maxAfford(i),1):n);
+    el.c.textContent=fmt(c);
+    el.b.classList.toggle('no',!afford);
+  }
+}
+$('#seg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.buy=b.dataset.m;
+  document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x===b)); renderGens(); });
+
+/* ================= UI: mejoras ================= */
+let upgDirty=true, upgKey='';
+const upgEls={};
+function visibleUpg(){ return UPG.filter(u=>!S.upg[u.id]&&u.req()).sort((a,b)=>a.cost-b.cost); }
+function renderUpg(){
+  if(S.chal==='aust'){ if(upgKey!=='aust'){ upgKey='aust'; for(const k in upgEls) delete upgEls[k]; $('#upgList').innerHTML='<div class="empty">🚫 Desafío Austeridad en curso:<br>no podés comprar mejoras.</div>'; } return; }
+  const vis=visibleUpg(), key=vis.map(u=>u.id).join(',');
+  if(upgDirty||key!==upgKey){
+    upgDirty=false; upgKey=key; const L=$('#upgList'); L.innerHTML='';
+    for(const k in upgEls) delete upgEls[k];
+    if(!vis.length) L.innerHTML='<div class="empty">No hay mejoras disponibles todavía.<br>Seguí comprando generadores para desbloquear más.</div>';
+    vis.forEach(u=>{
+      const r=document.createElement('div'); r.className='row';
+      r.innerHTML=`<div class="ic">${u.e}</div><div class="info"><div class="nm">${u.name}</div><div class="sub">${u.desc}</div></div>
+        <button class="buy"><span class="q">Mejorar</span><span class="c">${fmt(u.cost)}</span></button>`;
+      const b=r.querySelector('.buy'); holdBuy(b,()=>{ if(buyUpg(u.id)) toast(`${u.e} ${u.name}`); return false; });
+      L.appendChild(r); upgEls[u.id]=b;
+    });
+  }
+  for(const id in upgEls) upgEls[id].classList.toggle('no',UPG_BY[id].cost>S.dust);
+}
+$('#buyAllUpg').addEventListener('click',()=>{ let n=0; for(const u of visibleUpg()){ if(u.cost<=S.dust&&buyUpg(u.id,true)) n++; }
+  if(n) snd(880,.12,'triangle',.04);
+  toast(n?`⬆️ Compraste ${n} mejora${n>1?'s':''}`:'No te alcanza para ninguna mejora'); });
+
+/* ================= UI: expediciones + reliquias ================= */
+const expEls={};
+function buildExp(){
+  const L=$('#expList'); L.innerHTML='';
+  EXPS.forEach(x=>{
+    const r=document.createElement('div'); r.className='row';
+    r.innerHTML=`<div class="ic">${x.e}</div><div class="info"><div class="nm">${x.n}</div><div class="sub"></div><div class="bar g"><i></i></div></div>
+      <button class="buy"><span class="q"></span><span class="c"></span></button>`;
+    const b=r.querySelector('.buy'); b.addEventListener('click',()=>expAction(x));
+    L.appendChild(r); expEls[x.id]={r,sub:r.querySelector('.sub'),bar:r.querySelector('.bar i'),b,q:b.querySelector('.q'),c:b.querySelector('.c')};
+  });
+  buildRelics();
+}
+function expState(x){ const e=S.exp[x.id]; if(!e||!e.end) return 'idle'; return Date.now()>=e.end?'done':'run'; }
+function renderExp(){
+  EXPS.forEach(x=>{
+    const el=expEls[x.id]; if(!el) return;
+    const locked=S.expDone<x.need, st=expState(x), e=S.exp[x.id];
+    el.r.classList.toggle('lock',locked); el.r.classList.toggle('done',st==='done');
+    el.b.className='buy';
+    if(locked){ el.sub.innerHTML=`Se desbloquea con ${x.need} expedicion${x.need>1?'es':''} completada${x.need>1?'s':''}`;
+      el.bar.style.width='0'; el.q.textContent='🔒'; el.c.textContent=`${S.expDone}/${x.need}`; el.b.classList.add('no'); return; }
+    if(st==='idle'){
+      el.sub.innerHTML=`Dura <b>${fmtTime(expDur(x))}</b> · 💎${x.gem} · ${Math.round(x.rel*100)}% reliquia${x.relN?' (x2)':''}`;
+      el.bar.style.width='0'; el.q.textContent='Enviar'; el.c.textContent=fmtTime(expDur(x)); el.b.classList.add('go');
+    } else if(st==='run'){
+      const left=(e.end-Date.now())/1000, tot=e.dur||expDur(x);
+      el.sub.innerHTML=`En viaje… vuelve en <b>${clock(left)}</b>`; el.bar.style.width=(100*(1-left/tot))+'%';
+      el.q.textContent='Faltan'; el.c.textContent=clock(left); el.b.classList.add('no');
+    } else {
+      el.sub.innerHTML=`<b style="color:var(--good)">¡Volvió!</b> Tocá para ver el botín`; el.bar.style.width='100%';
+      el.q.textContent='Botín'; el.c.textContent='Abrir'; el.b.classList.add('gem');
+    }
+  });
+}
+function expAction(x){
+  if(S.expDone<x.need) return toast(`🔒 Completá ${x.need} expediciones para desbloquearla`);
+  const st=expState(x);
+  if(st==='run') return toast('🛰️ Todavía está en viaje');
+  if(st==='idle'){
+    const d=expDur(x), dust=Math.max(50*(EXPS.indexOf(x)+1), dps(true)*x.dur*x.k);
+    S.exp[x.id]={end:Date.now()+d*1000,dur:d,dust}; snd(300,.25,'sawtooth',.03); snd(600,.25,'sine',.03,.1);
+    toast(`${x.e} ${x.n}: ¡en camino!`); renderExp(); save(); return;
+  }
+  claimExp(x);
+}
+function claimExp(x){
+  const e=S.exp[x.id]; S.exp[x.id]={end:0};
+  const lm=1+0.1*lab('exp'), gg=Math.round(x.gem*lm); earn(e.dust*lm); addGems(gg); S.expDone++; cnt('exps'); passXp(15);
+  const got=[];
+  for(let k=0;k<(x.relN||1);k++) if(Math.random()<x.rel){ const r=RELICS[Math.floor(Math.random()*RELICS.length)]; gainRelic(r); got.push(r); }
+  jingle(); vib([15,30,15]);
+  const rtxt=got.map(r=>`<br>${r.e} <b>${r.n}</b> ${rlv(r.id)>1?`subió a Nv ${rlv(r.id)} (+1 fragmento ✧)`:'¡nueva!'} — ${r.f(rl(r.id))}`).join('');
+  showModal(x.e,'¡Expedición de vuelta!',`Trajo <b>${fmt(e.dust*lm)}</b> de polvo y <span class="gm">💎 ${gg}</span> gemas.${rtxt||'<br>Esta vez no encontró reliquias.'}`,[['¡Bien!',null]]);
+  buildRelics(); renderExp(); save();
+}
+function buildRelics(){
+  const L=$('#relList'); L.innerHTML='';
+  RELICS.forEach(r=>{ const l=rlv(r.id), t=rtier(r.id), R0=RAR[t], d=document.createElement('div'); d.className='cell'+(l?' got rar':'');
+    if(l) d.style.borderColor=R0.c+(t?'':'80');
+    d.innerHTML=l?`<span class="fr">✧${rfrag(r.id)}</span><span class="tag">Nv ${l}</span><span class="e">${r.e}</span>${r.n}<span class="rn" style="color:${R0.c}">${R0.n}${canForge(r.id)?' · ⚒️':''}</span><span class="ef">${r.f(rl(r.id))}</span>`:`<span class="e">❔</span>???`;
+    d.addEventListener('click',()=>openForge(r)); L.appendChild(d); });
+  $('#relCount').textContent=`${relicKinds()}/${RELICS.length}`;
+}
+
+/* ================= UI: cosmos ================= */
+function renderCos(){
+  const ev=S.ev&&evOn(S.ev.id)?EV_BY[S.ev.id]:null;
+  $('#evCard').innerHTML=ev?`<div class="t"><span class="big">${ev.e}</span>${ev.n}</div><div class="d">${ev.d}<br>Termina en <b>${clock((S.ev.end-Date.now())/1000)}</b>${ev.id==='bh'?` · se tragó <b>${fmt(S.ev.absorbed)}</b>`:''}</div>`
+    :`<div class="t"><span class="big">🌌</span>Cosmos en calma</div><div class="d">Próximo evento cósmico en <b>${clock((S.evNext-Date.now())/1000)}</b>. Pueden ser tormentas, eclipses, lluvias de meteoros, alineaciones, auroras… o un agujero negro.</div>`;
+  const ph=PHASES[PH()];
+  $('#dnCard').innerHTML=`<div class="t"><span class="big">${ph.e}</span>${ph.n} en tu zona</div><div class="d">${ph.d}<br>Cambia en <b>${fmtTime(nextPhaseIn())}</b>. El ciclo sigue la hora real de tu celular.</div>`;
+  renderBossCard();
+  $('#pfX').textContent=perfMult(); $('#reX').textContent=has('rit')?5:3; $('#reDur').textContent=hasC('lir')?40:20;
+  renderMk(false);
+}
+
+/* ================= UI: supernova + árbol ================= */
+function renderNova(){
+  $('#nuc').textContent=fmt(S.nucleos);
+  $('#nucRate').textContent='+'+(nucRate()*100)+'%';
+  $('#nucBonus').textContent='+'+fmt(S.nucleos*nucRate()*100)+'%';
+  const g=pendingNuc(); $('#nucGain').textContent=fmt(g);
+  $('#novaBtn').disabled=g<1;
+  const need=Math.pow((g+1)/nucMult(),2)*1e6;
+  $('#novaNext').textContent=g<1?`Necesitás ganar ${fmt(need)} de polvo en este ciclo (llevás ${fmt(S.runEarned)}).`
+    :`Próximo núcleo al llegar a ${fmt(need)} ganados en este ciclo.`;
+}
+function renderTree(){
+  const T=$('#tree'); T.innerHTML='';
+  const grid={}; SK.forEach(k=>grid[k.row+'_'+k.col]=k);
+  for(let row=0;row<9;row++) for(let col=0;col<3;col++){
+    const k=grid[row+'_'+col];
+    if(!k){ T.appendChild(document.createElement('div')); continue; }
+    const d=document.createElement('div');
+    const reqOk=(k.req||[]).every(has), own=has(k.id);
+    d.className='sk'+(own?' own':reqOk&&S.nucleos>=k.c?' ok':!reqOk?' lockd':'')+(row>0?' up':'')+(row>0&&reqOk?' lit':'');
+    d.innerHTML=`<div class="e">${k.e}</div><div class="t">${k.n}</div><div class="d">${k.d}</div><div class="p">${own?'✓ Activa':'⬢ '+k.c}</div>`;
+    d.addEventListener('click',()=>{ if(own) return; showModal(k.e,k.n,`${k.d}<br><br>Cuesta <b>${k.c}</b> núcleos (tenés ${fmt(S.nucleos)}).`,
+      [['Cancelar',null,'alt'],['Desbloquear',()=>buySkill(k.id)]]); });
+    T.appendChild(d);
+  }
+}
+$('#novaBtn').addEventListener('click',()=>{ const g=pendingNuc(); if(g<1) return;
+  showModal('💥','¿Hacer Supernova?',`Vas a ganar <b>${fmt(g)}</b> núcleos estelares (+${fmt(g*nucRate()*100)}% de producción).${S.chal?'<br>⚠️ Vas a abandonar el desafío en curso.':''}<br>Perdés el polvo, los generadores y las mejoras de este ciclo. Gemas, reliquias, constelaciones, expediciones y materia oscura se mantienen.`,
+  [['Todavía no',null,'alt'],['¡Explotar!',supernova,'danger']]); });
+
+/* ================= premio diario + misiones ================= */
+let misDirty=true, dailyPrompted=false;
+function ensureDay(){
+  const k=todayKey(); if(S.day.key===k) return;
+  S.day={key:k,c:{}};
+  const rnd=seeded(k+'|'+S.started), pool=MTYPES.slice(), out=[];
+  for(let i=0;i<3;i++){
+    const t=pool.splice(Math.floor(rnd()*pool.length),1)[0];
+    const target=t.ts? t.ts[i] : Math.max(5000, Math.round(dps(true)*600*(i+1)));
+    out.push({k:t.k,t:target,g:[5,8,12][i],ok:false});
+  }
+  S.missions=out; misDirty=true; dailyPrompted=false;
+}
+const dailyAvail=()=>S.daily.last!==todayKey();
+function nextStreakDay(){ return S.daily.last===yesterdayKey()? (S.daily.streak%7)+1 : 1; }
+function claimDaily(){
+  if(!dailyAvail()) return;
+  const day=nextStreakDay(), r=DAILY[day-1];
+  S.daily={last:todayKey(),streak:day}; passXp(50);
+  S.streakRun=(S.streakRunLast===yesterdayKey()? (S.streakRun||0)+1 : 1); S.streakRunLast=todayKey();
+  S.bestStreak=Math.max(S.bestStreak,S.streakRun);
+  const dust=Math.max(100*day, dps(true)*3600*r.h);
+  addGems(r.g); earn(dust); jingle(); vib([20,30,20]);
+  toast(`📅 Día ${day}: +💎${r.g} y +${fmt(dust)} de polvo`); renderMis(); save();
+}
+function showDaily(){
+  const day=nextStreakDay(), r=DAILY[day-1];
+  showModal('📅',`Premio diario · Día ${day}`,`¡Volviste! Tu premio de hoy:<br><span class="gm">💎 ${r.g} gemas</span> y <b>${r.h}h</b> de producción en polvo.<br><span style="font-size:12px">Entrá todos los días para mantener la racha (el día 7 da 💎40).</span>`,
+    [['Reclamar',claimDaily,'gem']]);
+}
+function checkDaily(){ if(dailyAvail()&&!dailyPrompted&&!document.hidden){ dailyPrompted=true; showDaily(); } }
+const misProg=m=>Math.min(m.t,S.day.c[m.k]||0);
+function renderMis(){
+  const day=dailyAvail()?nextStreakDay():S.daily.streak;
+  const sr=(S.streakRunLast===todayKey()||S.streakRunLast===yesterdayKey())?(S.streakRun||0):0;
+  $('#streak').textContent=sr; $('#streakU').textContent=sr===1?'día':'días';
+  const D=$('#days'); D.innerHTML='';
+  DAILY.forEach((r,i)=>{ const d=document.createElement('div');
+    const done=dailyAvail()? i<day-1 : i<day, nx=dailyAvail()&&i===day-1;
+    d.className='day'+(done?' done':'')+(nx?' next':''); d.innerHTML=`Día ${i+1}<b>💎${r.g}</b>`; D.appendChild(d); });
+  const b=$('#dailyBtn'); b.classList.toggle('no',!dailyAvail()); b.querySelector('.c').textContent=dailyAvail()?'Reclamar':'✓ Listo';
+  b.querySelector('.q').textContent=dailyAvail()?'Hoy':'Volvé mañana';
+  const L=$('#misList');
+  if(misDirty){ misDirty=false; L.innerHTML='';
+    S.missions.forEach((m,i)=>{ const t=MTYPES.find(x=>x.k===m.k), r=document.createElement('div'); r.className='row';
+      r.innerHTML=`<div class="ic">${t.e}</div><div class="info"><div class="nm" style="white-space:normal;font-size:14px">${t.n(m.t)}</div><div class="sub"></div><div class="bar g"><i></i></div></div>
+        <button class="buy gem"><span class="q">Premio</span><span class="c">💎${m.g}</span></button>`;
+      r.querySelector('.buy').addEventListener('click',()=>claimMission(i)); L.appendChild(r); });
+  }
+  [...L.children].forEach((r,i)=>{ const m=S.missions[i]; if(!m) return; const p=misProg(m);
+    r.querySelector('.sub').innerHTML=m.ok?'<b style="color:var(--good)">✓ Completada</b>':`<b>${fmt(p)}</b> / ${fmt(m.t)}`;
+    r.querySelector('.bar i').style.width=(100*p/m.t)+'%';
+    r.classList.toggle('done',m.ok);
+    const b=r.querySelector('.buy'); b.classList.toggle('no',m.ok||p<m.t); b.querySelector('.q').textContent=m.ok?'Listo':p>=m.t?'¡Reclamar!':'Premio'; });
+  renderPassCard();
+  $('#wSub').innerHTML=wheelFree()?'<b style="color:var(--good)">¡Giro gratis disponible!</b>':`Giro gratis en <b>${clock((S.wheelAt-Date.now())/1000)}</b>`;
+  const mid=new Date(); mid.setHours(24,0,0,0);
+  $('#misReset').textContent='nuevas en '+clock((mid-Date.now())/1000);
+}
+function claimMission(i){
+  const m=S.missions[i]; if(!m||m.ok) return; if(misProg(m)<m.t) return toast('Todavía no la completaste');
+  m.ok=true; addGems(m.g); S.misDone++; passXp(60); jingle(); toast(`📜 ¡Misión cumplida! +💎${m.g}`);
+  if(S.missions.every(x=>x.ok)){ addGems(10); setTimeout(()=>toast('🌟 ¡Todas las misiones del día! Bono +💎10'),400); }
+  renderMis(); save();
+}
+$('#dailyBtn').addEventListener('click',claimDaily);
+
+/* ================= tienda ================= */
+function buildShop(){
+  const L=$('#shopList'); L.innerHTML='';
+  SHOP.forEach(it=>{ const r=document.createElement('div'); r.className='row';
+    r.innerHTML=`<div class="ic">${it.e}</div><div class="info"><div class="nm">${it.n}</div><div class="sub" style="white-space:normal">${it.d}</div></div>
+      <button class="buy gem"><span class="q">Comprar</span><span class="c">💎${it.c}</span></button>`;
+    r.querySelector('.buy').addEventListener('click',()=>shopBuy(it)); r.dataset.c=it.c; L.appendChild(r); });
+}
+function renderShop(){ $('#gems2').textContent=fmt(S.gems); [...$('#shopList').children].forEach(r=>r.querySelector('.buy').classList.toggle('no',S.gems<+r.dataset.c)); }
+function shopBuy(it){
+  if(S.gems<it.c) return toast(`Te faltan 💎${it.c-S.gems}`);
+  if(it.id==='expf' && !EXPS.some(x=>expState(x)==='run')) return toast('No hay expediciones en curso');
+  if(it.id==='evt' && S.ev) return toast('Ya hay un evento cósmico en curso');
+  let preview='';
+  if(it.id==='warp1') preview=`<br>Vas a recibir <b>${fmt(dps(true)*3600)}</b> de polvo.`;
+  if(it.id==='warp8') preview=`<br>Vas a recibir <b>${fmt(dps(true)*28800)}</b> de polvo.`;
+  showModal(it.e,it.n,`${it.d}.${preview}<br>Cuesta <span class="gm">💎 ${it.c}</span>.`,[['Cancelar',null,'alt'],['Comprar',()=>{
+    if(S.gems<it.c) return; S.gems-=it.c;
+    if(it.id==='boost'){ S.boostUntil=Math.max(Date.now(),S.boostUntil)+15*60000; toast('🚀 Impulso x2 activado'); }
+    if(it.id==='warp1'){ const g=dps(true)*3600; earn(g); toast(`⏩ +${fmt(g)} de polvo`); }
+    if(it.id==='warp8'){ const g=dps(true)*28800; earn(g); toast(`⏭️ +${fmt(g)} de polvo`); }
+    if(it.id==='met'){ spawnMeteor(); go('gen'); toast('☄️ ¡Ahí viene un meteoro!'); }
+    if(it.id==='evt'){ const good=EVENTS.filter(e=>!e.neg); startEvent(good[Math.floor(Math.random()*good.length)].id); go('gen'); }
+    if(it.id==='expf'){ EXPS.forEach(x=>{ if(expState(x)==='run') S.exp[x.id].end=Date.now(); }); toast('⚡ ¡Las expediciones volvieron!'); }
+    if(it.id==='nuc'){ S.nucleos+=3; S.nucleosTotal+=3; toast('⬢ +3 núcleos estelares'); }
+    jingle(); save(); render();
+  },'gem']]);
+}
+$('#gemPill').addEventListener('click',()=>go('shop'));
+$('#shopBtn2').addEventListener('click',()=>go('shop'));
+$('#gearBtn').addEventListener('click',()=>go('set'));
+$('#dayPill').addEventListener('click',()=>{ const p=PHASES[PH()];
+  showModal(p.e,p.n,`${p.d}<br><br>El juego sigue la hora real de tu celular:<div class="slist" style="margin-top:8px">🌅 06–08 Amanecer · hora dorada<br>☀️ 08–19 Día · energía solar<br>🌇 19–21 Atardecer · hora dorada<br>🌙 21–06 Noche · toques y meteoros</div>Cambia en <b>${fmtTime(nextPhaseIn())}</b>.`,[['Cerrar',null]]); });
+
+/* ================= evolución de la estrella ================= */
+function applyStage(){
+  const s=STAGES[stageIdx()], st=star.style;
+  ['--c1','--c2','--c3','--c4','--c5'].forEach((v,i)=>st.setProperty(v,s.c[i]));
+  st.setProperty('--glow',s.g); st.setProperty('--sc',s.sc);
+  $('#stageName').textContent=s.n;
+}
+function checkStage(){
+  const i=stageIdx();
+  if(i>S.stageSeen){ S.stageSeen=i; applyStage(); flash(); jingle();
+    showModal('⭐','¡Tu estrella evolucionó!',`Ahora es una <b>${STAGES[i].n}</b>.<br>Cada etapa da <b>x1.2</b> a toda la producción y a los toques (total x${Math.pow(1.2,i).toFixed(2)}).`,[['¡Increíble!',null]]); }
+}
+$('#stagePill').addEventListener('click',()=>{
+  const cur=stageIdx();
+  const list=STAGES.map((s,i)=>`<div class="${i===cur?'cur':i>cur?'no':''}">${i<=cur?'✓':'○'} ${s.n} <span style="float:right">${i?fmt(s.t):'—'}</span></div>`).join('');
+  showModal('⭐','Evolución estelar',`La estrella evoluciona con el polvo total ganado (no se reinicia con Supernova). Cada etapa: x1.2 producción.<div class="slist" style="margin-top:10px">${list}</div>`,[['Cerrar',null]]);
+});
+
+/* ================= logros ================= */
+function buildAch(){
+  const L=$('#achList'); L.innerHTML='';
+  ACH.forEach(a=>{ const d=document.createElement('div'); d.className='cell'+(S.ach[a.id]?' got':''); d.innerHTML=`<span class="e">${a.e}</span>${a.n}`; L.appendChild(d); });
+  $('#achCount').textContent=`${Object.keys(S.ach).length}/${ACH.length}`;
+}
+function checkAch(){
+  let changed=false;
+  for(const a of ACH) if(!S.ach[a.id]&&a.ok()){ S.ach[a.id]=1; addGems(2); changed=true; toast(`🏆 Logro: ${a.n} · +💎2`); }
+  if(changed&&cur==='mis') buildAch();
+}
+
+/* ================= ajustes ================= */
+function renderSet(){
+  $('#auraRow').classList.toggle('hidden',!S.cosm.aura); $('#goldRow').classList.toggle('hidden',!S.cosm.gold);
+  document.querySelectorAll('.sw').forEach(s=>s.classList.toggle('on',!!S.set[s.dataset.s]));
+  $('#autoRow').classList.toggle('hidden',!has('bot'));
+  const best=S.gens.reduce((a,b)=>a+b,0);
+  $('#stats').innerHTML=`Polvo total ganado: <b>${fmt(S.totalEarned)}</b><br>Ganado en este ciclo: <b>${fmt(S.runEarned)}</b><br>
+    Mejor producción: <b>${fmt(S.peakDps)}/s</b><br>Etapa estelar: <b>${STAGES[stageIdx()].n}</b><br>Toques: <b>${fmt(S.taps)}</b> · perfectos: <b>${fmt(S.perfects)}</b><br>
+    Resonancias: <b>${S.resonances}</b> · Generadores: <b>${fmt(best)}</b><br>
+    Supernovas: <b>${S.supernovas}</b> · Núcleos obtenidos: <b>${fmt(S.nucleosTotal)}</b><br>
+    Gemas ganadas: <b>${fmt(S.gemsTotal)}</b> · Misiones: <b>${S.misDone}</b><br>
+    Expediciones: <b>${S.expDone}</b> · Reliquias: <b>${relicKinds()}/${RELICS.length}</b><br>
+    Constelaciones: <b>${Object.keys(S.cons).length}/${CONS.length}</b> · Eventos: <b>${S.evDone}</b><br>
+    Agujeros negros destruidos: <b>${S.bhKilled}</b> · Ventas con ganancia: <b>${S.sells}</b><br>
+    Desafíos: <b>${Object.keys(S.chDone).length}/${CHAL.length}</b> · Colapsos: <b>${S.collapses}</b> · Materia primordial: <b>${fmt(S.mpTotal)}</b><br>
+    ${S.pet.name}: <b>Nv ${S.pet.lv}</b> · Giros de rueda: <b>${S.spins}</b> · Pase: <b>nv ${passLevel()}</b><br>
+    Jefes derrotados: <b>${S.boss.kills}</b> · Investigaciones: <b>${labTotal()}</b><br>
+    Meteoros atrapados: <b>${S.meteors}</b> · Mejor racha: <b>${S.bestStreak}</b> días<br>
+    Tiempo en este ciclo: <b>${fmtTime((Date.now()-S.runStart)/1000)}</b><br>Tiempo total: <b>${fmtTime((Date.now()-S.started)/1000)}</b>`;
+}
+document.querySelectorAll('.sw').forEach(s=>s.addEventListener('click',()=>{ S.set[s.dataset.s]=!S.set[s.dataset.s]; renderSet(); applyCosm(); save(); if(S.set.snd) snd(700,.08,'triangle',.04); }));
+$('#expBtn').addEventListener('click',async()=>{
+  save(); const code=btoa(unescape(encodeURIComponent(JSON.stringify(S)))); const box=$('#saveBox'); box.value=code;
+  let ok=false; try{ await navigator.clipboard.writeText(code); ok=true; }catch(e){ try{ box.select(); ok=document.execCommand('copy'); }catch(_){} }
+  toast(ok?'📋 Código copiado':'Código listo en el cuadro: copialo a mano');
+});
+$('#impBtn').addEventListener('click',()=>{
+  const v=$('#saveBox').value.trim(); if(!v) return toast('Pegá un código primero');
+  try{ const o=JSON.parse(decodeURIComponent(escape(atob(v)))); if(!o||!Array.isArray(o.gens)) throw 0;
+    showModal('📥','¿Cargar partida?','Se reemplaza tu progreso actual por el del código.',[['Cancelar',null,'alt'],['Cargar',()=>{ merge(o); S.last=Date.now(); lastTick=Date.now(); clearEventFx(); refreshAll(); save(); toast('✅ Partida cargada'); }]]);
+  }catch(e){ toast('❌ Código inválido'); }
+});
+$('#resetBtn').addEventListener('click',()=>showModal('⚠️','¿Borrar todo?','Perdés todo: polvo, núcleos, gemas, reliquias, constelaciones, habilidades y logros. No se puede deshacer.',
+  [['Cancelar',null,'alt'],['Borrar',()=>{ S=fresh(); S.stageSeen=0; lastTick=Date.now(); clearEventFx(); ensureDay(); refreshAll(); save(); },'danger']]));
+function clearEventFx(){ if(bhEl){ bhEl.remove(); bhEl=null; } if(BOSS) hideBoss(); labKey=''; $('#labCur').dataset.k=''; $('#chalList').dataset.k=''; $('#mvList').dataset.k=''; upgKey=''; }
+
+/* ================= pestañas ================= */
+let cur='gen';
+function go(t){
+  cur=t;
+  document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.id==='t-'+t));
+  $('#main').scrollTop=0;
+  if(t==='upg') upgDirty=true; if(t==='nova'){ renderTree(); $('#chalList').dataset.k=''; $('#mvList').dataset.k=''; } if(t==='mis'){ misDirty=true; buildAch(); }
+  if(t==='set'){ renderSet(); renderCloud(); renderGP(); }
+  if(t==='shop') renderPay(); if(t==='pass'){ renderPassPrem(); renderPass(true); } if(t==='exp'){ buildExp(); labKey=''; $('#labCur').dataset.k=''; } if(t==='shop') buildShop();
+  if(t==='cos'){ buildCons(); renderCos(); renderPet(); requestAnimationFrame(drawMk); }
+  render();
+}
+$('#nav').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) go(b.dataset.t); });
+
+/* ================= modal (con cola) / toast ================= */
+const modalQ=[];
+function showModal(e,title,html,btns){
+  if(!$('#modal').classList.contains('hidden')){ modalQ.push([e,title,html,btns]); return; }
+  const box=$('#mbox'); box.innerHTML=`<div class="e">${e}</div><h3>${title}</h3><div class="mb">${html}</div><div class="mbtns"></div>`;
+  const w=box.querySelector('.mbtns');
+  btns.forEach(([t,fn,cls])=>{ const b=document.createElement('button'); b.className='btn'+(cls?' '+cls:''); b.textContent=t;
+    b.onclick=()=>{ $('#modal').classList.add('hidden'); fn&&fn(); const n=modalQ.shift(); if(n) setTimeout(()=>showModal(...n),120); }; w.appendChild(b); });
+  $('#modal').classList.remove('hidden');
+}
+const toastQ=[]; let toastBusy=false;
+function toast(t){ if(toastQ.length>6) toastQ.shift(); toastQ.push(t); if(!toastBusy) nextToast(); }
+function nextToast(){ const t=toastQ.shift(); if(!t){ toastBusy=false; return; } toastBusy=true;
+  const el=$('#toast'); el.textContent=t; el.classList.add('show');
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(nextToast,350); },t.length>60?2700:1900); }
+function flash(){ const f=document.createElement('div'); f.style.cssText='position:fixed;inset:0;z-index:40;background:#fff;pointer-events:none;transition:opacity 1s';
+  document.body.appendChild(f); requestAnimationFrame(()=>requestAnimationFrame(()=>f.style.opacity=0)); setTimeout(()=>f.remove(),1100); }
+
+/* ================= inactivo ================= */
+let offAcc={sec:0,gain:0};
+function applyOffline(sec){
+  const s=Math.min(sec,offlineCap()), g=dps(true)*s*offlineRate();
+  earn(g,true); offAcc.sec+=sec; offAcc.gain+=g;
+  if(S.ev){ if(bhEl){ bhEl.remove(); bhEl=null; } S.ev=null; S.evNext=Date.now()+60000; }
+  if(BOSS) loseBoss(true);
+  if(!document.hidden) showOffline();
+}
+function showOffline(){
+  if(offAcc.gain>0 && offAcc.sec>=30){
+    const A=readyAlerts(), full=offAcc.sec>=offlineCap();
+    showModal('🌙','Mientras no estabas…',`Estuviste afuera <b>${fmtTime(offAcc.sec)}</b>.<br>Tus máquinas recolectaron <b>${fmt(offAcc.gain)}</b> de polvo estelar.<br>
+      <span style="font-size:12px">(${Math.round(offlineRate()*100)}% de la producción, máximo ${+(offlineCap()/3600).toFixed(1)}h)</span>${full?'<br>⚠️ <span style="font-size:12.5px">Se llenó el almacenamiento: mejorá Cronología en el Laboratorio para guardar más tiempo.</span>':''}
+      ${A.length?`<div class="alh">LISTO PARA VOS</div>${A.map(a=>`<div class="alrow" data-a="${a.a}"><span class="ae">${a.e}</span>${a.t}<span class="ago">Ir ›</span></div>`).join('')}`:''}`,[['¡Genial!',null]]);
+  }
+  offAcc={sec:0,gain:0};
+}
+document.addEventListener('visibilitychange',()=>{ if(document.hidden){ save(); cloudSave(false); gpSave(false); } else { tick(); showOffline(); ensureDay(); checkDaily(); } });
+window.addEventListener('pagehide',save);
+
+/* ================= bucle ================= */
+let lastTick=Date.now(), autoAcc=0, slow=0, petHitT=0, cloudT=0, gpT=0;
+function tick(){
+  const now=Date.now(); let dt=(now-lastTick)/1000; lastTick=now;
+  if(dt<0) dt=0;
+  if(dt>10){ applyOffline(dt); dt=0; }
+  if(dt>0){
+    earn(dps()*dt);
+    if(has('aut')){ autoAcc+=dt*5; while(autoAcc>=1){ autoAcc--; doTap(null,null,true); } }
+    tickEvents(dt);
+    tickBoss(dt,now);
+    if(S.chal==='ent') S.dust-=S.dust*0.01*dt;
+    if(S.pet.lv>=8 && bhEl && evOn('bh') && now>petHitT){ petHitT=now+500; petJump(); hitBH(); }
+    mkAcc+=dt; if(mkAcc>=2){ mkAcc=0; mkStep(); if(cur==='cos') renderMk(true); }
+  }
+  slow+=dt;
+  if(slow>=1){ slow=0; S.peakDps=Math.max(S.peakDps,dps(true)); checkChallenge(); checkLab(); tickAlerts(); ensurePass();
+    if(!document.hidden&&++activeAcc>=60){ activeAcc=0; passXp(2); }
+    if(++gpT>=180){ gpT=0; gpSave(false); }
+    if(++cloudT>=60){ cloudT=0; cloudSave(false); }
+    if(!S.tutDone&&tutI<0&&!overlayOpen()) startTut(); renderPet(); if(!$('#wheel').classList.contains('hidden')&&!spinning) renderWheelUI(); checkAch(); checkStage(); ensureDay(); if(has('bot')&&S.set.auto) automate(); if(cur==='set'){ renderSet(); renderCloud(); } }
+  if(bhEl && now>bhMoveT){ bhMoveT=now+1900; moveBH(); }
+  if(now>=nextMeteor && !document.hidden){ spawnMeteor(); scheduleMeteor(); }
+  render();
+}
+function automate(){
+  for(const u of visibleUpg()) if(u.cost<=S.dust*0.5) buyUpg(u.id,true);
+  for(let k=0;k<200;k++){
+    let best=-1,bc=Infinity; for(let i=0;i<GENS.length;i++){ const c=unitCost(i); if(c<bc&&(i===0||S.gens[i-1]>0||S.gens[i]>0)&&!(S.chal==='mini'&&i>=4)){ bc=c; best=i; } }
+    if(best<0||bc>S.dust) break; S.dust-=bc; S.gens[best]++; cnt('gens');
+  }
+}
+function render(){
+  $('#dust').textContent=fmt(S.dust);
+  $('#dps').textContent=fmt(dps());
+  $('#gems').textContent=fmt(S.gems);
+  const ecl=evOn('eclipse');
+  $('#tapLine').innerHTML=ecl?'🌑 Eclipse: la estrella no se puede tocar':`${KB?'Tocá o pulsá <b style="color:var(--text)">Espacio</b>':'Tocá la estrella'} · <span class="num">+${fmt(tapValue(false))}</span> por toque`;
+  $('#app').classList.toggle('eclipse',ecl);
+  const now=Date.now(), fr=S.frenzyUntil-now, bo=S.boostUntil-now, re=S.resUntil-now;
+  $('#chipFr').classList.toggle('hidden',fr<=0); $('#app').classList.toggle('frenzyOn',fr>0); if(fr>0) $('#frT').textContent=Math.ceil(fr/1000);
+  $('#chipBo').classList.toggle('hidden',bo<=0); if(bo>0) $('#boT').textContent=clock(bo/1000);
+  $('#chipRe').classList.toggle('hidden',re<=0); if(re>0) $('#reT').textContent=Math.ceil(re/1000);
+  const cc=$('#chipCh');
+  if(S.chal){ const c=CH_BY[S.chal]; cc.classList.remove('hidden'); cc.textContent=`${c.e} ${c.n} · ${Math.min(100,Math.floor(100*S.runEarned/c.goal))}%`; } else cc.classList.add('hidden');
+  const ce=$('#chipEv');
+  if(S.ev&&now<S.ev.end){ const ev=EV_BY[S.ev.id]; ce.classList.remove('hidden'); ce.classList.toggle('neg',!!ev.neg); ce.textContent=`${ev.e} ${ev.n} · ${Math.ceil((S.ev.end-now)/1000)}s`; }
+  else ce.classList.add('hidden');
+  const ph=PHASES[PH()]; $('#dayPill').firstChild.textContent=ph.e+' '; $('#dayName').textContent=ph.n;
+  renderCombo();
+  $('#dotUpg').classList.toggle('hidden',S.chal==='aust'||!UPG.some(u=>!S.upg[u.id]&&u.req()&&u.cost<=S.dust));
+  const pn=pendingNuc(); $('#dotNova').classList.toggle('hidden',!(pn>=1&&pn>=Math.max(1,S.nucleosTotal*0.5)));
+  const labIdle=!S.lab.cur&&LAB.some(u=>lab(u.id)<u.max&&S.dust>=labCost(u));
+  $('#dotLab').classList.toggle('hidden',!labIdle);
+  $('#dotExp').classList.toggle('hidden',!(labIdle||EXPS.some(x=>S.expDone>=x.need&&expState(x)!=='run')));
+  if(tutActive()) placeTut();
+  $('#dotMis').classList.toggle('hidden',!(dailyAvail()||wheelFree()||passPending()>0||S.missions.some(m=>!m.ok&&misProg(m)>=m.t)));
+  $('#dotCos').classList.toggle('hidden',!CONS.some(c=>!hasC(c.id)&&(S.consPaid[c.id]||S.dust>=c.cost)));
+  if(cur==='gen') renderGens();
+  else if(cur==='upg') renderUpg();
+  else if(cur==='nova') renderNovaAll();
+  else if(cur==='exp'){ if(expPane==='lab') renderLab(); else renderExp(); }
+  else if(cur==='mis') renderMis();
+  else if(cur==='shop') renderShop();
+  else if(cur==='pass'&&slowCos()) renderPass(false);
+  else if(cur==='cos'&&slowCos()) renderCos();
+}
+let cosT=0; function slowCos(){ const n=Date.now(); if(n-cosT>500){ cosT=n; return true; } return false; }
+function refreshAll(){ upgDirty=true; misDirty=true; buildGens(); renderTree(); buildAch(); renderSet(); applyStage();
+  document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x.dataset.m===S.buy)); go(cur); }
+
+/* ================= cielo estrellado (fase del día + constelaciones) ================= */
+const SKYC={noche:['#1a1450','#0b0c26','#05060f',null],amanecer:['#3d2a72','#1a1848','#080920','rgba(255,150,100,.22)'],
+  dia:['#26348a','#121852','#070a24',null],atardecer:['#4e2258','#1f1440','#08081a','rgba(255,120,80,.26)']};
+(function sky(){
+  const c=$('#sky'), x=c.getContext('2d'); let W,H,D,stars=[];
+  function size(){ D=Math.min(window.devicePixelRatio||1,2); W=c.width=innerWidth*D; H=c.height=innerHeight*D; c.style.width=innerWidth+'px'; c.style.height=innerHeight+'px';
+    stars=Array.from({length:140},()=>({x:Math.random()*W,y:Math.random()*H,r:(Math.random()*1.4+.3)*D,t:Math.random()*6.28,s:.5+Math.random()*1.5,v:(.02+Math.random()*.08)*D})); }
+  size(); addEventListener('resize',size);
+  let tw=0;
+  function draw(){
+    const col=SKYC[PH()];
+    const g=x.createRadialGradient(W*.5,H*.25,0,W*.5,H*.25,Math.max(W,H)*.8);
+    g.addColorStop(0,col[0]); g.addColorStop(.5,col[1]); g.addColorStop(1,col[2]);
+    x.fillStyle=g; x.fillRect(0,0,W,H);
+    if(col[3]){ const h=x.createLinearGradient(0,H,0,H*.55); h.addColorStop(0,col[3]); h.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle=h; x.fillRect(0,H*.55,W,H*.45); }
+    for(const s of stars){ s.t+=.02*s.s; s.y+=s.v; if(s.y>H){ s.y=0; s.x=Math.random()*W; }
+      x.globalAlpha=.35+.65*Math.abs(Math.sin(s.t)); x.fillStyle='#dfe3ff'; x.beginPath(); x.arc(s.x,s.y,s.r,0,6.28); x.fill(); }
+    tw+=.02;
+    CONS.forEach(cn=>{ if(!S.cons[cn.id]) return; const [ox,oy,sz]=cn.sky, s=Math.min(W,H*.9)*sz, X0=ox*W, Y0=oy*H;
+      const P=cn.p.map(([a,b])=>[X0+a*s,Y0+b*s]);
+      x.globalAlpha=.32+.08*Math.sin(tw); x.strokeStyle='#ffd88a'; x.lineWidth=1.2*D;
+      cn.ed.forEach(([a,b])=>{ x.beginPath(); x.moveTo(...P[a]); x.lineTo(...P[b]); x.stroke(); });
+      x.globalAlpha=.9; x.fillStyle='#fff6d8'; P.forEach(([px,py])=>{ x.beginPath(); x.arc(px,py,1.8*D,0,6.28); x.fill(); }); });
+    x.globalAlpha=1; requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ================= inicio ================= */
+load();
+if(S.stageSeen<0) S.stageSeen=stageIdx();
+S.peakDps=Math.max(S.peakDps||0,dps(true));
+for(let i=0;i<60;i++) mkStep();
+const away=(Date.now()-S.last)/1000;
+lastTick=Date.now();
+ensureDay();
+refreshAll();
+if(away>10) applyOffline(away);
+checkDaily();
+checkLab();
+if(S.newsV<7){ const old=S.newsV<6; S.newsV=7; showModal('🆕','Novedades',`<div class="slist">${old?'⚔️ <b>Jefes cósmicos</b>: ¡tocá la estrella para dispararles!<br>🔬 <b>Laboratorio</b> en Viajes: investigaciones permanentes<br>📖 <b>Tutorial</b> guiado (en ⚙️ Ajustes)<br>':''}⚒️ <b>Forja de reliquias</b>: tocá una reliquia para subir su rareza<br>🔔 <b>Avisos</b>: la campanita te muestra lo que está listo y lo que viene<br>☁️ <b>Guardado en la nube</b> con tu cuenta (en ⚙️ Ajustes)</div>`,[['¡A jugar!',null]]); save(); }
+cloudInit(); ensurePass(); applyCosm();
+if(NATIVE){ try{ NATIVE.ready(); }catch(e){} }
+scheduleMeteor(); nextMeteor=Date.now()+40000;
+animRing(); renderPet();
+setInterval(tick,100);
+setInterval(save,5000);
+</script>
+</body>
+</html>

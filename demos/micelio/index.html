@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Micelio – juego incremental</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#231f3d;--panel:#2f2a52;--line:#443d75;--text:#eae6ff;--mute:#a9a2d6;
+  --spore:#ff8fb1;--mint:#7ee8c7;--amber:#ffd479;
+  --sky1:#120f2b;--sky2:#3a2f6b;--f1:#2c2a5c;--f2:#1f1c45;--f3:#14122e;--moon:#f3efff;--stars:1;--fog:#8f86e8;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]){color-scheme:light;--bg:#f1eeff;--panel:#ffffff;--line:#d3ccf5;--text:#2a2450;--mute:#6a62a0;--spore:#d6336c;--mint:#0f8a6a;--amber:#a86b00;--sky1:#cfc6ff;--sky2:#f6f2ff;--f1:#a79fe0;--f2:#8379c8;--f3:#5f55a8;--moon:#ffffff;--stars:0;--fog:#ffffff}
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4}
+.wrap{max-width:960px;margin:0 auto;padding:20px 16px 40px;display:grid;gap:20px;grid-template-columns:1fr}
+@media(min-width:820px){.wrap{grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:start}}
+h1{font-size:1.1rem;font-weight:600;margin:0;color:var(--mute)}
+.lvl{display:flex;align-items:center;gap:10px;margin-top:10px}
+.lvl b{font-weight:800;white-space:nowrap}
+.bar{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--mint);transition:width .2s}
+.lvlnote{color:var(--mute);font-size:.82rem;margin-top:4px}
+.hero{text-align:center;padding:8px 0}
+.count{font-size:clamp(2.4rem,9vw,3.6rem);font-weight:800;letter-spacing:-.02em;line-height:1}
+.rate{color:var(--mint);font-weight:600;margin-top:6px}
+.mush{position:relative;margin:22px auto 8px;width:min(260px,70vw);aspect-ratio:1;border:0;background:none;cursor:pointer;padding:0;-webkit-tap-highlight-color:transparent;transition:transform .08s}
+.mush:active{transform:scale(.94)}
+.mush:focus-visible{outline:3px solid var(--amber);outline-offset:6px;border-radius:50%}
+.mush svg{width:100%;height:100%;overflow:visible}
+.hint{color:var(--mute);font-size:.9rem}
+.float{position:fixed;pointer-events:none;font-weight:800;color:var(--spore);animation:up .9s ease-out forwards;z-index:5}
+@keyframes up{to{transform:translateY(-70px);opacity:0}}
+section{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+section+section{margin-top:16px}
+h2{margin:0 0 10px;font-size:1rem;font-weight:600;color:var(--mute)}
+.list{display:grid;gap:8px}
+.item{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;width:100%;text-align:left;font:inherit;color:inherit;background:transparent;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer}
+.item:hover:not(:disabled){border-color:var(--spore)}
+.item:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.item:disabled{opacity:.45;cursor:not-allowed}
+.item b{font-weight:600}
+.item small{color:var(--mute);grid-column:1}
+.price{color:var(--amber);font-weight:600;grid-row:1}
+.own{font-size:1.5rem;font-weight:800;grid-row:1/3;grid-column:2;justify-self:end;color:var(--mint);line-height:1}
+.item.gen{grid-template-columns:1fr auto auto}
+.item.gen .own{grid-column:3;grid-row:1/3}
+.item.gen .price{grid-column:2;grid-row:1/3}
+.item.done{opacity:1;border-color:var(--mint)}
+.item.done .price{color:var(--mint)}
+.ups:empty::before{content:"Compra más construcciones para desbloquear mejoras.";color:var(--mute);font-size:.9rem}
+.pres p{margin:0 0 10px;color:var(--mute);font-size:.9rem}
+.pres p strong{color:var(--spore)}
+.big{display:block;width:100%;font:inherit;font-weight:800;color:#2a1030;background:var(--spore);border:0;border-radius:10px;padding:12px;cursor:pointer;margin-bottom:14px}
+.big:disabled{opacity:.4;cursor:not-allowed}
+.big:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.foot{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:12px;color:var(--mute);font-size:.85rem}
+.foot button{font:inherit;color:var(--mute);background:none;border:1px solid var(--line);border-radius:8px;padding:4px 10px;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--spore);color:#2a1030;font-weight:800;padding:10px 18px;border-radius:99px;opacity:0;pointer-events:none;transition:all .3s;z-index:9;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.qty{display:flex;gap:6px;margin:-2px 0 10px}.row{display:flex;gap:8px;margin-top:8px}
+.row button,.qty button{font:inherit;color:var(--text);background:none;border:1px solid var(--line);border-radius:8px;padding:4px 12px;cursor:pointer}
+.row button:focus-visible,.qty button:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.qty button[aria-pressed=true]{border-color:var(--mint);color:var(--mint)}
+.achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.ach{border:1px solid var(--line);border-radius:10px;padding:8px 10px;opacity:.45;font-size:.9rem}
+.ach.on{opacity:1;border-color:var(--amber)}
+.ach small{display:block;color:var(--mute);font-size:.78rem}
+.stats{font-size:.92rem;line-height:1.7;color:var(--mute)}.stats strong{color:var(--amber)}
+textarea{width:100%;font:inherit;font-size:.8rem;color:var(--text);background:transparent;border:1px solid var(--line);border-radius:8px;padding:8px;resize:vertical}
+.gold{position:fixed;z-index:8;width:64px;height:64px;border-radius:50%;border:0;cursor:pointer;font-size:1.8rem;color:#5a3a00;background:radial-gradient(circle at 35% 30%,#fff3b0,var(--amber) 60%,#d49a00);box-shadow:0 0 24px 6px rgba(255,212,121,.6);animation:pulse 1.2s ease-in-out infinite}
+.gold[hidden]{display:none}
+.skinfo{margin:0 0 10px;color:var(--mute);font-size:.9rem}
+.forest{position:fixed;inset:0;z-index:-1;overflow:hidden;background:linear-gradient(var(--sky1),var(--sky2) 75%)}
+.forest svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ff{animation:glow 3s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.1}50%{opacity:1}}
+section{background:color-mix(in srgb,var(--panel) 90%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+@media(prefers-reduced-motion:reduce){.ff{animation:none;opacity:.6}}
+.tree{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media(max-width:520px){.tree{grid-template-columns:1fr}}
+.branch{display:flex;flex-direction:column}
+.branch h3{margin:0 0 8px;font-size:.9rem;font-weight:600;text-align:center}
+.node{position:relative;font:inherit;font-size:.82rem;color:inherit;background:transparent;border:1px solid var(--line);border-radius:10px;padding:8px;text-align:left;cursor:pointer}
+.node b{display:block;font-weight:600;font-size:.88rem}
+.node small{display:block;color:var(--mute)}
+.node+.node{margin-top:16px}
+.node+.node::before{content:"";position:absolute;left:50%;top:-16px;height:16px;border-left:2px solid var(--line)}
+.node.can{border-color:var(--amber)}
+.node.on{border-color:var(--mint);opacity:1}
+.node:disabled:not(.on){opacity:.45;cursor:not-allowed}
+.node:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+@keyframes pulse{50%{transform:scale(1.12)}}
+@media(prefers-reduced-motion:reduce){.float{animation-duration:.01s}.mush,.toast,.bar i{transition:none}.gold{animation:none}}
+</style>
+</head>
+<body>
+<div class="forest" aria-hidden="true"><svg id="forestsvg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice"></svg></div>
+<div class="wrap">
+  <div>
+    <h1>Micelio</h1>
+    <div class="lvl"><b id="lvl">Nivel 1</b><div class="bar"><i id="bar"></i></div></div>
+    <div class="lvlnote" id="lvlnote"></div>
+    <div class="hero">
+      <div class="count" id="count">0</div>
+      <div style="color:var(--mute)">esporas</div>
+      <div class="rate" id="rate">0 por segundo</div>
+      <button class="mush" id="mush" aria-label="Recolectar esporas">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <ellipse cx="100" cy="182" rx="56" ry="8" fill="#000" opacity=".25"/>
+          <path d="M80 110h40l6 66a8 8 0 0 1-8 9H82a8 8 0 0 1-8-9z" fill="#e9e1ff"/>
+          <path d="M14 112C14 58 56 22 100 22s86 36 86 90c0 8-6 12-14 12H28c-8 0-14-4-14-12z" fill="var(--spore)"/>
+          <circle cx="62" cy="76" r="12" fill="#fff" opacity=".85"/>
+          <circle cx="112" cy="56" r="9" fill="#fff" opacity=".85"/>
+          <circle cx="148" cy="92" r="13" fill="#fff" opacity=".85"/>
+          <circle cx="94" cy="98" r="7" fill="#fff" opacity=".85"/>
+        </svg>
+      </button>
+      <div class="hint" id="hint">Toca el hongo para recolectar</div>
+      <div class="hint" style="margin-top:4px">Atajos: espacio toca el hongo · 1, 2, 3 y 4 cambian la cantidad de compra</div>
+    </div>
+  </div>
+  <div>
+    <section>
+      <h2>Construcciones</h2><div class="qty" id="qty"></div>
+      <div class="list" id="gens"></div>
+    </section>
+    <section>
+      <h2>Mejoras</h2>
+      <div class="list ups" id="ups"></div>
+    </section>
+    <section><h2>Árbol de habilidades</h2><p class="skinfo" id="skinfo"></p><div class="tree" id="tree"></div><div class="row"><button id="respec">Reasignar puntos</button></div></section>
+    <section class="pres">
+      <h2>Esporular</h2>
+      <p id="presinfo"></p>
+      <button class="big" id="pres">Esporular</button>
+      <h2>Mejoras permanentes (esencias)</h2>
+      <div class="list" id="perm"></div>
+    </section>
+    <section><h2>Logros (cada uno da +2 % de producción)</h2><div class="achs" id="achs"></div></section>
+    <section><h2>Estadísticas</h2><div class="stats" id="stats"></div></section>
+    <section><h2>Datos de la partida</h2><textarea id="data" rows="3" aria-label="Código de la partida" placeholder="Aquí aparece tu código al exportar. Pega uno para importar."></textarea><div class="row"><button id="exp">Exportar</button><button id="imp">Importar</button></div></section>
+    <div class="foot"><span id="total"></span><button id="reset">Reiniciar todo</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<button class="gold" id="gold" hidden aria-label="Espora dorada: tócala">✦</button>
+<script>
+(function(){
+  var GENS=[
+    {id:'hifas',n:'Hifas',d:'Hilos que buscan humedad',c:15,p:0.2},
+    {id:'cultivo',n:'Cultivo',d:'Una bandeja de sustrato',c:100,p:1},
+    {id:'cueva',n:'Cueva húmeda',d:'Oscuridad y rocío constante',c:1100,p:8},
+    {id:'lab',n:'Laboratorio',d:'Cepas seleccionadas',c:12000,p:47},
+    {id:'bosque',n:'Bosque entero',d:'Una red bajo la tierra',c:130000,p:260},
+    {id:'luna',n:'Hongo lunar',d:'Florece solo de noche',c:1400000,p:1400},
+    {id:'cometa',n:'Cometa fértil',d:'Siembra esporas desde el cielo',c:2e7,p:7800},
+    {id:'nexo',n:'Nexo estelar',d:'Une todos los bosques',c:3.3e8,p:44000},
+    {id:'portal',n:'Portal fúngico',d:'Abre grietas a otros mundos',c:5.1e9,p:260000},
+    {id:'eterno',n:'Micelio eterno',d:'Existe desde antes del tiempo',c:7.5e10,p:1600000}
+  ];
+  var CLICKUPS=[100,1000,10000,100000,1000000];
+  var GLOB=[
+    {id:'g1',n:'Rocío matinal',d:'Toda la producción x1,25',m:1.25,c:500,r:200},
+    {id:'g2',n:'Luz tenue',d:'Toda la producción x1,5',m:1.5,c:5000,r:2000},
+    {id:'g3',n:'Simbiosis',d:'Toda la producción x2',m:2,c:250000,r:1e5},
+    {id:'g4',n:'Red de raíces',d:'Toda la producción x3',m:3,c:25e6,r:1e7},
+    {id:'g5',n:'Esporas doradas',d:'Toda la producción x5',m:5,c:5e9,r:2e9}
+  ];
+  var CSH=[
+    {id:'t1',n:'Toque resonante',c:2000,r:800},
+    {id:'t2',n:'Toque profundo',c:2e5,r:8e4},
+    {id:'t3',n:'Toque ancestral',c:2e7,r:8e6}
+  ];
+  var PERM=[
+    {id:'semillero',n:'Semillero',d:'Empiezas cada ciclo con 500 esporas',c:2},
+    {id:'ancestral',n:'Raíz fuerte',d:'Los toques valen el doble',c:4},
+    {id:'fertil',n:'Sustrato fértil',d:'Construcciones 10 % más baratas',c:10},
+    {id:'red',n:'Red micelial',d:'Producción x1,5 permanente',c:25},
+    {id:'cosechador',n:'Cosechador',d:'Toca el hongo solo 3 veces por segundo',c:6},
+    {id:'comprador',n:'Comprador automático',d:'Compra construcciones baratas solo, cada 2 s',c:15}
+  ];
+  var KEY='micelio-save-v1';
+  var S=fresh();
+  function fresh(){return {sp:0,run:0,life:0,own:{},gup:{},glob:{},cup:0,ess:0,essAll:0,perm:{},pres:0,ach:{},skills:{},clicks:0,golds:0,started:Date.now(),t:Date.now()};}
+
+  function need(l){return l<=1?0:100*Math.pow(4,l-2);}
+  function level(){var l=1;while(S.life>=need(l+1))l++;return l;}
+  function add(n){S.sp+=n;S.run+=n;S.life+=n;}
+  function owned(g){return S.own[g.id]||0;}
+  function gmult(g){return Math.pow(2,S.gup[g.id]||0);}
+  var qty=1;
+  function sk(id){return S.skills&&S.skills[id];}
+  function disc(){return (S.perm.fertil?0.9:1)*(sk('r2')?0.95:1);}
+  function costN(g,n){return Math.round(g.c*Math.pow(1.15,owned(g))*(Math.pow(1.15,n)-1)/0.15*disc());}
+  function nFor(g){
+    if(qty>0)return qty;
+    var b=g.c*Math.pow(1.15,owned(g))*disc();
+    var n=Math.max(1,Math.floor(Math.log(1+S.sp*0.15/b)/Math.log(1.15)));
+    while(n>1&&costN(g,n)>S.sp)n--;
+    return n;
+  }
+  function cost(g){return costN(g,nFor(g));}
+  function globMult(){
+    var m=(1+0.05*S.essAll)*(1+0.04*(level()-1))*(S.perm.red?1.5:1)*(1+0.02*Object.keys(S.ach).length)*bm()*(sk('r1')?1.1:1)*(sk('r3')?1.25:1)*(sk('r4')?1.5:1);
+    GLOB.forEach(function(u){if(S.glob[u.id])m*=u.m;});
+    return m;
+  }
+  function cps(){return GENS.reduce(function(a,g){return a+owned(g)*g.p*gmult(g);},0)*globMult();}
+  function share(){return 0.02+0.03*CSH.filter(function(u){return S.glob[u.id];}).length+(sk('e2')?0.03:0);}
+  function clickPower(){
+    return Math.pow(2,S.cup)*(S.perm.ancestral?2:1)*(sk('e1')?1.5:1)*(sk('e4')?2:1)*(1+0.04*(level()-1))+cps()*share();
+  }
+  function presGain(){return Math.floor(Math.sqrt(S.run/1e5)*(sk('f4')?1.25:1));}
+
+  var lastL=1;
+  function load(){
+    try{
+      var raw=localStorage.getItem(KEY);
+      if(!raw)return;
+      var d=JSON.parse(raw);
+      if(d&&typeof d.sp==='number'){
+        S=Object.assign(fresh(),d);
+        if(d.life===undefined){S.life=d.total||0;S.run=d.total||0;}
+        var secs=Math.min((Date.now()-S.t)/1000,8*3600);
+        var gain=cps()*secs*(sk('f4')?1:0.5);
+        if(gain>1){add(gain);
+          $('hint').textContent='Mientras no estabas: +'+fmt(gain)+' esporas';}
+      }
+    }catch(e){}
+  }
+  function save(){
+    S.t=Date.now();
+    try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+  }
+  function fmt(n){
+    if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n).toString();
+    var u=['mil','M','B','T','Q','Qi'];
+    var i=-1;
+    while(n>=1000&&i<u.length-1){n/=1000;i++;}
+    return n.toFixed(n<10?2:n<100?1:0)+' '+u[i];
+  }
+  var $=function(id){return document.getElementById(id);};
+  var tt;
+  function toast(m){
+    var t=$('toast');t.textContent=m;t.classList.add('on');
+    clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('on');},3200);
+  }
+
+  var genEls={};
+  GENS.forEach(function(g){
+    var b=document.createElement('button');
+    b.className='item gen';
+    b.innerHTML='<b>'+g.n+'</b><span class="price"></span><span class="own"></span><small>'+g.d+'</small>';
+    b.addEventListener('click',function(){
+      var c=cost(g);
+      if(S.sp<c)return;
+      var n=nFor(g);S.sp-=c;S.own[g.id]=owned(g)+n;render(true);
+    });
+    $('gens').appendChild(b);genEls[g.id]=b;
+  });
+
+  var permEls={};
+  PERM.forEach(function(p){
+    var b=document.createElement('button');
+    b.className='item';
+    b.innerHTML='<b>'+p.n+'</b><span class="price"></span><small>'+p.d+'</small>';
+    b.addEventListener('click',function(){
+      if(S.perm[p.id]||S.ess<p.c)return;
+      S.ess-=p.c;S.perm[p.id]=1;render(true);
+    });
+    $('perm').appendChild(b);permEls[p.id]=b;
+  });
+
+  function availableUps(){
+    var list=[];
+    if(S.cup<CLICKUPS.length)
+      list.push({key:'c'+S.cup,n:'Recolección x2',d:'Cada toque vale el doble',c:CLICKUPS[S.cup],
+        buy:function(){S.cup++;}});
+    GENS.forEach(function(g){
+      var lv=S.gup[g.id]||0,nd=10+lv*15;
+      if(owned(g)>=nd)
+        list.push({key:g.id+lv,n:g.n+' x2',d:'Producen el doble (tienes '+owned(g)+')',
+          c:Math.ceil(g.c*100*Math.pow(8,lv)),buy:function(){S.gup[g.id]=lv+1;}});
+    });
+    GLOB.forEach(function(u){
+      if(!S.glob[u.id]&&S.run>=u.r)
+        list.push({key:u.id,n:u.n,d:u.d,c:u.c,buy:function(){S.glob[u.id]=1;}});
+    });
+    CSH.forEach(function(u){
+      if(!S.glob[u.id]&&S.run>=u.r)
+        list.push({key:u.id,n:u.n,d:'Cada toque suma +3 % de tu producción por segundo',c:u.c,buy:function(){S.glob[u.id]=1;}});
+    });
+    return list;
+  }
+
+  var upKey='',upList=[];
+  function renderUps(force){
+    var list=availableUps();
+    var key=list.map(function(u){return u.key;}).join('|');
+    upList=list;
+    if(key!==upKey||force){
+      upKey=key;
+      var box=$('ups');box.innerHTML='';
+      list.forEach(function(u,i){
+        var b=document.createElement('button');
+        b.className='item';
+        b.innerHTML='<b>'+u.n+'</b><span class="price">'+fmt(u.c)+'</span><small>'+u.d+'</small>';
+        b.addEventListener('click',function(){
+          var cur=upList[i];
+          if(cur&&S.sp>=cur.c){S.sp-=cur.c;cur.buy();render(true);}
+        });
+        box.appendChild(b);
+      });
+    }
+    var btns=$('ups').children;
+    for(var i=0;i<btns.length;i++)btns[i].disabled=S.sp<list[i].c;
+  }
+
+  function render(force){
+    var L=level();
+    if(L>lastL){toast('¡Nivel '+L+'! Producción +4 % y 1 punto de habilidad');}
+    lastL=L;
+    var a=need(L),b=need(L+1);
+    $('lvl').textContent='Nivel '+L;
+    $('bar').style.width=Math.min(100,(S.life-a)/(b-a)*100)+'%';
+    $('lvlnote').textContent='Siguiente nivel: '+fmt(b)+' esporas en total · Bono de nivel: +'+((L-1)*4)+' %';
+    $('count').textContent=fmt(S.sp);
+    $('rate').textContent=fmt(cps())+' por segundo';
+    $('total').textContent='Este ciclo: '+fmt(S.run)+' · Ciclos: '+S.pres;
+    GENS.forEach(function(g){
+      var e=genEls[g.id],c=cost(g);
+      e.querySelector('.price').textContent=fmt(c)+(qty!==1?' (+'+nFor(g)+')':'');
+      e.querySelector('.own').textContent=owned(g);
+      e.querySelector('small').textContent=g.d+' · '+fmt(g.p*gmult(g)*globMult())+'/s cada uno';
+      e.disabled=S.sp<c;
+    });
+    renderUps(force);
+    var g=presGain();
+    $('presinfo').innerHTML='Tienes <strong>'+S.essAll+'</strong> esencias ganadas (+'+(S.essAll*5)+' % de producción) y <strong>'+S.ess+'</strong> sin gastar. Esporular reinicia construcciones y mejoras, pero conservas nivel, habilidades y mejoras permanentes.';
+    $('pres').disabled=g<1;
+    $('pres').textContent=g<1?'Necesitas 100 mil esporas en este ciclo':'Esporular: +'+g+' esencias';
+    PERM.forEach(function(p){
+      var e=permEls[p.id],on=!!S.perm[p.id];
+      e.classList.toggle('done',on);
+      e.querySelector('.price').textContent=on?'Activa':p.c+' esencias';
+      e.disabled=!on&&S.ess<p.c;
+      if(on)e.disabled=true;
+    });
+    renderExtra();
+    document.title=fmt(S.sp)+' esporas – Micelio';
+  }
+
+  $('pres').addEventListener('click',function(){
+    var g=presGain();
+    if(g<1)return;
+    if(!confirm('¿Esporular y ganar '+g+' esencias? Se reinician construcciones y mejoras de este ciclo.'))return;
+    S.ess+=g;S.essAll+=g;S.pres++;
+    S.sp=S.perm.semillero?500:0;S.run=0;S.own={};S.gup={};S.glob={};S.cup=0;
+    save();render(true);
+    toast('Esporulaste: +'+g+' esencias');
+  });
+
+  function pop(x,y,txt){
+    var f=document.createElement('div');
+    f.className='float';f.textContent='+'+txt;
+    f.style.left=(x-14)+'px';f.style.top=(y-20)+'px';
+    document.body.appendChild(f);
+    setTimeout(function(){f.remove();},900);
+  }
+  $('mush').addEventListener('click',function(e){
+    var p=clickPower();var crit=sk('e3')&&Math.random()<0.1;if(crit)p*=10;
+    add(p);S.clicks++;
+    var r=this.getBoundingClientRect();
+    pop(e.clientX||r.left+r.width/2,e.clientY||r.top+20,fmt(p)+(crit?' ¡crítico!':''));
+    render(false);
+  });
+
+  $('reset').addEventListener('click',function(){
+    if(confirm('¿Borrar TODO el progreso, incluidas esencias y nivel?')){
+      S=fresh();lastL=1;save();$('hint').textContent='Toca el hongo para recolectar';render(true);
+    }
+  });
+
+  var last=performance.now(),acc=0;
+  function tick(now){
+    var dt=Math.min((now-last)/1000,1);last=now;
+    add(cps()*dt);auto(dt);
+    acc+=dt;
+    if(acc>=0.2){acc=0;render(false);}
+    requestAnimationFrame(tick);
+  }
+  var buffUntil=0;
+  function bm(){return Date.now()<buffUntil?7:1;}
+  function builds(){return GENS.reduce(function(a,g){return a+owned(g);},0);}
+  function A(id,n,d,f){return {id:id,n:n,d:d,f:f};}
+  var ACH=[
+    A('a1','Primer toque','Toca el hongo',function(){return S.clicks>=1;}),
+    A('a2','Dedos de hongo','100 toques',function(){return S.clicks>=100;}),
+    A('a3','Mil toques','1000 toques',function(){return S.clicks>=1000;}),
+    A('a4','Primer millar','Recolecta 1000 esporas',function(){return S.life>=1e3;}),
+    A('a5','Millonario','1 M de esporas en total',function(){return S.life>=1e6;}),
+    A('a6','Miles de millones','1 B de esporas en total',function(){return S.life>=1e9;}),
+    A('a7','Granjero','50 construcciones',function(){return builds()>=50;}),
+    A('a8','Imperio','200 construcciones',function(){return builds()>=200;}),
+    A('a9','Veterano','Llega al nivel 5',function(){return level()>=5;}),
+    A('a10','Maestro micelial','Llega al nivel 10',function(){return level()>=10;}),
+    A('a11','Renacer','Esporula una vez',function(){return S.pres>=1;}),
+    A('a12','Cazador de destellos','Atrapa 5 esporas doradas',function(){return S.golds>=5;}),
+    A('a13','Torrente','1000 esporas por segundo',function(){return cps()>=1000;})
+  ];
+  var achEls={};
+  ACH.forEach(function(a){
+    var e=document.createElement('div');e.className='ach';
+    e.innerHTML='<b>'+a.n+'</b><small>'+a.d+'</small>';
+    $('achs').appendChild(e);achEls[a.id]=e;
+  });
+  function renderExtra(){
+    ACH.forEach(function(a){
+      if(!S.ach[a.id]&&a.f()){S.ach[a.id]=1;toast('Logro: '+a.n+' (+2 %)');}
+      achEls[a.id].classList.toggle('on',!!S.ach[a.id]);
+    });
+    renderSkills();
+    var mins=Math.floor((Date.now()-S.started)/60000);
+    $('stats').innerHTML='Construcciones: '+builds()+'<br>Valor por toque: '+fmt(clickPower())+'<br>Toques totales: '+S.clicks+'<br>Esporas doradas atrapadas: '+S.golds+'<br>Esporas totales: '+fmt(S.life)+'<br>Tiempo de juego: '+mins+' min'+(Date.now()<buffUntil?'<br><strong>Frenesí activo: x7</strong>':'');
+  }
+  [1,10,100,0].forEach(function(n){
+    var b=document.createElement('button');
+    b.textContent=n?'x'+n:'Máx';b.setAttribute('aria-pressed',n===1);
+    b.addEventListener('click',function(){
+      qty=n;var bs=$('qty').children;
+      for(var i=0;i<bs.length;i++)bs[i].setAttribute('aria-pressed',bs[i]===b);
+      render(true);
+    });
+    $('qty').appendChild(b);
+  });
+  var TREE=[
+    {n:'Raíces',nodes:[
+      {id:'r1',n:'Raíces finas',d:'Producción x1,1',c:1},
+      {id:'r2',n:'Red densa',d:'Construcciones 5 % más baratas',c:1},
+      {id:'r3',n:'Savia rica',d:'Producción x1,25',c:2},
+      {id:'r4',n:'Bosque ancestral',d:'Producción x1,5',c:2}]},
+    {n:'Esporas',nodes:[
+      {id:'e1',n:'Pulso suave',d:'Toques +50 %',c:1},
+      {id:'e2',n:'Resonancia',d:'Cada toque suma +3 % extra de tu producción',c:1},
+      {id:'e3',n:'Toque crítico',d:'10 % de probabilidad de un toque x10',c:2},
+      {id:'e4',n:'Tormenta',d:'Toques x2',c:2}]},
+    {n:'Fortuna',nodes:[
+      {id:'f1',n:'Ojo atento',d:'Esporas doradas 30 % más frecuentes',c:1},
+      {id:'f2',n:'Destello largo',d:'Duran 20 s en pantalla',c:1},
+      {id:'f3',n:'Frenesí largo',d:'El frenesí dura 60 s',c:2},
+      {id:'f4',n:'Cosecha lunar',d:'+25 % de esencias y producción completa sin conexión',c:2}]}
+  ];
+  function spent(){var s=0;TREE.forEach(function(b){b.nodes.forEach(function(x){if(sk(x.id))s+=x.c;});});return s;}
+  function points(){return (level()-1)+S.pres-spent();}
+  var nodeEls={};
+  TREE.forEach(function(b){
+    var col=document.createElement('div');col.className='branch';
+    col.innerHTML='<h3>'+b.n+'</h3>';
+    b.nodes.forEach(function(x,i){
+      var prev=i?b.nodes[i-1].id:null;
+      var e=document.createElement('button');e.className='node';
+      e.innerHTML='<b>'+x.n+'</b><small>'+x.d+'</small><small>'+x.c+(x.c>1?' puntos':' punto')+'</small>';
+      e.addEventListener('click',function(){
+        if(sk(x.id)||(prev&&!sk(prev))||points()<x.c)return;
+        S.skills[x.id]=1;render(true);
+      });
+      col.appendChild(e);nodeEls[x.id]={e:e,prev:prev,c:x.c};
+    });
+    $('tree').appendChild(col);
+  });
+  function renderSkills(){
+    var pts=points();
+    $('skinfo').textContent='Puntos disponibles: '+pts+' (1 por nivel y 1 por esporulación)';
+    for(var id in nodeEls){
+      var n=nodeEls[id],on=!!sk(id),open=!n.prev||sk(n.prev);
+      n.e.classList.toggle('on',on);
+      n.e.classList.toggle('can',!on&&open&&pts>=n.c);
+      n.e.disabled=on||!open||pts<n.c;
+    }
+  }
+  $('respec').addEventListener('click',function(){S.skills={};render(true);toast('Puntos reasignados');});
+  var ac=0,ab=0;
+  function auto(dt){
+    if(S.perm.cosechador){
+      ac+=dt;
+      while(ac>=1/3){ac-=1/3;add(clickPower());}
+    }
+    if(S.perm.comprador){
+      ab+=dt;
+      if(ab>=2){
+        ab=0;
+        for(var k=0;k<10;k++){
+          var best=null;
+          GENS.forEach(function(g){var c=costN(g,1);if(c<=S.sp&&(!best||c<best.c))best={g:g,c:c};});
+          if(!best)break;
+          S.sp-=best.c;S.own[best.g.id]=owned(best.g)+1;
+        }
+        render(true);
+      }
+    }
+  }
+  document.addEventListener('keydown',function(e){
+    var t=e.target&&e.target.tagName;
+    if(t==='TEXTAREA'||t==='INPUT')return;
+    if(e.code==='Space'){
+      if(t==='BUTTON')return;
+      e.preventDefault();$('mush').click();return;
+    }
+    var i=e.key.length===1?'1234'.indexOf(e.key):-1;
+    if(i>=0)$('qty').children[i].click();
+  });
+  var goldT;
+  function nextGold(){clearTimeout(goldT);goldT=setTimeout(spawnGold,(45000+Math.random()*75000)*(sk('f1')?0.7:1));}
+  function spawnGold(){
+    var g=$('gold');
+    g.style.left=(10+Math.random()*70)+'vw';g.style.top=(15+Math.random()*60)+'vh';
+    g.hidden=false;
+    setTimeout(function(){g.hidden=true;nextGold();},sk('f2')?20000:12000);
+  }
+  $('gold').addEventListener('click',function(){
+    this.hidden=true;S.golds++;
+    if(Math.random()<0.5){var v=Math.max(cps()*90,clickPower()*30,50);add(v);toast('Lluvia de esporas: +'+fmt(v));}
+    else{var dur=sk('f3')?60:30;buffUntil=Date.now()+dur*1000;toast('Frenesí: producción x7 durante '+dur+' s');}
+    render(false);
+  });
+  $('exp').addEventListener('click',function(){
+    save();var s=btoa(JSON.stringify(S));$('data').value=s;
+    try{navigator.clipboard.writeText(s).catch(function(){});}catch(e){}
+    toast('Partida exportada: guarda ese código');
+  });
+  $('imp').addEventListener('click',function(){
+    try{
+      var d=JSON.parse(atob($('data').value.trim()));
+      if(!d||typeof d.sp!=='number')throw 0;
+      S=Object.assign(fresh(),d);save();lastL=level();render(true);toast('Partida importada');
+    }catch(e){toast('El código no es una partida válida');}
+  });
+  nextGold();
+  load();lastL=level();render(true);
+  setInterval(save,5000);
+  window.addEventListener('beforeunload',save);
+  requestAnimationFrame(tick);
+})();
+</script>
+<script>
+(function(){
+  var svg=document.getElementById('forestsvg'),NS='http://www.w3.org/2000/svg',seed=11;
+  function r(a,b){seed=(seed*16807)%2147483647;return a+(seed/2147483647)*(b-a);}
+  function el(t,at,p){var e=document.createElementNS(NS,t);for(var k in at)e.setAttribute(k,at[k]);(p||svg).appendChild(e);return e;}
+  function pine(x,y,h,w){
+    var a=w*0.6,b=w*0.42,c=w*0.25;
+    return 'M'+x+' '+(y-h)+'L'+(x+c)+' '+(y-h*0.68)+'L'+(x+c*0.6)+' '+(y-h*0.68)+'L'+(x+b)+' '+(y-h*0.38)+'L'+(x+b*0.6)+' '+(y-h*0.38)+'L'+(x+a)+' '+y+'L'+(x-a)+' '+y+'L'+(x-b*0.6)+' '+(y-h*0.38)+'L'+(x-b)+' '+(y-h*0.38)+'L'+(x-c*0.6)+' '+(y-h*0.68)+'L'+(x-c)+' '+(y-h*0.68)+'Z';
+  }
+  var defs=el('defs',{});
+  var g=el('linearGradient',{id:'fog',x1:0,y1:0,x2:0,y2:1},defs);
+  var s1=el('stop',{offset:0},g);s1.style.stopColor='var(--fog)';s1.style.stopOpacity=0;
+  var s2=el('stop',{offset:1},g);s2.style.stopColor='var(--fog)';s2.style.stopOpacity=0.35;
+  var stars=el('g',{});stars.style.opacity='var(--stars)';
+  for(var i=0;i<70;i++){var s=el('circle',{cx:r(0,1600),cy:r(0,420),r:r(0.6,1.8)},stars);s.style.fill='var(--moon)';s.style.opacity=r(0.3,0.9);}
+  var glow=el('circle',{cx:1240,cy:170,r:130});glow.style.fill='var(--moon)';glow.style.opacity=0.12;
+  var moon=el('circle',{cx:1240,cy:170,r:58});moon.style.fill='var(--moon)';
+  var L=[
+    {y:600,n:44,h:[110,200],w:[40,70],c:'--f1'},
+    {y:690,n:28,h:[170,300],w:[60,100],c:'--f2'},
+    {y:800,n:14,h:[260,420],w:[90,140],c:'--f3'}
+  ];
+  L.forEach(function(l,idx){
+    if(idx){el('rect',{x:0,y:l.y-260,width:1600,height:300,fill:'url(#fog)'});}
+    var d='M-50 '+l.y+'L1650 '+l.y+'L1650 900L-50 900Z';
+    for(var i=0;i<l.n;i++)d+=pine(r(-40,1640),l.y,r(l.h[0],l.h[1]),r(l.w[0],l.w[1]));
+    var p=el('path',{d:d});p.style.fill='var('+l.c+')';
+  });
+  for(var j=0;j<16;j++){
+    var f=el('circle',{cx:r(100,1500),cy:r(480,820),r:2.6,class:'ff'});
+    f.style.fill='var(--amber)';f.style.animationDelay=r(0,3)+'s';
+  }
+})();
+</script>
+</body>
+</html>

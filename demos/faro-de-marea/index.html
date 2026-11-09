@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El faro de Marea: aprende a programar con una historia</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#e4eff2;--panel:#f7fbfc;--ink:#14303b;--muted:#4d6b76;--lamp:#c98a00;--beam:#f2c14e;--ok:#1f7a5a;--bad:#b2432f;--line:#b9d1d8;--sea:#bcd8df}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f2a35;--panel:#173a48;--ink:#e6f1f3;--muted:#9bbcc6;--lamp:#f2c14e;--beam:#f2c14e;--ok:#6fd1a6;--bad:#ff9a85;--line:#2b5565;--sea:#0b2029}}
+:root[data-theme="dark"]{--bg:#0f2a35;--panel:#173a48;--ink:#e6f1f3;--muted:#9bbcc6;--lamp:#f2c14e;--beam:#f2c14e;--ok:#6fd1a6;--bad:#ff9a85;--line:#2b5565;--sea:#0b2029}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.6 "Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif}
+main{max-width:720px;margin:0 auto;padding:20px 18px 48px}
+h1{font-size:1.7rem;line-height:1.2;margin:.2em 0}
+.sub{color:var(--muted);margin:0 0 12px}
+#scene{width:100%;height:auto;display:block;border-radius:14px;background:var(--sea);border:1px solid var(--line)}
+.bar{display:flex;gap:6px;margin:14px 0}
+.bar i{flex:1;height:8px;border-radius:4px;background:var(--line)}
+.bar i.on{background:var(--lamp)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:14px}
+.card h2{font-size:1.2rem;margin:0 0 6px}
+.concept{font-size:.95rem;color:var(--muted);border-left:3px solid var(--lamp);padding-left:12px;margin:12px 0}
+pre{margin:12px 0;padding:14px;border-radius:10px;background:var(--bg);border:1px solid var(--line);overflow-x:auto;font:15px/1.6 ui-monospace,Menlo,Consolas,monospace;color:var(--ink)}
+.q{font-weight:bold;margin:12px 0 8px}
+.opts{display:grid;gap:8px}
+button{font:inherit;text-align:left;padding:12px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;min-height:48px}
+button:hover{border-color:var(--lamp)}
+button:focus-visible{outline:3px solid var(--lamp);outline-offset:2px}
+button.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--panel))}
+button.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--panel))}
+button.main{background:var(--lamp);color:#14303b;border-color:var(--lamp);font-weight:bold;text-align:center;margin-top:14px}
+.fb{margin-top:12px;min-height:1.6em}
+.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+ul{padding-left:20px}
+.beam{transition:opacity .8s ease}
+@media (prefers-reduced-motion:reduce){.beam{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>El faro de Marea</h1>
+<p class="sub">Una historia en cuatro noches. Cada una enseña una idea de programación.</p>
+<svg id="scene" viewBox="0 0 400 190" role="img" aria-label="Un faro cuyo haz de luz crece a medida que avanzas">
+ <rect width="400" height="190" fill="var(--sea)"/>
+ <g class="beam" id="beam" opacity="0.1"><polygon points="200,52 400,10 400,95" fill="var(--beam)" opacity=".55"/><polygon points="200,52 0,10 0,95" fill="var(--beam)" opacity=".55"/></g>
+ <path d="M0 160 Q50 150 100 160 T200 160 T300 160 T400 160 V190 H0Z" fill="var(--line)"/>
+ <polygon points="180,160 220,160 211,70 189,70" fill="#f7fbfc" stroke="var(--ink)" stroke-width="1.5"/>
+ <polygon points="184,128 216,128 213,108 187,108" fill="#c8553d"/>
+ <polygon points="189,88 211,88 210,74 190,74" fill="#c8553d"/>
+ <rect x="190" y="56" width="20" height="16" fill="var(--beam)" stroke="var(--ink)" stroke-width="1.5"/>
+ <polygon points="186,56 214,56 200,42" fill="var(--ink)"/>
+</svg>
+<div class="bar" id="bar" aria-label="Progreso"></div>
+<div id="game"></div>
+</main>
+<script>
+var L=[
+{t:"Primera noche: el barril de aceite",
+ s:"Marea acaba de llegar al faro. El viejo farero le deja una nota: «El aceite se acaba rápido. Lleva la cuenta con una etiqueta».",
+ c:"Una variable es una etiqueta con un valor guardado. Puedes cambiarlo cuando quieras.",
+ code:"aceite = 5\naceite = aceite - 2\nencender_lampara(aceite)",
+ q:"¿Con cuántas llamas arde la lámpara?",
+ o:["2","3","5"],a:1,
+ hint:"Mira la segunda línea: la etiqueta aceite se actualiza restándole 2 a lo que valía antes.",
+ win:"Quedan 3. La lámpara arde con tres llamas y el mar se ve un poco más claro."},
+{t:"Segunda noche: la niebla",
+ s:"Una niebla espesa cubre la bahía. Marea debe decidir qué señal usar. Si decide mal, nadie la oirá.",
+ c:"Un condicional elige un camino según una condición: si pasa esto, haz aquello; si no, haz lo otro.",
+ code:"niebla = verdadero\n\nsi niebla == verdadero:\n    tocar(\"sirena\")\nsino:\n    tocar(\"campana\")",
+ q:"¿Qué suena esta noche?",
+ o:["La sirena","La campana","Las dos"],a:0,
+ hint:"La condición es verdadera, así que solo se ejecuta el bloque del «si». El «sino» se salta.",
+ win:"Suena la sirena. Entre la niebla, un barco ajusta su rumbo hacia el faro."},
+{t:"Tercera noche: la flota",
+ s:"Cinco barcos pesqueros vuelven a casa a la vez. Cada uno necesita ver una baliza en el muelle.",
+ c:"Un bucle repite una acción sin que tengas que escribirla una y otra vez.",
+ code:"repetir ___ veces:\n    encender_baliza()",
+ q:"¿Qué número hace que cada barco vea su baliza?",
+ o:["1","3","5"],a:2,
+ hint:"Hay cinco barcos y cada uno necesita una baliza. ¿Cuántas repeticiones hacen falta?",
+ win:"Cinco balizas encendidas con dos líneas de código. Sin el bucle habrías escrito la orden cinco veces."},
+{t:"Cuarta noche: la receta del aviso",
+ s:"Marea nota que repite siempre lo mismo para avisar a cada barco. Decide anotar el procedimiento una vez y darle nombre.",
+ c:"Una función es una receta con nombre. La defines una vez y la usas cuantas veces quieras.",
+ code:"definir avisar(barco):\n    tocar(\"sirena\")\n    anotar(barco)\n\navisar(\"Estrella\")\navisar(\"Gaviota\")",
+ q:"¿Cuántas veces suena la sirena?",
+ o:["1","2","4"],a:1,
+ hint:"La receta suena una vez cada vez que se la llama. Cuenta cuántas llamadas hay abajo.",
+ win:"Dos avisos, una sola receta. Marea ya no necesita al viejo farero para saber qué hacer."}
+];
+var i=-1,done=0,g=document.getElementById("game"),bar=document.getElementById("bar"),beam=document.getElementById("beam");
+function esc(x){return x.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function prog(){bar.innerHTML=L.map(function(_,k){return '<i class="'+(k<done?'on':'')+'"></i>'}).join("");beam.setAttribute("opacity",String(0.1+done*0.225))}
+function intro(){prog();g.innerHTML='<div class="card"><h2>Antes de empezar</h2><p>Marea es la nueva aprendiz de un faro remoto. Cada noche surge un problema, y la solución es una idea de programación. Lee la historia, mira el código y responde. No necesitas saber nada de antemano.</p><button class="main" id="go">Empezar la primera noche</button></div>';document.getElementById("go").onclick=function(){i=0;show()}}
+function show(){
+ var l=L[i];prog();
+ g.innerHTML='<div class="card"><h2>'+l.t+'</h2><p>'+l.s+'</p><div class="concept">'+l.c+'</div><pre>'+esc(l.code)+'</pre><div class="q">'+l.q+'</div><div class="opts" id="opts"></div><div class="fb" id="fb" role="status" aria-live="polite"></div><div id="nx"></div></div>';
+ var box=document.getElementById("opts"),fb=document.getElementById("fb");
+ l.o.forEach(function(o,k){var b=document.createElement("button");b.textContent=o;b.onclick=function(){
+  if(box.dataset.done)return;
+  if(k===l.a){box.dataset.done=1;b.className="ok";fb.className="fb ok";fb.textContent=l.win;done=i+1;prog();
+   var n=document.getElementById("nx");n.innerHTML='<button class="main" id="nb">'+(i<L.length-1?'Pasar a la siguiente noche':'Ver el final')+'</button>';
+   document.getElementById("nb").onclick=function(){i++;if(i<L.length)show();else fin()}}
+  else{b.className="bad";b.disabled=true;fb.className="fb bad";fb.textContent="Todavía no. "+l.hint}};box.appendChild(b)})
+}
+function fin(){prog();g.innerHTML='<div class="card"><h2>El faro brilla</h2><p>Al amanecer, Marea mira la bahía. Todos los barcos llegaron a puerto. Sin darse cuenta, aprendió cuatro ideas que usa cualquier programa:</p><ul><li><b>Variables:</b> etiquetas que guardan valores.</li><li><b>Condicionales:</b> decidir según una condición.</li><li><b>Bucles:</b> repetir sin copiar y pegar.</li><li><b>Funciones:</b> recetas con nombre que reutilizas.</li></ul><button class="main" id="again">Jugar otra vez</button></div>';document.getElementById("again").onclick=function(){done=0;i=-1;intro()}}
+intro();
+</script>
+</body>
+</html>
