@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gastón Román — Portafolio</title>
+<meta name="description" content="Portafolio de Gastón Román: juegos para navegador, Android y multijugador LAN, e historias para YouTube.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+  :root{
+    --accent:#C6F432;
+    --bg:#0E0F13; --panel:#15171D; --panel2:#121419;
+    --line:#22252F; --line2:#3A3E4C;
+    --text:#C9CCD6; --soft:#A9AEBD; --muted:#8B90A0; --white:#FFFFFF;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:17px;line-height:1.6}
+  a{color:#E8EAF0}a:hover{color:var(--white)}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 32px}
+  .navlink{text-decoration:none;color:var(--text)}
+  .navlink:hover{color:var(--white)}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .display{font-family:'Space Grotesk',sans-serif;color:var(--white);letter-spacing:-0.02em;margin:0}
+  section{border-top:1px solid var(--line)}
+  .kicker{margin:0;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent)}
+  h2.display{font-size:48px;line-height:1.05}
+
+  header{border-bottom:1px solid var(--line)}
+  header .wrap{padding-top:20px;padding-bottom:20px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+  .brand{display:flex;gap:12px;align-items:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;color:var(--white);text-decoration:none}
+  .logo{display:inline-flex;width:36px;height:36px;border-radius:8px;align-items:center;justify-content:center;background:var(--accent);color:var(--bg);font-size:16px}
+  nav{display:flex;flex-wrap:wrap;gap:28px;font-size:15px;font-weight:500}
+
+  #inicio{border-top:0}
+  .hero{padding-top:96px;padding-bottom:88px;display:flex;flex-wrap:wrap;gap:56px;align-items:flex-end}
+  .hero-main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:28px}
+  .hero h1{font-size:clamp(44px,7vw,92px);line-height:1;letter-spacing:-0.03em}
+  .lead{margin:0;max-width:620px;font-size:19px;color:var(--soft)}
+  .btns{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 24px;border-radius:10px;font-weight:600;text-decoration:none;font-size:16px;font-family:inherit;cursor:pointer}
+  .btn-primary{background:var(--accent);color:var(--bg);border:1px solid var(--accent)}
+  .btn-primary:hover{color:var(--bg);filter:brightness(1.08)}
+  .btn-ghost{background:transparent;color:var(--white);border:1px solid var(--line2)}
+  .facts{flex:1 1 300px;min-width:0;border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:28px;display:flex;flex-direction:column;gap:18px}
+  .fact{display:flex;flex-direction:column;gap:4px}
+  .fact small{font-size:13px;color:var(--muted)}
+  .fact span{color:var(--white);font-weight:500}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:10px}
+
+  .block{padding-top:88px;padding-bottom:88px;display:flex;flex-direction:column;gap:40px}
+  .head-row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between}
+  .head{display:flex;flex-direction:column;gap:10px}
+  .filters{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{min-height:44px;padding:0 18px;border-radius:999px;font:500 15px Inter,system-ui,sans-serif;cursor:pointer;background:transparent;color:var(--text);border:1px solid var(--line2)}
+  .pill[aria-pressed="true"]{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px}
+  .card{border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column;transition:transform .2s ease,border-color .2s ease}
+  .card:hover{transform:translateY(-4px);border-color:var(--line2)}
+  .thumb{position:relative;overflow:hidden;height:180px;display:flex;align-items:flex-end;justify-content:space-between;padding:20px}
+  .thumb::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:24px 24px;pointer-events:none}
+  .num{position:relative;z-index:1;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:64px;line-height:.9;color:rgba(255,255,255,.92)}
+  .status{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(14,15,19,.72);color:var(--white)}
+  .card-body{padding:24px;display:flex;flex-direction:column;gap:12px;flex-grow:1}
+  .card-body h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:24px;color:var(--white)}
+  .card-body p{margin:0;font-size:15px;color:var(--soft);flex-grow:1}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;padding-top:4px}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid #2C303B;color:var(--text)}
+
+  .about{padding-top:88px;padding-bottom:88px;display:flex;flex-wrap:wrap;gap:56px}
+  .about-head{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:10px}
+  .about-text{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:20px;font-size:19px}
+  .about-text p{margin:0}
+
+  .skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+  .skill{border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:14px;background:var(--panel2)}
+  .skill h3{margin:0;font-family:'Space Grotesk',sans-serif;font-size:20px;color:var(--white)}
+  .skill ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:15px}
+  .skill li{display:flex;gap:10px;align-items:center}
+  .skill li::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--accent);flex:none}
+
+  .contact{padding-top:104px;padding-bottom:104px;display:flex;flex-direction:column;gap:28px;align-items:flex-start}
+  .contact h2{font-size:clamp(40px,6vw,80px);line-height:1;letter-spacing:-0.03em}
+  .socials{display:flex;flex-wrap:wrap;gap:24px;padding-top:12px;font-size:15px}
+
+  footer{border-top:1px solid var(--line)}
+  footer .wrap{padding-top:28px;padding-bottom:28px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;font-size:14px;color:var(--muted)}
+
+  @media (max-width:600px){
+    .wrap{padding:0 20px}
+    .hero{padding-top:64px;padding-bottom:64px}
+    h2.display{font-size:36px}
+    .grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="#inicio" class="brand"><span class="logo">GR</span><span>Gastón Román</span></a>
+    <nav aria-label="Secciones">
+      <a href="#proyectos" class="navlink">Proyectos</a>
+      <a href="#sobre-mi" class="navlink">Sobre mí</a>
+      <a href="#habilidades" class="navlink">Habilidades</a>
+      <a href="#contacto" class="navlink">Contacto</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section id="inicio">
+  <div class="wrap hero">
+    <div class="hero-main">
+      <p class="kicker" style="letter-spacing:.08em;text-transform:uppercase">Desarrollo de juegos · Historias en video</p>
+      <h1 class="display">Hago juegos que se juegan en el navegador, en el celu y en la red de tu casa.</h1>
+      <p class="lead">Diseño y programo juegos incrementales, de carreras y de acción, y escribo historias para YouTube con personajes propios. Acá está lo que vengo construyendo.</p>
+      <div class="btns" style="padding-top:8px">
+        <a href="#proyectos" class="btn btn-primary">Ver proyectos
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href="#contacto" class="btn btn-ghost">Contactarme</a>
+      </div>
+    </div>
+    <aside class="facts" aria-label="Ficha rápida">
+      <p class="mono" style="margin:0;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Ficha rápida</p>
+      <div class="fact"><small>Base</small><span>[TU CIUDAD, PAÍS]</span></div>
+      <div class="fact"><small>Foco</small><span>Juegos HTML, Android y multijugador LAN</span></div>
+      <div class="fact"><small>Disponible para</small><span><i class="dot" aria-hidden="true"></i>[COLABORACIONES / TRABAJOS]</span></div>
+    </aside>
+  </div>
+</section>
+
+<section id="proyectos">
+  <div class="wrap block">
+    <div class="head-row">
+      <div class="head">
+        <p class="kicker">01 — Proyectos</p>
+        <h2 class="display">Lo que estoy construyendo</h2>
+      </div>
+      <div class="filters" role="group" aria-label="Filtrar proyectos" id="filters"></div>
+    </div>
+    <div class="grid" id="projects"></div>
+  </div>
+</section>
+
+<section id="sobre-mi">
+  <div class="wrap about">
+    <div class="about-head">
+      <p class="kicker">02 — Sobre mí</p>
+      <h2 class="display">Ideas que se pueden jugar</h2>
+    </div>
+    <div class="about-text">
+      <p>Me gusta llevar una idea hasta que se pueda tocar: un hongo que crece mientras no mirás, un auto que suena distinto a todos los demás, una partida en red con amigos en la misma casa.</p>
+      <p>Además de programar, invento historias. Con La Banda del Barrio escribo episodios para YouTube armados a base de prompts, y estoy diseñando un juego que enseña a programar a través de una narrativa.</p>
+      <p style="color:var(--muted)">[Agregá acá un par de líneas tuyas: desde cuándo hacés esto, qué estudiaste o qué estás buscando.]</p>
+    </div>
+  </div>
+</section>
+
+<section id="habilidades">
+  <div class="wrap block">
+    <div class="head">
+      <p class="kicker">03 — Habilidades</p>
+      <h2 class="display">Con qué trabajo</h2>
+    </div>
+    <div class="skills" id="skills"></div>
+  </div>
+</section>
+
+<section id="contacto">
+  <div class="wrap contact">
+    <p class="kicker">04 — Contacto</p>
+    <h2 class="display">¿Armamos algo juntos?</h2>
+    <p class="lead" style="max-width:560px">Si tenés una idea de juego, una colaboración o querés probar algo que hice, escribime.</p>
+    <div class="btns">
+      <a href="mailto:gastonroman41@gmail.com" class="btn btn-primary" style="min-height:52px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        gastonroman41@gmail.com
+      </a>
+      <button type="button" class="btn btn-ghost" id="copy" style="min-height:52px">Copiar email</button>
+    </div>
+    <div class="socials">
+      <!-- Reemplazá el # por tus links reales -->
+      <a href="#" class="navlink">YouTube: [TU CANAL]</a>
+      <a href="#" class="navlink">GitHub: [TU USUARIO]</a>
+      <a href="#" class="navlink">itch.io: [TU PERFIL]</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="year">2026</span> Gastón Román</span>
+    <a href="#inicio" class="navlink">Volver arriba ↑</a>
+  </div>
+</footer>
+
+<script>
+  // ====== Editá tus proyectos acá ======
+  const projects = [
+    { num:'01', title:'Micelio', bg:'#1E4D3A', status:'En desarrollo', cats:['web'],
+      desc:'Juego incremental en HTML: un hongo que crece, suelta esporas y se expande. Mejoras, prestigio y niveles para seguir avanzando.',
+      tags:['HTML','JavaScript','Idle'] },
+    { num:'02', title:'Carreras LAN', bg:'#6B2A1F', status:'En desarrollo', cats:['web'],
+      desc:'Juego de carreras con gráficos en HD y multijugador por red local. Cada auto tiene su propio sonido y varias skins para elegir.',
+      tags:['Multijugador','LAN','Carreras'] },
+    { num:'03', title:'Shooter 3D', bg:'#2A3550', status:'En desarrollo', cats:['web'],
+      desc:'Shooter en primera persona hecho en HTML, de estilo táctico: modelos 3D y armas con disparo y daño.',
+      tags:['3D','FPS','HTML'] },
+    { num:'04', title:'Idle para Android', bg:'#4A2F63', status:'En desarrollo', cats:['movil'],
+      desc:'Juego incremental inactivo para Android, con mecánicas propias que no vas a encontrar en otros idle.',
+      tags:['Android','Idle','Móvil'] },
+    { num:'05', title:'Aprender a programar jugando', bg:'#5A4A16', status:'En diseño', cats:[],
+      desc:'Un juego que enseña conceptos de programación a través de una historia, para aprender sin sentir que es una clase.',
+      tags:['Narrativa','Educativo'] },
+    { num:'06', title:'La Banda del Barrio', bg:'#1F4E5C', status:'Serie en curso', cats:['video'],
+      desc:'Serie de videos para YouTube creada con prompts, con Toño, Camperita, Pika y Javier como protagonistas.',
+      tags:['YouTube','Prompts','Historias'] }
+  ];
+  const filters = [
+    { id:'todos', label:'Todos' },
+    { id:'web', label:'Navegador' },
+    { id:'movil', label:'Android' },
+    { id:'video', label:'Video' }
+  ];
+  const skills = [
+    { area:'Juegos web', items:['HTML, CSS y JavaScript','Escenas 3D en el navegador','Sistemas incrementales'] },
+    { area:'Multijugador', items:['Partidas por red local (LAN)','Sincronización de jugadores','Sonido por vehículo'] },
+    { area:'Móvil', items:['Juegos para Android','Progreso inactivo','Diseño de mejoras y prestigio'] },
+    { area:'Historias', items:['Guiones con prompts','Personajes propios','Narrativa educativa'] }
+  ];
+  // =====================================
+
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let current = 'todos';
+
+  function renderFilters(){
+    document.getElementById('filters').innerHTML = filters.map(f =>
+      `<button type="button" class="pill" data-id="${f.id}" aria-pressed="${f.id===current}">${esc(f.label)}</button>`
+    ).join('');
+  }
+  function renderProjects(){
+    const list = current==='todos' ? projects : projects.filter(p => p.cats.includes(current));
+    document.getElementById('projects').innerHTML = list.map(p => `
+      <article class="card">
+        <div class="thumb" style="background:${p.bg}">
+          <span class="num">${esc(p.num)}</span>
+          <span class="status">${esc(p.status)}</span>
+        </div>
+        <div class="card-body">
+          <h3>${esc(p.title)}</h3>
+          <p>${esc(p.desc)}</p>
+          <div class="tags">${p.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+        </div>
+      </article>`).join('');
+  }
+  document.getElementById('filters').addEventListener('click', e => {
+    const b = e.target.closest('.pill'); if(!b) return;
+    current = b.dataset.id; renderFilters(); renderProjects();
+  });
+  document.getElementById('skills').innerHTML = skills.map(s => `
+    <div class="skill"><h3>${esc(s.area)}</h3><ul>${s.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></div>`).join('');
+
+  document.getElementById('copy').addEventListener('click', async e => {
+    try { await navigator.clipboard.writeText('gastonroman41@gmail.com'); e.target.textContent = 'Copiado ✓'; }
+    catch { e.target.textContent = 'Copialo a mano'; }
+  });
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  renderFilters(); renderProjects();
+</script>
+</body>
+</html>
