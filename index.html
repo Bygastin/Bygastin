@@ -149,7 +149,7 @@
 <footer>
   <div class="wrap">
     <span>© <span id="year">2026</span> Gastón Román</span>
-    <span class="mono" style="font-size:12px">Pista: ↑ ↑ ↓ ↓ ← → ← → B A</span>
+    <button type="button" class="term-open mono" id="term-open">&gt;_ Abrir terminal <span class="term-key">tecla | o `</span></button>
   </div>
 </footer>
 
@@ -166,6 +166,21 @@
       <div class="tags" id="m-tags"></div>
       <div class="btns" id="m-links" style="padding-top:6px"></div>
     </div>
+  </div>
+</dialog>
+
+<dialog id="term" class="term" aria-label="Terminal">
+  <div class="term-bar">
+    <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="mono">gaston@portafolio: ~</span>
+    <button type="button" class="term-x" id="term-x" aria-label="Cerrar terminal">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="term-out mono" id="term-out" role="log" aria-live="polite"></div>
+  <div class="term-line mono">
+    <label for="term-in" class="term-prompt">&gt;</label>
+    <input id="term-in" class="term-in mono" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" aria-label="Escribí un comando">
   </div>
 </dialog>
 

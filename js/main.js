@@ -46,6 +46,8 @@
     } catch (e) {}
     return null;
   }
+  // Imágenes: solo archivos propios dentro de assets/
+  const safeImg = u => (typeof u === 'string' && /^assets\/[a-z0-9/_-]+\.(webp|png|jpe?g|gif)$/i.test(u) ? u : null);
   const safeColor = c => (/^#[0-9a-f]{6}$/i.test(c) ? c : '#2A3550');
 
   const store = {
@@ -60,23 +62,23 @@
     { num:'01', title:'Micelio', bg:'#1E4D3A', status:'Demo jugable', cats:['web'],
       desc:'Juego incremental en HTML: un hongo que crece, suelta esporas y se expande. Mejoras, prestigio y niveles para seguir avanzando.',
       feats:['Mejoras para crecer más rápido','Sistema de prestigio','Niveles de progreso'],
-      tags:['HTML','JavaScript','Idle'], demo:'demos/micelio/', code:REPO+'micelio' },
+      tags:['HTML','JavaScript','Idle'], img:'assets/shots/micelio.webp', demo:'demos/micelio/', code:REPO+'micelio' },
     { num:'02', title:'APEX RUSH', bg:'#6B2A1F', status:'Demo jugable', cats:['web'],
       desc:'Juego de carreras en 3D con gráficos en HD y multijugador por red local. Cada auto tiene su propio sonido y varias skins para elegir.',
       feats:['Carreras en 3D','Sonido distinto para cada auto','Skins para personalizar','Multijugador en red local'],
-      tags:['3D','Multijugador','Carreras'], demo:'demos/apex-rush/', code:REPO+'apex-rush' },
+      tags:['3D','Multijugador','Carreras'], img:'assets/shots/apex-rush.webp', demo:'demos/apex-rush/', code:REPO+'apex-rush' },
     { num:'03', title:'Strike 3D', bg:'#2A3550', status:'Demo jugable', cats:['web'],
       desc:'Shooter en primera persona hecho en HTML, de estilo táctico: modelos 3D y armas con disparo y daño.',
       feats:['Modelos 3D','Armas con disparo y daño','Se juega en el navegador','Las salas online solo funcionan dentro de Claude'],
-      tags:['3D','FPS','Three.js'], demo:'demos/strike-3d/', code:REPO+'strike-3d' },
+      tags:['3D','FPS','Three.js'], img:'assets/shots/strike-3d.webp', demo:'demos/strike-3d/', code:REPO+'strike-3d' },
     { num:'04', title:'Polvo Estelar', bg:'#4A2F63', status:'Demo jugable', cats:['movil','web'],
       desc:'Juego incremental inactivo pensado para Android, con mecánicas propias que no vas a encontrar en otros idle. La demo se juega en el navegador.',
       feats:['Progreso mientras no jugás','Funciones únicas','Pensado para pantalla de celular'],
-      tags:['Android','Idle','Móvil'], demo:'demos/polvo-estelar/', code:REPO+'polvo-estelar' },
+      tags:['Android','Idle','Móvil'], img:'assets/shots/polvo-estelar.webp', demo:'demos/polvo-estelar/', code:REPO+'polvo-estelar' },
     { num:'05', title:'El faro de Marea', bg:'#5A4A16', status:'Demo jugable', cats:['web'],
       desc:'Un juego que enseña conceptos de programación a través de una historia, para aprender sin sentir que es una clase.',
       feats:['Conceptos de programación contados como historia','Visual e interactivo'],
-      tags:['Narrativa','Educativo'], demo:'demos/faro-de-marea/', code:REPO+'faro-de-marea' },
+      tags:['Narrativa','Educativo'], img:'assets/shots/faro-de-marea.webp', demo:'demos/faro-de-marea/', code:REPO+'faro-de-marea' },
     { num:'06', title:'La Banda del Barrio', bg:'#1F4E5C', status:'Serie en curso', cats:['video'],
       desc:'Serie de videos para YouTube creada con prompts, con Toño, Camperita, Pika y Javier como protagonistas.',
       feats:['Personajes: Toño, Camperita, Pika y Javier','Historias armadas con prompts'],
@@ -161,7 +163,8 @@
     }
     $('projects').replaceChildren(...list.map(({ p, idx }) =>
       h('button', { type: 'button', class: 'card', 'aria-label': 'Ver detalles de ' + p.title, onclick: () => openProject(idx) },
-        h('span', { class: 'thumb', style: { background: safeColor(p.bg) } },
+        h('span', { class: 'thumb' + (safeImg(p.img) ? ' has-img' : ''), style: { background: safeColor(p.bg) } },
+          safeImg(p.img) && h('img', { src: safeImg(p.img), alt: 'Captura de ' + p.title, loading: 'lazy', decoding: 'async', width: 960, height: 540 }),
           h('span', { class: 'num' }, p.num),
           h('span', { class: 'status' }, p.status)),
         h('span', { class: 'card-body' },
@@ -175,7 +178,11 @@
   const modal = $('modal');
   function openProject(i) {
     const p = projects[i];
-    $('m-thumb').style.background = safeColor(p.bg);
+    const mt = $('m-thumb');
+    mt.style.background = safeColor(p.bg);
+    mt.classList.toggle('has-img', !!safeImg(p.img));
+    mt.querySelectorAll('img').forEach(i => i.remove());
+    if (safeImg(p.img)) mt.prepend(h('img', { src: safeImg(p.img), alt: 'Captura de ' + p.title, width: 960, height: 540 }));
     $('m-num').textContent = p.num; $('m-status').textContent = p.status;
     $('m-title').textContent = p.title; $('m-desc').textContent = p.desc;
     $('m-feats').replaceChildren(...p.feats.map(f => h('li', {}, f)));
@@ -297,6 +304,146 @@
       gain(500); renderGame(); save();
       toast('¡Código secreto! Nuevo color y +500 esporas');
     }
+  });
+
+  /* ---------- Terminal secreta ---------- */
+  const term = $('term'), tOut = $('term-out'), tIn = $('term-in');
+  const history = []; let hPos = 0, welcomed = false;
+
+  function print(text, cls) {
+    tOut.append(h('div', { class: cls || '' }, text));
+    tOut.scrollTop = tOut.scrollHeight;
+  }
+  function printLink(label, url) {
+    const safe = safeUrl(url); if (!safe) return;
+    tOut.append(h('div', {}, '  ', h('a', { href: safe, target: '_blank', rel: 'noopener noreferrer' }, label)));
+    tOut.scrollTop = tOut.scrollHeight;
+  }
+  function openUrl(url) {
+    const safe = safeUrl(url); if (!safe) return false;
+    h('a', { href: safe, target: '_blank', rel: 'noopener noreferrer' }).click();
+    return true;
+  }
+  function findProject(arg) {
+    if (!arg) return null;
+    const a = arg.toLowerCase();
+    const n = parseInt(a, 10);
+    if (n >= 1 && n <= projects.length) return projects[n - 1];
+    return projects.find(p => p.title.toLowerCase().replace(/\s+/g, '-').includes(a.replace(/\s+/g, '-'))) || null;
+  }
+  function openTerm() {
+    if (term.open) return;
+    term.showModal ? term.showModal() : term.setAttribute('open', '');
+    if (!welcomed) {
+      welcomed = true;
+      print('Bienvenido a la terminal de Gastón Román.', 't-ok');
+      print('Escribí "ayuda" para ver los comandos. Tab completa, ↑ ↓ recorren el historial, Esc cierra.', 't-dim');
+    }
+    setTimeout(() => tIn.focus(), 0);
+  }
+  const closeTerm = () => (term.close ? term.close() : term.removeAttribute('open'));
+
+  const commands = {
+    ayuda: { help: 'muestra esta lista', run() {
+      Object.entries(commands).filter(([, c]) => c.help).forEach(([k, c]) => print(('  ' + k).padEnd(20) + c.help));
+    } },
+    proyectos: { help: 'lista mis proyectos', run() {
+      projects.forEach((p, i) => print(`  ${i + 1}. ${p.title.padEnd(22)} ${p.status}`));
+      print('Probá: jugar 1  ·  info apex  ·  codigo strike', 't-dim');
+    } },
+    jugar: { help: 'abre la demo (ej: jugar micelio)', run(arg) {
+      const p = findProject(arg);
+      if (!p) return print('¿Cuál? Escribí "jugar" y el número o nombre del proyecto.', 't-err');
+      if (!openUrl(p.demo)) return print(`${p.title} todavía no tiene demo.`, 't-err');
+      print(`Abriendo ${p.title} en otra pestaña…`, 't-ok');
+    } },
+    codigo: { help: 'abre el código de un proyecto', run(arg) {
+      const p = findProject(arg);
+      if (!p) return print('¿Cuál? Ej: codigo 2', 't-err');
+      if (!openUrl(p.code)) return print(`${p.title} no tiene código publicado.`, 't-err');
+      print(`Abriendo el código de ${p.title}…`, 't-ok');
+    } },
+    info: { help: 'muestra el detalle de un proyecto', run(arg) {
+      const i = projects.indexOf(findProject(arg));
+      if (i < 0) return print('¿Cuál? Ej: info 3', 't-err');
+      closeTerm(); openProject(i);
+    } },
+    sobre: { help: 'quién soy', run() {
+      print('Gastón Román. Hago juegos para el navegador, Android y red local,');
+      print('y escribo historias para YouTube con personajes propios.');
+    } },
+    habilidades: { help: 'con qué trabajo', run() {
+      skills.forEach(s => print(`  ${s.area}: ${s.items.join(', ')}`));
+    } },
+    contacto: { help: 'cómo escribirme', run() {
+      print('  Email:  ' + email);
+      printLink('GitHub: github.com/Bygastin', 'https://github.com/Bygastin');
+    } },
+    ir: { help: 'va a una sección (proyectos, probar, sobre-mi, habilidades, contacto)', run(arg) {
+      const ids = ['inicio', 'proyectos', 'probar', 'sobre-mi', 'habilidades', 'contacto'];
+      const id = ids.find(x => arg && x.startsWith(arg.toLowerCase()));
+      if (!id) return print('Secciones: ' + ids.join(', '), 't-err');
+      closeTerm(); $(id).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+    } },
+    tema: { help: 'cambia entre claro y oscuro', run() {
+      $('theme').click(); print('Tema: ' + (document.documentElement.dataset.theme === 'light' ? 'claro' : 'oscuro'), 't-ok');
+    } },
+    esporas: { help: 'tu progreso en Mini Micelio', run() {
+      print(`  Esporas: ${fmt(g.spores)}  ·  Hifas: ${g.hifas}  ·  Esporas dobles: ${g.dobles}`);
+      print(`  Total juntado: ${fmt(g.total)}`, 't-dim');
+    } },
+    cosechar: { help: 'junta esporas desde la terminal', run() {
+      const n = 25 + perSec() * 10; gain(n); renderGame(); save();
+      print(`+${fmt(n)} esporas cosechadas. Ahora tenés ${fmt(g.spores)}.`, 't-ok');
+    } },
+    historial: { help: 'comandos que usaste', run() {
+      history.forEach((c, i) => print(`  ${String(i + 1).padStart(3)}  ${c}`));
+    } },
+    limpiar: { help: 'limpia la pantalla', run() { tOut.replaceChildren(); } },
+    salir: { help: 'cierra la terminal', run() { closeTerm(); } },
+    // comandos escondidos (no salen en "ayuda")
+    hola: { run() { print('¡Hola! Gracias por pasar. Probá "jugar apex".', 't-ok'); } },
+    sudo: { run() { print('Permiso denegado: acá el único administrador es el hongo.', 't-err'); } },
+    secreto: { run() { print('Pista: ↑ ↑ ↓ ↓ ← → ← → B A (fuera de la terminal).', 't-dim'); } },
+    fecha: { run() { print(new Date().toLocaleString('es-AR')); } }
+  };
+  const alias = { help: 'ayuda', ls: 'proyectos', clear: 'limpiar', cls: 'limpiar', exit: 'salir', whoami: 'sobre',
+                  play: 'jugar', code: 'codigo', 'código': 'codigo', cd: 'ir', theme: 'tema', contact: 'contacto' };
+
+  function run(line) {
+    const text = line.trim().slice(0, 80);
+    print('> ' + text, 't-cmd');
+    if (!text) return;
+    history.push(text); if (history.length > 50) history.shift(); hPos = history.length;
+    const [rawCmd, ...rest] = text.split(/\s+/);
+    const name = alias[rawCmd.toLowerCase()] || rawCmd.toLowerCase();
+    const cmd = Object.prototype.hasOwnProperty.call(commands, name) ? commands[name] : null;
+    if (!cmd) {
+      const guess = Object.keys(commands).find(k => commands[k].help && k.startsWith(name.slice(0, 2)));
+      return print(`No conozco "${rawCmd}".` + (guess ? ` ¿Quisiste decir "${guess}"?` : ' Escribí "ayuda".'), 't-err');
+    }
+    cmd.run(rest.join(' '));
+  }
+
+  tIn.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { run(tIn.value); tIn.value = ''; }
+    else if (e.key === 'ArrowUp') { if (hPos > 0) { hPos--; tIn.value = history[hPos]; } e.preventDefault(); }
+    else if (e.key === 'ArrowDown') { hPos = Math.min(hPos + 1, history.length); tIn.value = history[hPos] || ''; e.preventDefault(); }
+    else if (e.key === 'Tab') {
+      e.preventDefault();
+      const v = tIn.value.toLowerCase();
+      const matches = Object.keys(commands).filter(k => commands[k].help && k.startsWith(v));
+      if (matches.length === 1) tIn.value = matches[0] + ' ';
+      else if (matches.length > 1) print(matches.join('   '), 't-dim');
+    }
+    e.stopPropagation(); // que el código secreto no se active mientras escribís
+  });
+  $('term-open').addEventListener('click', openTerm);
+  $('term-x').addEventListener('click', closeTerm);
+  term.addEventListener('click', e => { if (e.target === term) closeTerm(); });
+  addEventListener('keydown', e => {
+    const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement && document.activeElement.tagName);
+    if (e.code === 'Backquote' && !typing && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); openTerm(); }
   });
 
   $('year').textContent = new Date().getFullYear();
