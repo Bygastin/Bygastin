@@ -54,16 +54,25 @@
       <a href="https://bygastin.github.io/Bygastin/demos/faro-de-marea/">▶ Jugar</a> · <a href="demos/faro-de-marea">Código</a>
     </td>
     <td width="50%" valign="top">
+      <a href="https://bygastin.github.io/Bygastin/demos/cuentas-claras/"><img src="assets/shots/cuentas-claras.webp" alt="Captura de Cuentas Claras"></a>
+      <h3>Cuentas Claras</h3>
+      App para Android de gastos compartidos sin cuentas: te dice quién le paga a quién. Se comparte con un QR y funciona sin internet.<br><br>
+      <a href="https://bygastin.github.io/Bygastin/demos/cuentas-claras/">▶ Probar</a> · <a href="demos/cuentas-claras">Código</a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
       <h3>🎬 La Banda del Barrio</h3>
       Serie de videos para YouTube armada con prompts, con Toño, Camperita, Pika y Javier como protagonistas.<br><br>
       <i>Episodios en camino.</i>
     </td>
+    <td width="50%" valign="top"></td>
   </tr>
 </table>
 
 ## 🛠️ Con qué trabajo
 
-`HTML` `CSS` `JavaScript` `Three.js` `Juegos 3D en el navegador` `Multijugador LAN` `Idle / incrementales` `Android` `Narrativa`
+`HTML` `CSS` `JavaScript` `Three.js` `Juegos 3D en el navegador` `Multijugador LAN` `Idle / incrementales` `Android` `PWA` `Narrativa`
 
 ---
 
