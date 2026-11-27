@@ -79,7 +79,11 @@
       desc:'Un juego que enseña conceptos de programación a través de una historia, para aprender sin sentir que es una clase.',
       feats:['Conceptos de programación contados como historia','Visual e interactivo'],
       tags:['Narrativa','Educativo'], img:'assets/shots/faro-de-marea.webp', demo:'demos/faro-de-marea/', code:REPO+'faro-de-marea' },
-    { num:'06', title:'La Banda del Barrio', bg:'#1F4E5C', status:'Serie en curso', cats:['video'],
+    { num:'06', title:'Cuentas Claras', bg:'#0F5C45', status:'App lista', cats:['movil','web'],
+      desc:'App para Android de gastos compartidos sin cuentas: anotás quién pagó qué en el viaje o la casa y te dice quién le paga a quién, con la menor cantidad de transferencias.',
+      feats:['Sin registrarse: el grupo se comparte con un link o un QR','Si dos celus anotan gastos, se combinan sin pisarse','Funciona sin internet y se instala como app','Resumen para mandar por WhatsApp'],
+      tags:['Android','PWA','JavaScript'], img:'assets/shots/cuentas-claras.webp', demo:'demos/cuentas-claras/', code:REPO+'cuentas-claras' },
+    { num:'07', title:'La Banda del Barrio', bg:'#1F4E5C', status:'Serie en curso', cats:['video'],
       desc:'Serie de videos para YouTube creada con prompts, con Toño, Camperita, Pika y Javier como protagonistas.',
       feats:['Personajes: Toño, Camperita, Pika y Javier','Historias armadas con prompts'],
       tags:['YouTube','Prompts','Historias'], demo:'', code:'' }
